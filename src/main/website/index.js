@@ -95,7 +95,7 @@ export default function Web(props) {
                   <div className="content-box d-flex flex-wrap align-items-center justify-content-between">
                     <div className="item">
                       <p>Location</p>
-                      <span>New York</span>
+                      <span>Cantoment</span>
                     </div>
                     <div className="item">
                       <p>Type</p>
@@ -123,7 +123,7 @@ export default function Web(props) {
                   <div className="content-box d-flex flex-wrap align-items-center justify-content-between">
                     <div className="item">
                       <p>Location</p>
-                      <span>New York</span>
+                      <span>East Legon</span>
                     </div>
                     <div className="item">
                       <p>Type</p>
@@ -151,7 +151,7 @@ export default function Web(props) {
                   <div className="content-box d-flex flex-wrap align-items-center justify-content-between">
                     <div className="item">
                       <p>Location</p>
-                      <span>New York</span>
+                      <span>Accr Newtown</span>
                     </div>
                     <div className="item">
                       <p>Type</p>
