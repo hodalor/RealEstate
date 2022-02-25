@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
 
 export default function Login(props) {
+  // handle login function
+  const _handleLogin = async () => {
+    props.onLogin();
+  };
+
   return (
     <div className="site-wrapper overflow-hidden position-relative">
       {/* Sign In Area */}
@@ -9,7 +14,7 @@ export default function Login(props) {
           <div className="row justify-content-center">
             <div className="col-lg-7 col-md-8 position-static d-none d-lg-block">
               <div className="inner-page-left-bg">
-                <img src="../assets/image/landing-7/slider-3.png" alt />
+                <img src="../assets/image/landing-7/slider-3.png" alt="back" />
               </div>
             </div>
             <div className="col-lg-5 col-md-8">
@@ -56,13 +61,14 @@ export default function Login(props) {
                     </div>
                   </div>
                   <div className="sign-in-log-btn">
-                    <Link
+                    <button
                       to="/dashboard"
                       type="button"
                       className="btn focus-reset"
+                      onClick={_handleLogin}
                     >
                       Log In
-                    </Link>
+                    </button>
                   </div>
                   <div className="create-new-acc-text">
                     <p>
