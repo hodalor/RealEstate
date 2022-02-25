@@ -193,8 +193,9 @@ export default function Web(props) {
                 <div className="content">
                   <h4>Beautiful Architecture</h4>
                   <p>
-                    Duis aute irure dolor in velit esse reprehen derit in
-                    voluptate cillum dolore eu fugiat nulla.
+                  Our architect  fulfill 
+                  the user's wishes, while simultaneously reinvent new ways of living 
+                  the day-to-day. 
                   </p>
                 </div>
               </div>
@@ -215,8 +216,9 @@ export default function Web(props) {
                 <div className="content">
                   <h4>Best Location</h4>
                   <p>
-                    Duis aute irure dolor in velit esse reprehen derit in
-                    voluptate cillum dolore eu fugiat nulla.
+                  Important amenities such as water, electricy and many more are available at our 
+                  sites, we know most people want convinient places.
+
                   </p>
                 </div>
               </div>
@@ -237,8 +239,8 @@ export default function Web(props) {
                 <div className="content">
                   <h4>Affordable Price</h4>
                   <p>
-                    Duis aute irure dolor in velit esse reprehen derit in
-                    voluptate cillum dolore eu fugiat nulla.
+                 Our housing units are affordable to everybody including those section of society whose
+                   income is below the median household income.
                   </p>
                 </div>
               </div>
@@ -375,7 +377,7 @@ export default function Web(props) {
                   </div>
                   <div className="item-content">
                     <h4>Easy Payment Method</h4>
-                    <p>Contray to popular belief, Lorem ipsum</p>
+                    <p>Make Payment only if you are satisfied with property</p>
                   </div>
                 </div>
                 <div
@@ -389,7 +391,7 @@ export default function Web(props) {
                   </div>
                   <div className="item-content">
                     <h4>Fixed Fee &amp; Suppo</h4>
-                    <p>Contray to popular belief, Lorem ipsum</p>
+                    <p>No extra or hidden charges </p>
                   </div>
                 </div>
                 <div
@@ -402,8 +404,8 @@ export default function Web(props) {
                     <span>3</span>
                   </div>
                   <div className="item-content">
-                    <h4>Tax Advantage</h4>
-                    <p>Contray to popular belief, Lorem ipsum</p>
+                    <h4>Social Amenities</h4>
+                    <p>You dont have to worry about water electricy, and others</p>
                   </div>
                 </div>
                 <div
@@ -417,7 +419,7 @@ export default function Web(props) {
                   </div>
                   <div className="item-content">
                     <h4>Property Insurance</h4>
-                    <p>Contray to popular belief, Lorem ipsum</p>
+                    <p>We got you covered for all the properties you purchase from us </p>
                   </div>
                 </div>
               </div>
@@ -460,8 +462,8 @@ export default function Web(props) {
                   </div>
                   <div className="video-card d-flex align-items-center justify-content-between">
                     <div className="content">
-                      <h6>Gustavo George</h6>
-                      <span>West London, Uk</span>
+                      <h6>Godwin Hodalor</h6>
+                      <span>West Legon</span>
                     </div>
                     <div className="video-icon-area">
                       <a
@@ -492,11 +494,11 @@ export default function Web(props) {
                     />
                   </div>
                   <div className="content">
-                    <h4>Gustavo George</h4>
+                    <h4>Godwin Hodalor</h4>
                     <p>
-                      “Saya tuh kalau pengin beli rumah pasti yagn selalu mahal.
-                      Saya tuh gak pengin rumah yang jelek kaya punya kau.
-                      Pokoknya saya ganteng.”
+                      “All the processes was on point everything was transparent
+                      and the house was exaly what i saw on their site, no hidden
+                      charges no land guard issues”
                     </p>
                   </div>
                 </div>
@@ -514,9 +516,8 @@ export default function Web(props) {
                     <div className="section__heading-3">
                       <h2>Testimonials from lovely previous buyers.</h2>
                       <p>
-                        Sed ultrices nisl velit, eu ornare est ullamcorper a.
-                        Nunc quis nibh magna. Proin risus erat, fringilla vel
-                        purus.
+                     Thank you HodalorEestate for been the reason why i have a good place to sleep
+
                       </p>
                     </div>
                   </div>
@@ -567,16 +568,16 @@ export default function Web(props) {
                   <img src="../assets/image/logo/logo-black.png" alt="image" />
                 </a>
                 <p>
-                  Lorem Ipsum is simply dummy text of the printing and
-                  typesetting industry. Lorem Ipsum has been the industry's
-                  standard dummy text.
+                  we are real estate development Company that provide
+                  affordable yet quality properties for ghanaian including those section of society whose
+                   income is below the median household income.
                 </p>
               </div>
             </div>
             <div className="offset-xl-2 col-xl-2 col-lg-3 col-sm-4">
               <h3>Company</h3>
               <ul className="list-unstyled">
-                <li>
+                {/* <li>
                   <a href="#">Global location</a>
                 </li>
                 <li>
@@ -586,8 +587,8 @@ export default function Web(props) {
                   <a href="#">Careers </a>
                 </li>
                 <li>
-                  <a href="#">Investors </a>
-                </li>
+                  <a href="#">Investors </a> */}
+                {/* </li> */}
                 <li>
                   <a href="#">News rooms </a>
                 </li>
@@ -597,10 +598,10 @@ export default function Web(props) {
               <h3>Impact</h3>
               <ul className="list-unstyled">
                 <li>
-                  <a href="#">Creator awards</a>
+                  <a href="#">princehodalor@mail.com</a>
                 </li>
                 <li>
-                  <a href="#">Creative ideas</a>
+                  <a href="#">+233 24 398 4046</a>
                 </li>
                 <li>
                   <a href="#">Refuge initiatives </a>
@@ -610,7 +611,7 @@ export default function Web(props) {
                 </li>
               </ul>
             </div>
-            <div className="col-xl-2 col-lg-2 col-sm-4">
+            {/* <div className="col-xl-2 col-lg-2 col-sm-4">
               <h3>Partnership</h3>
               <ul className="list-unstyled">
                 <li>
@@ -626,7 +627,7 @@ export default function Web(props) {
                   <a href="#">Push door </a>
                 </li>
               </ul>
-            </div>
+            </div> */}
           </div>
         </div>
       </footer>
