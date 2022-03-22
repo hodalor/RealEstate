@@ -61,16 +61,32 @@
       rel="stylesheet"
       href="%PUBLIC_URL%/assets/plugins/slick/slick.min.css"
     />
-    <!-- <link href="%PUBLIC_URL%/assets2/css/vendor/all.css" rel="stylesheet" />
-    <link href="%PUBLIC_URL%/assets2/css/app/app.css" rel="stylesheet" /> -->
     <!-- Vendor stylesheets  -->
     <link rel="stylesheet" href="%PUBLIC_URL%/assets/css/main.css" />
+
+    <!-- styles for theme 2 -->
+    <link
+      rel="stylesheet"
+      href="%PUBLIC_URL%/assets2/plugins/bootstrap/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="%PUBLIC_URL%/assets2/plugins/charts-c3/plugin.css"
+    />
+    <link
+      rel="stylesheet"
+      href="%PUBLIC_URL%/assets2/plugins/jvectormap/jquery-jvectormap-2.0.3.min.css"
+    />
+    <!-- Custom Css -->
+    <link rel="stylesheet" href="%PUBLIC_URL%/assets2/css/main.css" />
+    <link rel="stylesheet" href="%PUBLIC_URL%/assets2/css/color_skins.css" />
     <title>Real Estate</title>
   </head>
   <body
     data-theme-mode-panel-active
     data-theme="light"
     style="font-family: 'Mazzard H'"
+    class="theme-purple"
   >
     <div id="root"></div>
 
@@ -87,9 +103,19 @@
     <script src="%PUBLIC_URL%/assets/plugins/isotope/packery.pkgd.min.js"></script>
     <script src="%PUBLIC_URL%/assets/plugins/isotope/image.loaded.js"></script>
     <script src="%PUBLIC_URL%/assets/plugins/menu/menu.js"></script>
-    <!-- <script src="%PUBLIC_URL%/assets2/js/vendor/all.js"></script>
-    <script src="%PUBLIC_URL%/assets2/js/app/app.js"></script> -->
     <!-- Activation Script -->
     <script src="%PUBLIC_URL%/assets/js/custom.js"></script>
+
+    <!-- scripts for theme 2 -->
+    <!-- Jquery Core Js -->
+    <script src="%PUBLIC_URL%/assets2/bundles/libscripts.bundle.js"></script>
+    <script src="%PUBLIC_URL%/assets2/bundles/vendorscripts.bundle.js"></script>
+
+    <script src="%PUBLIC_URL%/assets2/bundles/c3.bundle.js"></script>
+    <script src="%PUBLIC_URL%/assets2/bundles/jvectormap.bundle.js"></script>
+    <script src="%PUBLIC_URL%/assets2/bundles/knob.bundle.js"></script>
+
+    <script src="%PUBLIC_URL%/assets2/bundles/mainscripts.bundle.js"></script>
+    <script src="%PUBLIC_URL%/assets2/js/pages/index.js"></script>
   </body>
 </html>

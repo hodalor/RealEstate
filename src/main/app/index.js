@@ -1,9 +1,11 @@
+import { useContext } from "react";
 import { Redirect } from "react-router-dom";
+import { AuthContext } from "../libs/contexts/authContext";
 
-export default function MainApp(props) {
+export default function MainApp() {
+  const {authState} = useContext(AuthContext)
   // get role from props
-  const userType = props.userType || props.history.location.userType;
-  console.log(userType);
+  const userType = authState.userType
 
   // show page based on user type
   if (userType === "" || userType === undefined) {

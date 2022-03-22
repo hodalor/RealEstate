@@ -1,10 +1,9 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../libs/contexts/authContext";
 
-export default function Login(props) {
-  // handle login function
-  const _handleLogin = async () => {
-    props.onLogin();
-  };
+export default function Login() {
+  const {_handleLogin} = useContext(AuthContext)
 
   return (
     <div className="site-wrapper overflow-hidden position-relative">

@@ -17,8 +17,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "git-pushs": "git add . && git status && git commit -m'commiting-changes' && git push origin master",
-    "git-pull": "git add . && git status && git commit -m'commiting-changes-to-pull' && git pull origin master"
+    "deploy": "git add . && git status && git commit -m'commiting-changes' && git push origin master",
+    "pull": "git add . && git status && git commit -m'commiting-changes-to-pull' && git pull origin master"
   },
   "eslintConfig": {
     "extends": [
