@@ -10,9 +10,9 @@ import NotAuth from "./app/pages/errPages/not-auth";
 import Buyers from "./app/pages/byers";
 import Agents from "./app/pages/agents";
 import Admin from "./app/pages/admins";
+import Support from "./app/pages/others/support";
 
 export default function Main() {
-
   return (
     <Switch>
       <Route exact path="/" render={(props) => <Web {...props} />} />
@@ -25,6 +25,7 @@ export default function Main() {
         <Route path="/agents" component={Agents} />
         <Route path="/admin" component={Admin} />
         <Route path="/check" component={MainApp} />
+        <Route path="/support" component={Support} />
       </AuthContextProvider>
     </Switch>
   );

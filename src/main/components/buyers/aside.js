@@ -1,6 +1,9 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { BuyersContext } from "../../libs/contexts/buyersContext";
 
 export default function Aside() {
+  const {_navigateToAgents} = useContext(BuyersContext)
   return (
     <div>
       <aside id="leftsidebar" className="sidebar">
@@ -104,8 +107,8 @@ export default function Aside() {
                     </li>
                   </ul>
                 </li>
-                <li>
-                  <Link to="/properties/agents">
+                <li role="button" type="button" onClick={_navigateToAgents}>
+                  <Link>
                     <i className="fa fa-users" />
                     <span>Agents</span>
                   </Link>
@@ -117,7 +120,7 @@ export default function Aside() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/properties/listings">
+                  <Link to="/support">
                     <i className="fa fa-headset" />
                     <span>Support</span>
                   </Link>

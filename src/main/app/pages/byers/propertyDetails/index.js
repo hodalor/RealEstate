@@ -83,25 +83,25 @@ export default function ItemDetails() {
                 ipsum' will uncover many web sites still in their infancy.{" "}
               </p>
               <small className="text-muted">
-                <i className="zmdi zmdi-pin mr-2" />
+                <i className="fa fa-map-marker mr-2" />
                 245 E 20th St, New York, NY 201609
               </small>
               <div className="d-flex flex-wrap justify-content-start mt-3 p-3 bg-light">
                 <a href="#" className="w100" title="Square Feet">
-                  <i className="zmdi zmdi-view-dashboard mr-2" />
+                  <i className="fa fa-home mr-2" />
                   <span>280</span>
                 </a>
                 <a href="#" className="w100" title="Bedroom">
-                  <i className="zmdi zmdi-hotel mr-2" />
+                  <i className="fa fa-hotel mr-2" />
                   <span>4</span>
                 </a>
                 <a href="#" className="w100" title="Parking space">
-                  <i className="zmdi zmdi-car-taxi mr-2" />
+                  <i className="fa fa-car mr-2" />
                   <span>2</span>
                 </a>
-                <a href="#" className="w100" title="Garages">
-                  <i className="zmdi zmdi-home mr-2" />
-                  <span> 24H</span>
+                <a href="#" className="w100" title="bath rooms">
+                  <i className="fa fa-shower mr-2" />
+                  <span>2</span>
                 </a>
               </div>
             </div>
@@ -112,73 +112,41 @@ export default function ItemDetails() {
                 <strong>General</strong> Amenities
                 <small>Description Text Here...</small>
               </h2>
-              <ul className="header-dropdown">
-                <li className="dropdown">
-                  {" "}
-                  <a
-                    href="javascript:void(0);"
-                    className="dropdown-toggle"
-                    data-toggle="dropdown"
-                    role="button"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    {" "}
-                    <i className="zmdi zmdi-more" />{" "}
-                  </a>
-                  <ul className="dropdown-menu dropdown-menu-right slideUp">
-                    <li>
-                      <a href="javascript:void(0);">Action</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">Another action</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">Something else</a>
-                    </li>
-                  </ul>
-                </li>
-                <li className="remove">
-                  <a role="button" className="boxs-close">
-                    <i className="zmdi zmdi-close" />
-                  </a>
-                </li>
-              </ul>
             </div>
             <div className="body">
               <div className="row clearfix">
                 <div className="col-sm-4">
                   <ul className="list-group">
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Swimming pool
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Air conditioning
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Internet
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Radio
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Balcony
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Roof terrace
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Cable TV
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Electricity
                     </li>
                   </ul>
@@ -186,31 +154,31 @@ export default function ItemDetails() {
                 <div className="col-sm-4">
                   <ul className="list-group">
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Terrace
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Cofee pot
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Oven
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Towelwes
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Computer
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Grill
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Parquet
                     </li>
                   </ul>
@@ -218,31 +186,31 @@ export default function ItemDetails() {
                 <div className="col-sm-4">
                   <ul className="list-group">
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Dishwasher
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Near Green Zone
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Near Church
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Near Hospital
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Near School
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Near Shop
                     </li>
                     <li className="list-group-item">
-                      <i className="zmdi zmdi-check-circle mr-2" />
+                      <i className="fa fa-check-circle mr-2" />
                       Natural Gas
                     </li>
                   </ul>
@@ -263,29 +231,29 @@ export default function ItemDetails() {
         <div className="col-lg-4 col-md-12">
           <div className="card">
             <div className="body text-center">
-              <a href="#">
+              <span>
                 <img
                   src="../../../assets2/images/sm/avatar1.jpg"
                   className="rounded-circle"
                   alt="profile-image"
                 />
-              </a>
+              </span>
               <h4 className="m-t-10">Eliana Smith</h4>
               <div className="col-12">
                 <ul className="d-flex justify-content-center list-unstyled">
                   <li className="w30">
                     <a title="facebook" href="#">
-                      <i className="zmdi zmdi-facebook" />
+                      <i className="fab fa-facebook" />
                     </a>
                   </li>
                   <li className="w30">
                     <a title="twitter" href="#">
-                      <i className="zmdi zmdi-twitter" />
+                      <i className="fab fa-twitter" />
                     </a>
                   </li>
                   <li className="w30">
                     <a title="instagram" href="#">
-                      <i className="zmdi zmdi-instagram" />
+                      <i className="fab fa-instagram" />
                     </a>
                   </li>
                 </ul>
@@ -296,15 +264,15 @@ export default function ItemDetails() {
               <div className="row">
                 <div className="col-4">
                   <h5>18</h5>
-                  <small>Files</small>
+                  <small>Properties</small>
                 </div>
                 <div className="col-4">
-                  <h5>2GB</h5>
-                  <small>Used</small>
+                  <h5>10</h5>
+                  <small>Clean Deals</small>
                 </div>
                 <div className="col-4">
-                  <h5>65,6$</h5>
-                  <small>Spent</small>
+                  <h5>2yrs</h5>
+                  <small>Member for</small>
                 </div>
               </div>
             </div>
@@ -314,61 +282,8 @@ export default function ItemDetails() {
               <h2>
                 <strong>Request</strong> Inquiry
               </h2>
-              <ul className="header-dropdown">
-                <li className="dropdown">
-                  {" "}
-                  <a
-                    href="javascript:void(0);"
-                    className="dropdown-toggle"
-                    data-toggle="dropdown"
-                    role="button"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    {" "}
-                    <i className="zmdi zmdi-more" />{" "}
-                  </a>
-                  <ul className="dropdown-menu dropdown-menu-right slideUp float-right">
-                    <li>
-                      <a href="javascript:void(0);">Edit</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">Delete</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">Report</a>
-                    </li>
-                  </ul>
-                </li>
-                <li className="remove">
-                  <a role="button" className="boxs-close">
-                    <i className="zmdi zmdi-close" />
-                  </a>
-                </li>
-              </ul>
             </div>
             <div className="body">
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Name"
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Mobile No."
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Email"
-                />
-              </div>
               <div className="form-group">
                 <textarea
                   rows={4}
@@ -377,11 +292,11 @@ export default function ItemDetails() {
                   defaultValue={""}
                 />
               </div>
-              <button type="submit" className="btn btn-primary btn-round">
+              <button type="button" className="btn btn-primary btn-round">
                 Submit
               </button>
               <button
-                type="submit"
+                type="button"
                 className="btn btn-default btn-round btn-simple"
               >
                 Cancel
@@ -391,40 +306,8 @@ export default function ItemDetails() {
           <div className="card">
             <div className="header">
               <h2>
-                <strong>Location</strong>
+                <strong>Details</strong>
               </h2>
-              <ul className="header-dropdown">
-                <li className="dropdown">
-                  {" "}
-                  <a
-                    href="javascript:void(0);"
-                    className="dropdown-toggle"
-                    data-toggle="dropdown"
-                    role="button"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    {" "}
-                    <i className="zmdi zmdi-more" />{" "}
-                  </a>
-                  <ul className="dropdown-menu dropdown-menu-right slideUp float-right">
-                    <li>
-                      <a href="javascript:void(0);">Edit</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">Delete</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);">Report</a>
-                    </li>
-                  </ul>
-                </li>
-                <li className="remove">
-                  <a role="button" className="boxs-close">
-                    <i className="zmdi zmdi-close" />
-                  </a>
-                </li>
-              </ul>
             </div>
             <div className="body">
               <div className="table-responsive">
