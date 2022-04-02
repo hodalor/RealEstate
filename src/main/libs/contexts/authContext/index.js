@@ -14,7 +14,7 @@ export default function AuthContextProvider(props) {
     // handle login here
     setAuthState({
       ...authState,
-      userType: "BUYERS",
+      userType: "ADMIN",
     });
     history.push("/check");
   };

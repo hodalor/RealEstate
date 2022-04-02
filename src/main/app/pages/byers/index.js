@@ -1,5 +1,4 @@
-import { Route } from "react-router-dom";
-import { Switch } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import BuyersStart from "../../../components/buyers";
 import PageTitle from "../../../components/buyers/pagetTitle";
 import BuyersContextProvided from "../../../libs/contexts/buyersContext";
@@ -10,7 +9,7 @@ import Properties from "./properties";
 import ItemDetails from "./propertyDetails";
 import Profile from "./userProfile";
 
-export default function Buyers(props) {
+export default function Buyers() {
   return (
     <div>
       <BuyersContextProvided>
@@ -20,7 +19,11 @@ export default function Buyers(props) {
           <div className="container-fluid">
             <div className="row clearfix">
               <Switch>
-                <Route exact path="/properties/listings" component={Properties} />
+                <Route
+                  exact
+                  path="/properties/listings"
+                  component={Properties}
+                />
                 <Route exact path="/properties/agents" component={Agents} />
                 <Route path="/properties/favorites" component={Favorites} />
                 <Route path="/properties/profile" component={Profile} />
