@@ -8,6 +8,7 @@ import AgentProfile from "./agentDetails";
 import Agents from "./agents";
 import AdminProperties from "./properties";
 import PropertyDetails from "./propertyDetails";
+import Users from "./users";
 
 export default function Admin() {
   return (
@@ -33,6 +34,7 @@ export default function Admin() {
                 component={AgentProfile}
               />
               <Route path="/admin/add-agent/" component={AddAgent} />
+              <Route path="/admin/users/" component={Users} />
               {/* <Route
                 exact
                 path="/agents/notifications"

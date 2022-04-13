@@ -16,9 +16,13 @@ export default function AdminContextProvider(props) {
     history.push("/admin/agents/details/" + data);
   };
 
+  const _routeToUsers = (data) => {
+    history.push("/admin/users/user-details/" + data);
+  };
+
   return (
     <AdminContext.Provider
-      value={{ adminData, _routeToDetails, _routeToAgents }}
+      value={{ adminData, _routeToDetails, _routeToAgents, _routeToUsers }}
     >
       {props.children}
     </AdminContext.Provider>

@@ -1,4 +1,3 @@
-import { useContext } from "react";
 
 export default function AdminPageTitle() {
   return (
@@ -11,14 +10,6 @@ export default function AdminPageTitle() {
           </h2>
         </div>
         <div className="col-lg-5 col-md-6 col-sm-12">
-          <button
-            class="btn btn-white btn-icon btn-round hidden-sm-down float-right ml-3"
-            type="button"
-            // onClick={_routeToAdd}
-            title="add property"
-          >
-            <i class="fa fa-plus"></i>
-          </button>
           <ul className="breadcrumb float-md-right">
             <li className="breadcrumb-item">
               <span>

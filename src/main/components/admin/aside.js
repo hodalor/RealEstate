@@ -61,7 +61,7 @@ export default function AdminAside() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/agents/create-property">
+                  <Link to="/admin/users/">
                     <i className="fa fa-users" />
                     <span>Users</span>
                   </Link>
