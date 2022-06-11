@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { AdminContext } from "../../libs/contexts/adminContext";
 
 export default function AgentsTable() {
-  const { _routeToAgents } = useContext(AdminContext);
+  const { _routeToAgents, adminData } = useContext(AdminContext);
   return (
     <div className="table-responsive">
       <div
@@ -60,7 +60,7 @@ export default function AgentsTable() {
                     aria-label="City: activate to sort column ascending"
                     style={{ width: "66.0156px" }}
                   >
-                    City
+                    Address
                   </th>
                   <th
                     className="sorting"
@@ -71,25 +71,39 @@ export default function AgentsTable() {
                     aria-label="Deal: activate to sort column ascending"
                     style={{ width: "37.0781px" }}
                   >
-                    Deal
+                    Properties
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr onClick={() => _routeToAgents(1)} role="row" className="odd">
-                  <td>
-                    <img
-                      src="../../assets2/images/xs/avatar1.jpg"
-                      className="w30 rounded mr-2"
-                      alt
-                    />{" "}
-                    Karen Eilla Boyette
-                  </td>
-                  <td>areneboyette@armyspy.com</td>
-                  <td>+502-324-4194</td>
-                  <td>Manchester</td>
-                  <td>53</td>
-                </tr>
+                {adminData.agents.length !== 0 ? (
+                  adminData.agents.map((agent, index) => {
+                    var imgUrl = agent.image;
+                    return (
+                      <tr
+                        onClick={() => _routeToAgents(agent)}
+                        role="row"
+                        className="odd"
+                        key={index}
+                      >
+                        <td>
+                          <img
+                            src={imgUrl}
+                            className="w30 rounded mr-2"
+                            alt="agent"
+                          />{" "}
+                          {agent.firstName + " " + agent.lastName}
+                        </td>
+                        <td>{agent.email}</td>
+                        <td>{agent.phone}</td>
+                        <td>{agent.address}</td>
+                        <td>{agent.properties.length}</td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <span>No data found</span>
+                )}
               </tbody>
             </table>
           </div>

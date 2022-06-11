@@ -2,10 +2,12 @@ import { Switch, Route } from "react-router-dom";
 import AdminStart from "../../../components/admin";
 import AdminPageTitle from "../../../components/admin/pageTitle";
 import AdminContextProvider from "../../../libs/contexts/adminContext";
+import AddAdmin from "./addAdmin";
 import AddAgent from "./addAgent";
 import AddProp from "./addProperty";
 import AgentProfile from "./agentDetails";
 import Agents from "./agents";
+import AdminProfile from "./profile";
 import AdminProperties from "./properties";
 import PropertyDetails from "./propertyDetails";
 import Users from "./users";
@@ -34,7 +36,9 @@ export default function Admin() {
                 component={AgentProfile}
               />
               <Route path="/admin/add-agent/" component={AddAgent} />
+              <Route path="/admin/add-admin/" component={AddAdmin} />
               <Route path="/admin/users/" component={Users} />
+              <Route path="/admin/profile/" component={AdminProfile} />
               {/* <Route
                 exact
                 path="/agents/notifications"

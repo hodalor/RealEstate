@@ -23,7 +23,7 @@ export default function AdminAside() {
                 <li>
                   <div className="user-info">
                     <div className="image">
-                      <Link to="/agents/profile/">
+                      <Link to="/admin/profile/">
                         <img
                           src="../assets2/images/profile_av.jpg"
                           alt="User"
@@ -87,7 +87,7 @@ export default function AdminAside() {
                 <li>
                   <div className="user-info m-b-20 p-b-15">
                     <div className="image">
-                      <Link to="/properties/profile">
+                      <Link to="/admin/profile/">
                         <img
                           src="../assets2/images/profile_av.jpg"
                           alt="User"
@@ -110,6 +110,23 @@ export default function AdminAside() {
                   <small className="text-muted">Phone: </small>
                   <p>+ 202-555-0191</p>
                   <hr />
+                </li>
+                <li>
+                  <Link
+                    to="/admin/add-admin/"
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginLeft: "10px",
+                      marginRight: "10px",
+                      color: "white",
+                      height: "30px",
+                    }}
+                    className="btn-sm btn-primary"
+                  >
+                    Add Admin
+                  </Link>
                 </li>
               </ul>
             </div>

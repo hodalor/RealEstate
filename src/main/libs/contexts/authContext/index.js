@@ -8,6 +8,25 @@ export default function AuthContextProvider(props) {
     userType: "",
   });
 
+  const [notiData, setNotiData] = useState({
+    type: "",
+    show: true,
+    msg: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  // ** start noti handlers ** //
+  const _closeNoti = () => {
+    setNotiData({
+      ...notiData,
+      show: false,
+      type: "",
+      msg: "",
+    });
+  };
+  // ** end noti handlers ** //
+
   const history = useHistory();
 
   const _handleLogin = async () => {
@@ -20,7 +39,17 @@ export default function AuthContextProvider(props) {
   };
 
   return (
-    <AuthContext.Provider value={{ authState, _handleLogin }}>
+    <AuthContext.Provider
+      value={{
+        authState,
+        _handleLogin,
+        notiData,
+        _closeNoti,
+        setNotiData,
+        loading,
+        setLoading,
+      }}
+    >
       {props.children}
     </AuthContext.Provider>
   );
