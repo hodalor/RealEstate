@@ -1,12 +1,12 @@
 import { useContext } from "react";
 import { AdminContext } from "../../libs/contexts/adminContext";
 
-export default function UsersTable() {
-  const { _routeToUsers, adminData } = useContext(AdminContext);
-  const customers = adminData.customers;
+export default function AdminNoti() {
+  const { _routeToDetails, adminData } = useContext(AdminContext);
+  const properties = adminData.pending;
 
   return (
-    <div className="table-responsive">
+    <div className="card table-responsive">
       <div
         id="DataTables_Table_0_wrapper"
         className="dataTables_wrapper dt-bootstrap4 no-footer"
@@ -30,7 +30,7 @@ export default function UsersTable() {
                     aria-label="Name: activate to sort column ascending"
                     style={{ width: "157.516px" }}
                   >
-                    Name
+                    Property Name
                   </th>
                   <th
                     className="sorting"
@@ -39,9 +39,9 @@ export default function UsersTable() {
                     rowSpan={1}
                     colSpan={1}
                     aria-label="Email: activate to sort column ascending"
-                    style={{ width: "185.047px" }}
+                    style={{ width: "70px" }}
                   >
-                    Email
+                    Property type
                   </th>
                   <th
                     className="sorting"
@@ -49,9 +49,9 @@ export default function UsersTable() {
                     aria-controls="DataTables_Table_0"
                     rowSpan={1}
                     colSpan={1}
-                    style={{ width: "85.4375px" }}
+                    style={{ width: "30px" }}
                   >
-                    Phone
+                    Approval
                   </th>
                   <th
                     className="sorting"
@@ -59,40 +59,39 @@ export default function UsersTable() {
                     aria-controls="DataTables_Table_0"
                     rowSpan={1}
                     colSpan={1}
-                    aria-label="City: activate to sort column ascending"
-                    style={{ width: "66.0156px" }}
+                    aria-label="Deal: activate to sort column ascending"
+                    style={{ width: "200px" }}
                   >
-                    Status
+                    Location
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {customers !== undefined || customers.length !== 0 ? (
-                  customers.map((customer, index) => {
-                    var imgUrl = customer.image;
+                {properties === undefined || properties.length === 0 ? (
+                  <span>No data found</span>
+                ) : (
+                  properties.map((property, index) => {
                     return (
                       <tr
-                        onClick={() => _routeToUsers(customer)}
                         role="row"
+                        onClick={() => _routeToDetails(property)}
                         className="odd"
                         key={index}
                       >
                         <td>
                           <img
-                            src={imgUrl}
+                            src={property.images.image1}
                             className="w30 rounded mr-2"
-                            alt="cutomer"
+                            alt
                           />{" "}
-                          {customer.firstName + " " + customer.lastName}
+                          {property.name}
                         </td>
-                        <td>{customer.email}</td>
-                        <td>{customer.phone}</td>
-                        <td>{customer.isBlocked ? "Blocked" : "Active"}</td>
+                        <td>{property.propType}</td>
+                        <td>{property.isApproved ? "" : "Pending"}</td>
+                        <td>{property.location}</td>
                       </tr>
                     );
                   })
-                ) : (
-                  <span>No data found</span>
                 )}
               </tbody>
             </table>

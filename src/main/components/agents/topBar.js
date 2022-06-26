@@ -1,6 +1,9 @@
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../libs/contexts/authContext";
 
 export default function AgentsTopBar() {
+  const { _logout } = useContext(AuthContext);
+
   return (
     <div>
       {/* Overlay For Sidebars */}
@@ -152,16 +155,16 @@ export default function AgentsTopBar() {
           </li>
 
           <li className="float-right">
-            <Link
-              to="/login"
+            <span
               type="button"
               role="button"
               className="mega-menu"
               data-close="true"
               title="log out"
+              onClick={_logout}
             >
               <i className="fa fa-power-off" />
-            </Link>
+            </span>
             <a
               href="javascript:void(0);"
               className="js-right-sidebar"

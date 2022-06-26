@@ -7,6 +7,7 @@ import AddAgent from "./addAgent";
 import AddProp from "./addProperty";
 import AgentProfile from "./agentDetails";
 import Agents from "./agents";
+import Notifications from "./notifications";
 import AdminProfile from "./profile";
 import AdminProperties from "./properties";
 import PropertyDetails from "./propertyDetails";
@@ -39,15 +40,11 @@ export default function Admin() {
               <Route path="/admin/add-admin/" component={AddAdmin} />
               <Route path="/admin/users/" component={Users} />
               <Route path="/admin/profile/" component={AdminProfile} />
-              {/* <Route
+              <Route
                 exact
-                path="/agents/notifications"
+                path="/admin/notifications"
                 component={Notifications}
               />
-              <Route
-                path="/agents/notifications/details/:ID"
-                component={NotiDetails}
-              />  */}
               <Route path="/admin/create-property" component={AddProp} />
             </Switch>
           </div>

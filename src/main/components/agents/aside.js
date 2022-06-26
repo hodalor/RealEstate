@@ -1,6 +1,11 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AgentsContext } from "../../libs/contexts/agentsContext";
 
 export default function AgentsAside() {
+  const { agentState } = useContext(AgentsContext);
+  const agent = agentState.agent;
+
   return (
     <div>
       <aside id="leftsidebar" className="sidebar">
@@ -25,14 +30,14 @@ export default function AgentsAside() {
                     <div className="image">
                       <Link to="/agents/profile/">
                         <img
-                          src="../assets2/images/profile_av.jpg"
+                          src={agent !== undefined ? agent.image : ""}
                           alt="User"
                         />
                       </Link>
                     </div>
                     <div className="detail">
-                      <h4>Michael</h4>
-                      <small>Agent</small>
+                      <h4>{agent.firstName + " " + agent.lastName}</h4>
+                      <small>{agent.role}</small>
                     </div>
                   </div>
                 </li>
@@ -131,28 +136,32 @@ export default function AgentsAside() {
                 <li>
                   <div className="user-info m-b-20 p-b-15">
                     <div className="image">
-                      <Link to="/properties/profile">
+                      <Link to="/agents/profile">
                         <img
-                          src="../assets2/images/profile_av.jpg"
+                          src={agent !== undefined ? agent.image : ""}
                           alt="User"
                         />
                       </Link>
                     </div>
                     <div className="detail">
-                      <h4>Michael</h4>
-                      <small>User</small>
+                      <h4>
+                        {agent !== undefined
+                          ? agent.firstName + " " + agent.lastName
+                          : "Name"}
+                      </h4>
+                      <small>{agent.role}</small>
                     </div>
                     <p className="text-muted">
-                      795 Folsom Ave, Suite 600 San Francisco, CADGE 94107
+                      {agent !== undefined ? agent.address : "Address"}
                     </p>
                   </div>
                 </li>
                 <li>
                   <small className="text-muted">Email address: </small>
-                  <p>michael@gmail.com</p>
+                  <p>{agent !== undefined ? agent.email : "Email"}</p>
                   <hr />
                   <small className="text-muted">Phone: </small>
-                  <p>+ 202-555-0191</p>
+                  <p>{agent !== undefined ? agent.phone : "Phone"}</p>
                   <hr />
                 </li>
               </ul>

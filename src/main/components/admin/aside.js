@@ -1,6 +1,11 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AdminContext } from "../../libs/contexts/adminContext";
 
 export default function AdminAside() {
+  const { adminData } = useContext(AdminContext);
+  const admin = adminData.admin;
+
   return (
     <div>
       <aside id="leftsidebar" className="sidebar">
@@ -25,14 +30,14 @@ export default function AdminAside() {
                     <div className="image">
                       <Link to="/admin/profile/">
                         <img
-                          src="../assets2/images/profile_av.jpg"
+                          src={admin !== undefined ? admin.image : ""}
                           alt="User"
                         />
                       </Link>
                     </div>
                     <div className="detail">
-                      <h4>Michael</h4>
-                      <small>Admin</small>
+                      <h4>{admin.firstName + " " + admin.lastName}</h4>
+                      <small>{admin.role}</small>
                     </div>
                   </div>
                 </li>
@@ -55,9 +60,9 @@ export default function AdminAside() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/add-agent/">
+                  <Link to="/admin/add-admin/">
                     <i className="fa fa-user-plus" />
-                    <span>Add Agent</span>
+                    <span>Add admin</span>
                   </Link>
                 </li>
                 <li>
@@ -67,15 +72,9 @@ export default function AdminAside() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/agents/notifications">
+                  <Link to="/admin/notifications">
                     <i className="fa fa-bell" />
                     <span>Notifications</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/support">
-                    <i className="fa fa-headset" />
-                    <span>Support</span>
                   </Link>
                 </li>
               </ul>
@@ -89,26 +88,26 @@ export default function AdminAside() {
                     <div className="image">
                       <Link to="/admin/profile/">
                         <img
-                          src="../assets2/images/profile_av.jpg"
+                          src={admin !== undefined ? admin.image : ""}
                           alt="User"
                         />
                       </Link>
                     </div>
                     <div className="detail">
-                      <h4>Michael</h4>
-                      <small>Admin</small>
+                      <h4>{admin.firstName + " " + admin.lastName}</h4>
+                      <small>{admin.role}</small>
                     </div>
                     <p className="text-muted">
-                      795 Folsom Ave, Suite 600 San Francisco, CADGE 94107
+                      {admin !== undefined ? admin.address : "Address"}
                     </p>
                   </div>
                 </li>
                 <li>
                   <small className="text-muted">Email address: </small>
-                  <p>michael@gmail.com</p>
+                  <p>{admin !== undefined ? admin.email : "Email"}</p>
                   <hr />
                   <small className="text-muted">Phone: </small>
-                  <p>+ 202-555-0191</p>
+                  <p>{admin !== undefined ? admin.phone : "Phone"}</p>
                   <hr />
                 </li>
                 <li>

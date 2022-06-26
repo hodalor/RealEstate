@@ -1,9 +1,12 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+import Loader from "../../components/loader";
+import Notify from "../../components/notification";
 import { AuthContext } from "../../libs/contexts/authContext";
 
 export default function Login() {
-  const {_handleLogin} = useContext(AuthContext)
+  const { _handleLogin, _handleChange, authState, loading } =
+    useContext(AuthContext);
 
   return (
     <div className="site-wrapper overflow-hidden position-relative">
@@ -22,6 +25,7 @@ export default function Login() {
                   <h2>Sign in</h2>
                   <p>Enter your account details below</p>
                 </div>
+                <Notify />
                 <form action="#">
                   <div className="form-group">
                     <label>Email*</label>
@@ -31,16 +35,30 @@ export default function Login() {
                       id="email"
                       className="form-control"
                       placeholder="ex: john@email.com"
+                      value={authState.email}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "email",
+                          value: e.target.value.toUpperCase(),
+                        })
+                      }
                     />
                   </div>
                   <div className="form-group">
                     <label>Password*</label>
                     <input
-                      type="text"
+                      type="password"
                       name="password"
                       id="password"
                       className="form-control"
                       placeholder="i.e. IAmthepreciouspass123 "
+                      value={authState.password}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "pass",
+                          value: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="keep-sign-area">
@@ -64,9 +82,9 @@ export default function Login() {
                       to="/dashboard"
                       type="button"
                       className="btn focus-reset"
-                      onClick={_handleLogin}
+                      onClick={loading ? null : _handleLogin}
                     >
-                      Log In
+                      {loading ? <Loader /> : " Log In"}
                     </button>
                   </div>
                   <div className="create-new-acc-text">

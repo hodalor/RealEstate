@@ -1,6 +1,12 @@
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../libs/contexts/authContext";
+import { AdminContext } from "../../libs/contexts/adminContext";
 
 export default function AdminTopBar() {
+  const { _logout } = useContext(AuthContext);
+  const { adminData } = useContext(AdminContext);
+  const pending = adminData.pending;
+
   return (
     <div>
       {/* Overlay For Sidebars */}
@@ -29,133 +35,37 @@ export default function AdminTopBar() {
           <li className="dropdown">
             {" "}
             <a
-              href="javascript:void(0);"
+              // href="javascript:void(0);"
               className="dropdown-toggle"
-              data-toggle="dropdown"
-              role="button"
+              // data-toggle="dropdown"
+              // role="pointer"
             >
               <i className="fa fa-bell" title="notifications" />
-              <div className="notify">
-                <span className="heartbit" />
-                <span className="point" />
-              </div>
+              {pending.length === 0 ? (
+                <div className="notify">
+                  <span className="" />
+                  <span className="" />
+                </div>
+              ) : (
+                <div className="notify">
+                  <span className="heartbit" />
+                  <span className="point" />
+                </div>
+              )}
             </a>
-            <ul className="dropdown-menu pullDown">
-              <li className="body">
-                <ul className="menu list-unstyled">
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/1.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Sophia <span className="time">For Sale</span>
-                          </span>
-                          <span className="message">Relaxing Apartment</span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/2.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Sophia <span className="time">For Rent</span>
-                          </span>
-                          <span className="message">
-                            Co-op Apartment in Bay Terrace
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/3.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Isabella <span className="time">For Rent</span>
-                          </span>
-                          <span className="message">
-                            A must see Villa on Chicago Ave
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/4.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Alexander <span className="time">For Sale</span>
-                          </span>
-                          <span className="message">
-                            5 Room Apartment Special Deal
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/5.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Grayson <span className="time">For Rent</span>
-                          </span>
-                          <span className="message">
-                            Real House Luxury Villa
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li className="footer">
-                {" "}
-                <a href="javascript:void(0);">View All</a>{" "}
-              </li>
-            </ul>
           </li>
 
           <li className="float-right">
-            <Link
-              to="/login"
+            <span
               type="button"
               role="button"
               className="mega-menu"
               data-close="true"
               title="log out"
+              onClick={_logout}
             >
               <i className="fa fa-power-off" />
-            </Link>
+            </span>
             <a
               href="javascript:void(0);"
               className="js-right-sidebar"

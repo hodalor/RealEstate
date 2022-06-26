@@ -1,10 +1,28 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "../authContext";
-import { _validateAdmin, _validateAgent } from "../../functions/validations";
-import { _addAgent, _createAdmin } from "../../functions/creates";
-import { _fetchAgents, _fetchAll } from "../../functions/fetches";
+import {
+  _validateAdmin,
+  _validateAgent,
+  _validatePass,
+  _validateProp,
+} from "../../functions/validations";
+import { _addAgent, _addProperty, _createAdmin } from "../../functions/creates";
+import {
+  _fetchAgents,
+  _fetchAll,
+  _fetchProperties,
+} from "../../functions/fetches";
 import { _calcDays } from "../../functions/dateDiff";
+import {
+  _approveProperty,
+  _blockAgnt,
+  _editAgent,
+  _editPass,
+  _unblockAgnt,
+} from "../../functions/edits";
+import { _delAgent } from "../../functions/deletes";
+import { _retrieveFromStroage, _saveToStorage } from "../../functions/storage";
 
 export const AdminContext = createContext();
 
@@ -22,6 +40,7 @@ export default function AdminContextProvider(props) {
       password: "",
       address: "",
       con_pass: "",
+      new_pass: "",
       image: {},
       dob: "",
       ghcard: "",
@@ -35,24 +54,103 @@ export default function AdminContextProvider(props) {
       fb: "",
       tw: "",
       ins: "",
+      isBlocked: false,
+    },
+    property: {
+      propName: "",
+      propLoca: "",
+      propType: "",
+      propDesc: "",
+      rentOrSale: "",
+      price: Number,
+      bedRoomNumber: Number,
+      bathRoomNumber: Number,
+      sqft: Number,
+      carPark: Boolean,
+      year: "",
+      agentID: "",
+      address: "",
+      dRoom: Boolean,
+      kitchen: Boolean,
+      livRoom: Boolean,
+      mBedroom: Boolean,
+      porch: Boolean,
+      stRoom: Boolean,
+      pool: Boolean,
+      ppWater: Boolean,
+      acon: Boolean,
+      elct: Boolean,
+      nmRoad: Boolean,
+      nsMarket: Boolean,
+      pets: Boolean,
+      rooms: Number,
+      propImages: [],
+    },
+    categories: {
+      all: true,
+      singleRooms: false,
+      appartments: false,
+      offices: false,
+      shops: false,
+      fullHouse: false,
     },
     agents: [],
+    properties: [],
+    pending: [],
+    customers: [],
     agent: {},
+    propertyDetails: {},
+    customer: {},
+    admin: {},
   });
 
-  const _routeToDetails = (data) => {
-    history.push("/admin/properties/details/" + data._id);
+  const _resetDetails = async (key) => {
+    const data = await _retrieveFromStroage(key);
+
+    if (key === "property")
+      return setAdminData({
+        ...adminData,
+        propertyDetails: data,
+      });
+
+    if (key === "agent")
+      return setAdminData({
+        ...adminData,
+        agent: data,
+      });
+
+    if (key === "customer")
+      return setAdminData({
+        ...adminData,
+        customer: data,
+      });
+  };
+
+  const _routeToDetails = async (data) => {
+    const store = await _saveToStorage({ data, key: "property" });
+
+    if (store) {
+      setAdminData({
+        ...adminData,
+        propertyDetails: data,
+      });
+      history.push("/admin/properties/details/" + data._id);
+    }
   };
 
   const _routeToAgents = async (data) => {
     const res = await _calcDays(data.createdAt);
     data.days = res;
 
-    setAdminData({
-      ...adminData,
-      agent: data,
-    });
-    history.push("/admin/agents/details/" + data);
+    const store = await _saveToStorage({ data, key: "agent" });
+
+    if (store) {
+      setAdminData({
+        ...adminData,
+        agent: data,
+      });
+      history.push("/admin/agents/details/" + data._id);
+    }
   };
 
   const _routeToUsers = (data) => {
@@ -64,16 +162,31 @@ export default function AdminContextProvider(props) {
   }, []);
 
   const getAdminData = async () => {
+    const userData = await _retrieveFromStroage("user");
     setLoading(true);
     const results = await _fetchAll();
 
     setLoading(false);
     if (results !== undefined) {
       const agentsData = results[0];
+      const propData = results[1];
+      const custData = results[2];
+
+      var pend = [];
+      var ps = [];
+      propData.data.forEach((pro) => {
+        if (pro.isApproved) ps.push(pro);
+        if (!pro.isApproved) pend.push(pro);
+      });
+
       if (agentsData.success === 1) {
         setAdminData({
           ...adminData,
           agents: agentsData.data,
+          properties: ps,
+          pending: pend,
+          customers: custData.success === 1 ? custData.data : [],
+          admin: userData,
         });
       }
     }
@@ -133,6 +246,15 @@ export default function AdminContextProvider(props) {
         user: {
           ...adminData.user,
           con_pass: value,
+        },
+      });
+
+    if (field === "new_pass")
+      return setAdminData({
+        ...adminData,
+        user: {
+          ...adminData.user,
+          new_pass: value,
         },
       });
 
@@ -261,6 +383,294 @@ export default function AdminContextProvider(props) {
           ins: value,
         },
       });
+
+    if (field === "propName")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propName: value,
+        },
+      });
+
+    if (field === "propLoca")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propLoca: value,
+        },
+      });
+
+    if (field === "propType")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propType: value,
+        },
+      });
+
+    if (field === "propDesc")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propDesc: value,
+        },
+      });
+
+    if (field === "rentOrSale")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          rentOrSale: value,
+        },
+      });
+
+    if (field === "price")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          price: value,
+        },
+      });
+
+    if (field === "bedRooms")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          bedRoomNumber: value,
+        },
+      });
+
+    if (field === "bathRooms")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          bathRoomNumber: value,
+        },
+      });
+
+    if (field === "sqft")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          sqft: value,
+        },
+      });
+
+    if (field === "carPark")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          carPark: value,
+        },
+      });
+
+    if (field === "year")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          year: value,
+        },
+      });
+
+    if (field === "agentID")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          agentID: value,
+        },
+      });
+
+    if (field === "paddress")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          address: value,
+        },
+      });
+
+    if (field === "dRoom")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          dRoom: value,
+        },
+      });
+
+    if (field === "kitchen")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          kitchen: value,
+        },
+      });
+
+    if (field === "livRoom")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          livRoom: value,
+        },
+      });
+
+    if (field === "mBedroom")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          mBedroom: value,
+        },
+      });
+
+    if (field === "porch")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          porch: value,
+        },
+      });
+
+    if (field === "stRoom")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          stRoom: value,
+        },
+      });
+
+    if (field === "pool")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          pool: value,
+        },
+      });
+
+    if (field === "ppWater")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          ppWater: value,
+        },
+      });
+
+    if (field === "acon")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          acon: value,
+        },
+      });
+
+    if (field === "elct")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          elct: value,
+        },
+      });
+
+    if (field === "nmRoad")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          nmRoad: value,
+        },
+      });
+
+    if (field === "nsMarket")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          nsMarket: value,
+        },
+      });
+
+    if (field === "pets")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          pets: value,
+        },
+      });
+
+    if (field === "image_1")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propImages: [...adminData.property.propImages, value.file],
+        },
+      });
+
+    if (field === "image_2")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propImages: [...adminData.property.propImages, value.file],
+        },
+      });
+
+    if (field === "image_3")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propImages: [...adminData.property.propImages, value.file],
+        },
+      });
+
+    if (field === "image_4")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propImages: [...adminData.property.propImages, value.file],
+        },
+      });
+
+    if (field === "image_5")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propImages: [...adminData.property.propImages, value.file],
+        },
+      });
+
+    if (field === "rooms")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          rooms: value,
+        },
+      });
   };
 
   const _cancelAdd = () => {
@@ -287,6 +697,7 @@ export default function AdminContextProvider(props) {
         fb: "",
         tw: "",
         ins: "",
+        isBlocked: false,
       },
     });
   };
@@ -363,6 +774,11 @@ export default function AdminContextProvider(props) {
         show: true,
       });
 
+      setAdminData({
+        ...adminData,
+        agents: [],
+      });
+
       return;
     }
 
@@ -379,6 +795,440 @@ export default function AdminContextProvider(props) {
     });
   };
 
+  const _changePass = async (key) => {
+    const validate = await _validatePass(adminData.user);
+
+    if (!validate.status)
+      return setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: validate.mesg,
+        show: true,
+      });
+
+    setLoading(true);
+
+    const res = await _editPass({
+      data: adminData,
+      key,
+      admin: adminData.admin,
+    });
+
+    _cancelAdd();
+    if (res === undefined || res.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: res.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchAgents();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      setAdminData({
+        ...adminData,
+        agents: [],
+      });
+
+      return;
+    }
+
+    setAdminData({
+      ...adminData,
+      agents: getData.data,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Password updated successfully!",
+      show: true,
+    });
+  };
+
+  const _saveChanges = async (key) => {
+    setLoading(true);
+
+    const results = await _editAgent({
+      fields: adminData.user,
+      agent: adminData.agent,
+      key,
+      admin: adminData.admin,
+    });
+
+    _cancelAdd();
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchAgents();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      setAdminData({
+        ...adminData,
+        agents: [],
+      });
+
+      return;
+    }
+
+    setAdminData({
+      ...adminData,
+      agents: getData.data,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Agent data updated successfully!",
+      show: true,
+    });
+  };
+
+  const _blockAgent = async () => {
+    setLoading(true);
+    const results = await _blockAgnt({
+      fields: adminData.user,
+      agent: adminData.agent,
+    });
+
+    _cancelAdd();
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchAgents();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      setAdminData({
+        ...adminData,
+        agents: [],
+      });
+
+      return;
+    }
+
+    setAdminData({
+      ...adminData,
+      agents: getData.data,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Agent data updated successfully!",
+      show: true,
+    });
+  };
+
+  const _unblockAgent = async () => {
+    setLoading(true);
+    const results = await _unblockAgnt({
+      fields: adminData.user,
+      agent: adminData.agent,
+    });
+
+    _cancelAdd();
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchAgents();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      setAdminData({
+        ...adminData,
+        agents: [],
+      });
+
+      return;
+    }
+
+    setAdminData({
+      ...adminData,
+      agents: getData.data,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Agent data updated successfully!",
+      show: true,
+    });
+  };
+
+  const _removeAgent = async () => {
+    setLoading(true);
+    const results = await _delAgent(adminData.agent._id);
+
+    _cancelAdd();
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchAgents();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      setAdminData({
+        ...adminData,
+        agents: [],
+      });
+
+      return;
+    }
+
+    setAdminData({
+      ...adminData,
+      agents: getData.data,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Agent data updated successfully!",
+      show: true,
+    });
+
+    history.push("/admin/agents/");
+  };
+
+  const _createProperty = async () => {
+    const validate = await _validateProp(adminData.property);
+
+    if (!validate.status)
+      return setNotiData({
+        ...notiData,
+        type: "error",
+        msg: validate.mesg,
+        show: true,
+      });
+
+    setLoading(true);
+
+    const results = await _addProperty(adminData.property);
+
+    _cancelAdd();
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchProperties();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      setAdminData({
+        ...adminData,
+        properties: [],
+      });
+
+      return;
+    }
+
+    var pend = [];
+    var ps = [];
+    getData.data.forEach((pro) => {
+      if (pro.isApproved) ps.push(pro);
+      if (!pro.isApproved) pend.push(pro);
+    });
+
+    setAdminData({
+      ...adminData,
+      properties: ps,
+      pending: pend,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Property added successfully!",
+      show: true,
+    });
+  };
+
+  const _findAndRouteToAgent = (_id) => {
+    const agent = adminData.agents.find((item) => item._id === _id);
+
+    if (agent) {
+      setAdminData({
+        ...adminData,
+        agent: agent,
+      });
+
+      history.push("/admin/agents/details/" + _id);
+
+      return;
+    }
+  };
+
+  const _handleCategory = (data) => {
+    const properties = adminData.properties;
+    if (data.field === "all") {
+      setAdminData({
+        ...adminData,
+        categories: {
+          ...adminData.categories,
+          all: data.value ? true : false,
+          singleRooms: false,
+          appartments: false,
+          offices: false,
+          shops: false,
+          fullHouse: false,
+        },
+      });
+    }
+  };
+
+  const _approve = async (data) => {
+    setLoading(true);
+
+    const results = await _approveProperty(data._id);
+
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchProperties();
+
+    if (getData === undefined || getData.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      setAdminData({
+        ...adminData,
+        properties: [],
+      });
+
+      return;
+    }
+
+    var pend = [];
+    var ps = [];
+    getData.data.forEach((pro) => {
+      if (pro.isApproved) ps.push(pro);
+      if (!pro.isApproved) pend.push(pro);
+    });
+
+    setAdminData({
+      ...adminData,
+      properties: ps,
+      pending: pend,
+    });
+
+    setLoading(false);
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Property Approved successfully!",
+      show: true,
+    });
+  };
+
   return (
     <AdminContext.Provider
       value={{
@@ -390,6 +1240,16 @@ export default function AdminContextProvider(props) {
         _cancelAdd,
         _submit,
         _createAgent,
+        _changePass,
+        _saveChanges,
+        _blockAgent,
+        _unblockAgent,
+        _removeAgent,
+        _createProperty,
+        _resetDetails,
+        _findAndRouteToAgent,
+        _handleCategory,
+        _approve,
       }}
     >
       {props.children}

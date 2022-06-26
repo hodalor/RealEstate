@@ -1,7 +1,7 @@
 import { Route, Switch } from "react-router-dom";
 import AuthContextProvider from "./libs/contexts/authContext";
 
-import Web from "./website";
+// import Web from "./website";
 import Login from "./auth/signin";
 import Register from "./auth/register";
 import Terms from "./auth/termsAndConditions";
@@ -15,9 +15,9 @@ import Support from "./app/pages/others/support";
 export default function Main() {
   return (
     <Switch>
-      <Route exact path="/" render={(props) => <Web {...props} />} />
+      {/* <Route exact path="/" render={(props) => <Web {...props} />} /> */}
       <AuthContextProvider>
-        <Route path="/login" component={Login} />
+        <Route exact path="/" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/terms" component={Terms} />
         <Route path="/forbidden" component={NotAuth} />

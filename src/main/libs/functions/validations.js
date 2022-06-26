@@ -154,4 +154,142 @@ const _validateAgent = async (data) => {
   return results;
 };
 
-export { _validateAdmin, _validateAgent };
+const _validatePass = async (data) => {
+  var results = {
+    status: false,
+    mesg: "",
+  };
+  const { password, new_pass, con_pass } = data;
+
+  if (password === "" || new_pass === "" || con_pass === "")
+    return (results = {
+      status: false,
+      mesg: "Please provide all passwords!",
+    });
+
+  if (new_pass.length < 6 || con_pass.length < 6)
+    return (results = {
+      status: false,
+      mesg: "Please passwords must more than 6 charachters!",
+    });
+
+  if (new_pass !== con_pass)
+    return (results = {
+      status: false,
+      mesg: "New password and Confirm password do not match!",
+    });
+
+  results = {
+    status: true,
+    mesg: "",
+  };
+
+  return results;
+};
+
+const _validateProp = async (data) => {
+  var results = {
+    status: false,
+    mesg: "",
+  };
+
+  const {
+    propName,
+    propLoca,
+    propType,
+    propDesc,
+    rentOrSale,
+    price,
+    rooms,
+    bedRoomNumber,
+    bathRoomNumber,
+    sqft,
+    carPark,
+    year,
+    agentID,
+    address,
+    dRoom,
+    kitchen,
+    livRoom,
+    mBedroom,
+    porch,
+    stRoom,
+    pool,
+    ppWater,
+    acon,
+    elct,
+    nmRoad,
+    nsMarket,
+    pets,
+    propImages,
+  } = data;
+
+  if (
+    propName === "" ||
+    propLoca === "" ||
+    propType === "" ||
+    propDesc === "" ||
+    rentOrSale === "" ||
+    propType === "" ||
+    price === undefined ||
+    rooms === undefined ||
+    bedRoomNumber === undefined ||
+    bathRoomNumber === undefined ||
+    carPark === undefined ||
+    year === "" ||
+    agentID === "" ||
+    address === "" ||
+    dRoom === undefined ||
+    kitchen === undefined ||
+    livRoom === undefined ||
+    mBedroom === undefined ||
+    porch === undefined ||
+    stRoom === undefined
+  )
+    return (results = {
+      status: false,
+      mesg: "Please provide all fields!",
+    });
+
+  if (propImages.length < 3)
+    return (results = {
+      status: false,
+      mesg: "Please provide 3 or more images!",
+    });
+
+  results = {
+    status: true,
+    mesg: "",
+  };
+
+  return results;
+};
+
+const _validateUser = async (data) => {
+  var results = {
+    status: false,
+    mesg: "",
+  };
+  const { email, password } = data;
+
+  if (email === "" || password === "")
+    return (results = {
+      status: false,
+      mesg: "Please provide all fields!",
+    });
+
+  results = {
+    status: true,
+    mesg: "",
+  };
+
+  return results;
+};
+
+export {
+  _validateAdmin,
+  _validateAgent,
+  _validatePass,
+  _validateProp,
+  _validateUser,
+};

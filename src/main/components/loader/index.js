@@ -16,10 +16,10 @@ export default function Loader(props) {
         justifyContent: "center",
         alignItems: "center",
         color: "whitesmoke",
-        backgroundColor: "blue",
+        backgroundColor: "#7e6990",
       }}
     >
-      <Oval height="25" width="25" color="grey" ariaLabel="loading" />
+      <Oval height="25" width="25" color="white" ariaLabel="loading" />
     </div>
   );
 }

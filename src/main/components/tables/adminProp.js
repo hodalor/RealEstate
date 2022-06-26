@@ -2,9 +2,9 @@ import { useContext } from "react";
 import { AdminContext } from "../../libs/contexts/adminContext";
 
 export default function AgentsTable() {
-  const { _routeToDetails } = useContext(AdminContext);
+  const { _routeToDetails, adminData } = useContext(AdminContext);
+  const properties = adminData.properties;
 
-  
   return (
     <div className="card table-responsive">
       <div
@@ -39,9 +39,9 @@ export default function AgentsTable() {
                     rowSpan={1}
                     colSpan={1}
                     aria-label="Email: activate to sort column ascending"
-                    style={{ width: "185.047px" }}
+                    style={{ width: "70px" }}
                   >
-                    Owner
+                    Property type
                   </th>
                   <th
                     className="sorting"
@@ -49,7 +49,7 @@ export default function AgentsTable() {
                     aria-controls="DataTables_Table_0"
                     rowSpan={1}
                     colSpan={1}
-                    style={{ width: "85.4375px" }}
+                    style={{ width: "30px" }}
                   >
                     Status
                   </th>
@@ -60,30 +60,43 @@ export default function AgentsTable() {
                     rowSpan={1}
                     colSpan={1}
                     aria-label="Deal: activate to sort column ascending"
-                    style={{ width: "37.0781px" }}
+                    style={{ width: "200px" }}
                   >
                     Location
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  role="row"
-                  onClick={() => _routeToDetails(1)}
-                  className="odd"
-                >
-                  <td>
-                    <img
-                      src="../../assets2/images/xs/avatar1.jpg"
-                      className="w30 rounded mr-2"
-                      alt
-                    />{" "}
-                    Karen Eilla Boyette
-                  </td>
-                  <td>areneboyette@armyspy.com</td>
-                  <td>+502-324-4194</td>
-                  <td>Manchester</td>
-                </tr>
+                {properties === undefined || properties.length === 0 ? (
+                  <span>No data found</span>
+                ) : (
+                  properties.map((property, index) => {
+                    return (
+                      <tr
+                        role="row"
+                        onClick={() => _routeToDetails(property)}
+                        className="odd"
+                        key={index}
+                      >
+                        <td>
+                          <img
+                            src={property.images.image1}
+                            className="w30 rounded mr-2"
+                            alt
+                          />{" "}
+                          {property.name}
+                        </td>
+                        <td>{property.propType}</td>
+                        <td>
+                          {property.others.available
+                            ? "Available"
+                            : "Not Available"}
+                        </td>
+                        <td>{property.location}</td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>

@@ -1,4 +1,16 @@
+import { useContext } from "react";
+import Loader from "../../../../components/loader";
+import Notify from "../../../../components/notification";
+import ImageUpload from "../../../../components/uploadImage";
+import { AdminContext } from "../../../../libs/contexts/adminContext";
+import { AuthContext } from "../../../../libs/contexts/authContext";
+
 export default function AdminProfile() {
+  const { adminData, _handleChange, _changePass, _saveChanges } =
+    useContext(AdminContext);
+  const { loading } = useContext(AuthContext);
+  const admin = adminData.admin;
+
   return (
     <div>
       <div className="container-fluid">
@@ -11,20 +23,17 @@ export default function AdminProfile() {
                     <div className="profile-image float-md-right">
                       {" "}
                       <img
-                        src="../../../assets2/images/profile_av.jpg"
-                        alt
+                        src={admin !== undefined ? admin.image : ""}
+                        alt="user"
                       />{" "}
                     </div>
                   </div>
                   <div className="col-lg-8 col-md-8 col-12">
                     <h4 className="m-t-0 m-b-0">
-                      <strong>Michael</strong> Deo
+                      <strong>{admin.firstName}</strong> {admin.lastName}
                     </h4>
-                    <span className="job_post">Admin</span>
-                    <p>
-                      795 Folsom Ave, Suite 600
-                      <br /> San Francisco, CADGE 94107
-                    </p>
+                    <span className="job_post">{admin.role}</span>
+                    <p>{admin.address}</p>
                   </div>
                 </div>
               </div>
@@ -44,16 +53,11 @@ export default function AdminProfile() {
               <div className="tab-content">
                 <div className="tab-pane body active" id="about">
                   <small className="text-muted">Email address: </small>
-                  <p>michael@gmail.com</p>
+                  <p>{admin.email}</p>
                   <hr />
                   <small className="text-muted">Phone: </small>
-                  <p>+ 202-555-9191</p>
+                  <p>{admin.phone}</p>
                   <hr />
-                  <small className="text-muted">Mobile: </small>
-                  <p>+ 202-555-2828</p>
-                  <hr />
-                  <small className="text-muted">Birth Date: </small>
-                  <p className="m-b-0">October 22th, 1990</p>
                 </div>
               </div>
             </div>
@@ -75,6 +79,7 @@ export default function AdminProfile() {
                 id="usersettings"
               >
                 <div className="card">
+                  <Notify />
                   <div className="header">
                     <h2>
                       <strong>Security</strong> Settings
@@ -83,16 +88,15 @@ export default function AdminProfile() {
                   <div className="body">
                     <div className="form-group">
                       <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Username"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <input
                         type="password"
                         className="form-control"
-                        placeholder="Current Password"
+                        placeholder="Current password"
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "password",
+                            value: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <div className="form-group">
@@ -100,11 +104,38 @@ export default function AdminProfile() {
                         type="password"
                         className="form-control"
                         placeholder="New Password"
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "new_pass",
+                            value: e.target.value,
+                          })
+                        }
                       />
                     </div>
-                    <button className="btn btn-info btn-round">
-                      Save Changes
-                    </button>
+                    <div className="form-group">
+                      <input
+                        type="password"
+                        className="form-control"
+                        placeholder="Confirm new Password"
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "con_pass",
+                            value: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    {loading ? (
+                      <Loader />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => _changePass("admin")}
+                        className="btn btn-info btn-round"
+                      >
+                        Save Password
+                      </button>
+                    )}
                   </div>
                 </div>
                 <div className="card">
@@ -115,21 +146,18 @@ export default function AdminProfile() {
                   </div>
                   <div className="body">
                     <div className="row clearfix">
-                      <div className="col-lg-6 col-md-12">
+                      <div className="col-lg-4 col-md-12">
                         <div className="form-group">
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="First Name"
-                          />
-                        </div>
-                      </div>
-                      <div className="col-lg-6 col-md-12">
-                        <div className="form-group">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Last Name"
+                            placeholder={admin.firstName}
+                            onChange={(e) =>
+                              _handleChange({
+                                field: "firstName",
+                                value: e.target.value.toUpperCase(),
+                              })
+                            }
                           />
                         </div>
                       </div>
@@ -138,7 +166,13 @@ export default function AdminProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="City"
+                            placeholder={admin.lastName}
+                            onChange={(e) =>
+                              _handleChange({
+                                field: "lastName",
+                                value: e.target.value.toUpperCase(),
+                              })
+                            }
                           />
                         </div>
                       </div>
@@ -147,7 +181,13 @@ export default function AdminProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="E-mail"
+                            placeholder={admin.phone}
+                            onChange={(e) =>
+                              _handleChange({
+                                field: "phone",
+                                value: e.target.value,
+                              })
+                            }
                           />
                         </div>
                       </div>
@@ -156,24 +196,54 @@ export default function AdminProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Country"
+                            placeholder={admin.email}
+                            onChange={(e) =>
+                              _handleChange({
+                                field: "email",
+                                value: e.target.value.toUpperCase(),
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-12">
+                        <div className="form-group">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder={admin.address}
+                            onChange={(e) =>
+                              _handleChange({
+                                field: "address",
+                                value: e.target.value.toUpperCase(),
+                              })
+                            }
                           />
                         </div>
                       </div>
                       <div className="col-md-12">
                         <div className="form-group">
-                          <textarea
-                            rows={4}
-                            className="form-control no-resize"
-                            placeholder="Address Line 1"
-                            defaultValue={""}
+                          <ImageUpload
+                            onUpload={(v) =>
+                              _handleChange({
+                                field: "image",
+                                value: v,
+                              })
+                            }
                           />
                         </div>
                       </div>
                       <div className="col-md-12">
-                        <button className="btn btn-primary btn-round">
-                          Save Changes
-                        </button>
+                        {loading ? (
+                          <Loader />
+                        ) : (
+                          <button
+                            onClick={() => _saveChanges("admin")}
+                            className="btn btn-primary btn-round"
+                          >
+                            Save Changes
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
