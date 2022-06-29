@@ -1,8 +1,8 @@
 import React, { createContext, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { _login } from "../../functions/login";
+import { _login, _register } from "../../functions/auth";
 import { _saveToStorage, _removeFromStorage } from "../../functions/storage";
-import { _validateUser } from "../../functions/validations";
+import { _validateRegister, _validateUser } from "../../functions/validations";
 
 export const AuthContext = createContext();
 
@@ -11,6 +11,10 @@ export default function AuthContextProvider(props) {
     userType: "",
     email: "",
     password: "",
+    con_pass: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
     user: {},
   });
 
@@ -38,6 +42,10 @@ export default function AuthContextProvider(props) {
       ...authState,
       email: "",
       password: "",
+      firstName: "",
+      lastName: "",
+      con_pass: "",
+      phone: "",
     });
   };
 
@@ -96,6 +104,69 @@ export default function AuthContextProvider(props) {
         ...authState,
         password: value,
       });
+
+    if (field === "con_pass")
+      return setAuthState({
+        ...authState,
+        con_pass: value,
+      });
+
+    if (field === "phone")
+      return setAuthState({
+        ...authState,
+        phone: value,
+      });
+
+    if (field === "firstName")
+      return setAuthState({
+        ...authState,
+        firstName: value,
+      });
+
+    if (field === "lastName")
+      return setAuthState({
+        ...authState,
+        lastName: value,
+      });
+  };
+
+  const _handleRegister = async () => {
+    const validate = await _validateRegister(authState);
+
+    if (!validate.status)
+      return setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: validate.mesg,
+        show: true,
+      });
+
+    setLoading(true);
+
+    const results = await _register(authState);
+
+    _clearFields();
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    setLoading(false);
+
+    setLoading(false);
+    setNotiData({
+      ...notiData,
+      type: "success",
+      msg: results.message,
+      show: true,
+    });
   };
 
   const _logout = async () => {
@@ -116,6 +187,7 @@ export default function AuthContextProvider(props) {
         setLoading,
         _handleChange,
         _logout,
+        _handleRegister,
       }}
     >
       {props.children}

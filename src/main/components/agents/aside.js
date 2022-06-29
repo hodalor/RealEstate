@@ -47,7 +47,7 @@ export default function AgentsAside() {
                     <span>Properties</span>
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <a href="javascript:void(0);" className="menu-toggle">
                     <i className="fa fa-city" />
                     <span>Categories</span>
@@ -108,7 +108,7 @@ export default function AgentsAside() {
                       </span>
                     </li>
                   </ul>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/agents/create-property">
                     <i className="fa fa-hospital" />

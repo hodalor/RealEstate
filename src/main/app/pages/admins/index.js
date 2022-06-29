@@ -11,6 +11,7 @@ import Notifications from "./notifications";
 import AdminProfile from "./profile";
 import AdminProperties from "./properties";
 import PropertyDetails from "./propertyDetails";
+import User from "./user";
 import Users from "./users";
 
 export default function Admin() {
@@ -39,6 +40,7 @@ export default function Admin() {
               <Route path="/admin/add-agent/" component={AddAgent} />
               <Route path="/admin/add-admin/" component={AddAdmin} />
               <Route path="/admin/users/" component={Users} />
+              <Route path="/admin/users/user/:ID" component={User} />
               <Route path="/admin/profile/" component={AdminProfile} />
               <Route
                 exact

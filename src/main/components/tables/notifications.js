@@ -2,7 +2,9 @@ import { useContext } from "react";
 import { AgentsContext } from "../../libs/contexts/agentsContext";
 
 export default function NotificationsTable() {
-  const { _routeToNotification } = useContext(AgentsContext);
+  const { _routeToNotification, agentState } = useContext(AgentsContext);
+  const requests = agentState.requests;
+
   return (
     <div className="table-responsive">
       <div
@@ -39,7 +41,7 @@ export default function NotificationsTable() {
                     aria-label="Email: activate to sort column ascending"
                     style={{ width: "185.047px" }}
                   >
-                    Email
+                    Sender Contact
                   </th>
                   <th
                     className="sorting"
@@ -49,7 +51,7 @@ export default function NotificationsTable() {
                     colSpan={1}
                     style={{ width: "85.4375px" }}
                   >
-                    Mobile
+                    Property Name
                   </th>
                   <th
                     className="sorting"
@@ -59,30 +61,30 @@ export default function NotificationsTable() {
                     colSpan={1}
                     style={{ width: "85.4375px" }}
                   >
-                    Status
+                    Property Location
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  onClick={() => _routeToNotification(1)}
-                  role="row"
-                  className="odd"
-                >
-                  <td>
-                    <img
-                      src="../../assets2/images/xs/avatar1.jpg"
-                      className="w30 rounded mr-2"
-                      alt
-                    />{" "}
-                    Karen Eilla Boyette
-                  </td>
-                  <td>areneboyette@armyspy.com</td>
-                  <td>+502-324-4194</td>
-                  <td style={{ textAlign: "center" }}>
-                    <i className="fa fa-check" />
-                  </td>
-                </tr>
+                {requests === undefined || requests.length === 0 ? (
+                  <span>No requests made</span>
+                ) : (
+                  requests.map((request, index) => {
+                    return (
+                      <tr
+                        onClick={() => _routeToNotification(request)}
+                        role="row"
+                        className="odd"
+                        key={index}
+                      >
+                        <td>{request.userName}</td>
+                        <td>{request.userContact}</td>
+                        <td>{request.property.propName}</td>
+                        <td>{request.property.propLocation}</td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>

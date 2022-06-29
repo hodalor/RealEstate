@@ -60,9 +60,9 @@ export default function AdminAside() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/add-admin/">
+                  <Link to="/admin/add-agent">
                     <i className="fa fa-user-plus" />
-                    <span>Add admin</span>
+                    <span>Add Agent</span>
                   </Link>
                 </li>
                 <li>

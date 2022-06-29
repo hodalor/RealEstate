@@ -2,8 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { _addProperty } from "../../functions/creates";
 import { _calcDays } from "../../functions/dateDiff";
+import { _delNoti, _delProp, _sellProp } from "../../functions/deletes";
 import { _editAgent, _editPass } from "../../functions/edits";
-import { _fetchProperties } from "../../functions/fetches";
+import { _fetchProperties, _fetchReq } from "../../functions/fetches";
 import { _retrieveFromStroage, _saveToStorage } from "../../functions/storage";
 import { _validatePass, _validateProp } from "../../functions/validations";
 import { AuthContext } from "../authContext";
@@ -72,6 +73,8 @@ export default function AgentContextProvider(props) {
     properties: [],
     isReply: false,
     agent: {},
+    requests: [],
+    request: {},
   });
 
   useEffect(() => {
@@ -83,17 +86,33 @@ export default function AgentContextProvider(props) {
   const _getData = async () => {
     var userData = await _retrieveFromStroage("user");
     const days = await _calcDays(userData.createdAt);
-
     userData.days = days;
+    setAgentState({
+      ...agentState,
+      agent: userData,
+    });
+
     setLoading(true);
     const results = await _fetchProperties();
+    const reqs = await _fetchReq();
 
     var properties = [];
-    await results.data.forEach((property) => {
-      if (property.agentID === userData._id) {
-        properties.push(property);
-      }
-    });
+    if (results.success !== 0) {
+      await results.data.forEach((property) => {
+        if (property.agentID === userData._id) {
+          properties.push(property);
+        }
+      });
+    }
+
+    var agReqs = [];
+    if (reqs.success !== 0) {
+      await reqs.data.forEach((request) => {
+        if (request.agentID === userData._id) {
+          agReqs.push(request);
+        }
+      });
+    }
 
     properties.sort(function (a, b) {
       return new Date(a.createdAt) - new Date(b.createdAt);
@@ -104,6 +123,7 @@ export default function AgentContextProvider(props) {
       ...agentState,
       properties:
         results !== undefined && results.success === 1 ? properties : [],
+      requests: reqs !== undefined && reqs.success === 1 ? agReqs : [],
       agent: userData,
     });
   };
@@ -120,8 +140,32 @@ export default function AgentContextProvider(props) {
     }
   };
 
-  const _routeToNotification = (id) => {
-    history.push("/agents/notifications/details/" + id);
+  const _routeToNotification = async (data) => {
+    const store = await _saveToStorage({ data, key: "req" });
+
+    if (store) {
+      setAgentState({
+        ...agentState,
+        request: data,
+      });
+      history.push("/agents/notifications/details/" + data._id);
+    }
+  };
+
+  const _goToDetails = async (id) => {
+    const property = await agentState.properties.find(
+      (property) => property._id === id
+    );
+
+    const store = await _saveToStorage({ data: property, key: "property" });
+
+    if (store) {
+      setAgentState({
+        ...agentState,
+        propertyDetails: property,
+      });
+      history.push("/agents/properties/details/" + id);
+    }
   };
 
   const _triggerReply = (check) => {
@@ -753,8 +797,10 @@ export default function AgentContextProvider(props) {
       });
 
     setLoading(true);
+    const data = agentState.property;
+    data.agentID = agentState.agent._id;
 
-    const results = await _addProperty(agentState.property);
+    const results = await _addProperty(data);
 
     _cancelAdd();
     if (results === undefined || results.success === 0) {
@@ -801,9 +847,159 @@ export default function AgentContextProvider(props) {
     });
   };
 
-  const _removeProp = async (id) => {};
+  const _removeProp = async (id) => {
+    const agentID = agentState.agent._id;
+    const data = {
+      id,
+      agentID,
+    };
 
-  const _sold = async (id) => {};
+    setLoading(true);
+
+    const results = await _delProp(data);
+
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchProperties();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      setAgentState({
+        ...agentState,
+        properties: [],
+      });
+
+      return;
+    }
+
+    setAgentState({
+      ...agentState,
+      properties: getData.data,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Property removed successfully!",
+      show: true,
+    });
+  };
+
+  const _sold = async (id) => {
+    const agentID = agentState.agent._id;
+    const data = {
+      id,
+      agentID,
+    };
+
+    setLoading(true);
+
+    const results = await _sellProp(data);
+
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchProperties();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      setAgentState({
+        ...agentState,
+        properties: [],
+      });
+
+      return;
+    }
+
+    setAgentState({
+      ...agentState,
+      properties: getData.data,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Property sold successfully!",
+      show: true,
+    });
+  };
+
+  const _delReq = async (id) => {
+    setLoading(true);
+
+    const results = await _delNoti(id);
+
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    const getData = await _fetchReq();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData.message,
+        show: true,
+      });
+
+      return;
+    }
+
+    setAgentState({
+      ...agentState,
+      requests: getData.data,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: results.message,
+      show: true,
+    });
+  };
 
   return (
     <AgentsContext.Provider
@@ -820,6 +1016,8 @@ export default function AgentContextProvider(props) {
         _saveChanges,
         _removeProp,
         _sold,
+        _goToDetails,
+        _delReq,
       }}
     >
       {props.children}

@@ -2,11 +2,11 @@ import { useContext } from "react";
 import FilterComp from "../../../../components/filter";
 import ItemComp from "../../../../components/buyers/item";
 import Loader from "../../../../components/loaderComp";
-import { BuyersContext } from "../../../../libs/contexts/buyersContext";
+import { AuthContext } from "../../../../libs/contexts/authContext";
 
 export default function Properties() {
-  const { buyerState } = useContext(BuyersContext);
-  const loading = buyerState.loading;
+  const { loading } = useContext(AuthContext);
+
   return (
     <div>
       {loading ? (

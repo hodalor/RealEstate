@@ -61,35 +61,18 @@ export default function Login() {
                       }
                     />
                   </div>
-                  <div className="keep-sign-area">
-                    <div className="check-form d-inline-block">
-                      <label
-                        htmlFor="terms-check"
-                        className="check-input-control d-flex align-items-center mb-0"
-                      >
-                        <input
-                          className="d-none"
-                          type="checkbox"
-                          id="terms-check"
-                        />
-                        <span className="checkbox checkbox-2 rounded-check-box " />
-                        <span className="remember-text">Keep me signed in</span>
-                      </label>
-                    </div>
-                  </div>
                   <div className="sign-in-log-btn">
                     <button
-                      to="/dashboard"
                       type="button"
                       className="btn focus-reset"
                       onClick={loading ? null : _handleLogin}
                     >
-                      {loading ? <Loader /> : " Log In"}
+                      {loading ? <Loader title="auth" /> : " Log In"}
                     </button>
                   </div>
                   <div className="create-new-acc-text">
                     <p>
-                      Forgot password? <Link to="">Reset now</Link>
+                      Not registered yet? <Link to="/register">Sign up</Link>
                     </p>
                   </div>
                 </form>

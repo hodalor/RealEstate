@@ -1,4 +1,4 @@
-import { adminUrl, agentUrl, customerUrl, propertyUrl } from "../data/baseUrls";
+import { adminUrl, agentUrl, customerUrl, propertyUrl, requestsUrl } from "../data/baseUrls";
 
 const _fetchAdmin = async () => {
   var results;
@@ -51,6 +51,23 @@ const _fetchProperties = async () => {
   return results;
 };
 
+const _fetchReq = async () => {
+  var results
+
+  const url = requestsUrl + "getRequests";
+
+  const reqs = await fetch(url).catch((error) => {
+    results = {
+      success: 0,
+      message: "Please check your internet connection!",
+    };
+  });
+
+  results = reqs === undefined ? results : await reqs.json();
+
+  return results;
+};
+
 const _fetchAll = async () => {
   var results;
 
@@ -76,4 +93,4 @@ const _fetchAll = async () => {
   return results;
 };
 
-export { _fetchAdmin, _fetchAgents, _fetchProperties, _fetchAll };
+export { _fetchAdmin, _fetchAgents, _fetchProperties, _fetchAll, _fetchReq };

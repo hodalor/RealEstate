@@ -153,8 +153,16 @@ export default function AdminContextProvider(props) {
     }
   };
 
-  const _routeToUsers = (data) => {
-    history.push("/admin/users/user-details/" + data);
+  const _routeToUsers = async (data) => {
+    const store = await _saveToStorage({ data, key: "custo" });
+
+    if (store) {
+      setAdminData({
+        ...adminData,
+        customer: data,
+      });
+      history.push("/admin/users/user/" + data._id);
+    }
   };
 
   useEffect(() => {
@@ -163,6 +171,11 @@ export default function AdminContextProvider(props) {
 
   const getAdminData = async () => {
     const userData = await _retrieveFromStroage("user");
+    setAdminData({
+      ...adminData,
+      admin: userData,
+    });
+
     setLoading(true);
     const results = await _fetchAll();
 
@@ -174,10 +187,12 @@ export default function AdminContextProvider(props) {
 
       var pend = [];
       var ps = [];
-      propData.data.forEach((pro) => {
-        if (pro.isApproved) ps.push(pro);
-        if (!pro.isApproved) pend.push(pro);
-      });
+      if (propData.success !== 0) {
+        propData.data.forEach((pro) => {
+          if (pro.isApproved) ps.push(pro);
+          if (!pro.isApproved) pend.push(pro);
+        });
+      }
 
       if (agentsData.success === 1) {
         setAdminData({

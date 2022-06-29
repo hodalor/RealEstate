@@ -203,7 +203,6 @@ const _validateProp = async (data) => {
     rooms,
     bedRoomNumber,
     bathRoomNumber,
-    sqft,
     carPark,
     year,
     agentID,
@@ -214,13 +213,6 @@ const _validateProp = async (data) => {
     mBedroom,
     porch,
     stRoom,
-    pool,
-    ppWater,
-    acon,
-    elct,
-    nmRoad,
-    nsMarket,
-    pets,
     propImages,
   } = data;
 
@@ -237,7 +229,6 @@ const _validateProp = async (data) => {
     bathRoomNumber === undefined ||
     carPark === undefined ||
     year === "" ||
-    agentID === "" ||
     address === "" ||
     dRoom === undefined ||
     kitchen === undefined ||
@@ -286,10 +277,63 @@ const _validateUser = async (data) => {
   return results;
 };
 
+const _validateRegister = async (data) => {
+  var results = {
+    status: false,
+    mesg: "",
+  };
+  const { email, password, firstName, lastName, phone, con_pass } = data;
+
+  if (
+    email === "" ||
+    password === "" ||
+    firstName === "" ||
+    lastName === "" ||
+    phone === "" ||
+    con_pass === ""
+  )
+    return (results = {
+      status: false,
+      mesg: "Please provide all fields!",
+    });
+
+  if (password.length <= 6)
+    return (results = {
+      status: false,
+      mesg: "Please password must be more than 6 charachters!",
+    });
+
+  if (password !== con_pass)
+    return (results = {
+      status: false,
+      mesg: "Please password do not match!",
+    });
+
+  if (phone.length < 10)
+    return (results = {
+      status: false,
+      mesg: "Please phone number is not correct!",
+    });
+
+  if (isNaN(phone))
+    return (results = {
+      status: false,
+      mesg: "Please phone must contain only numbers!",
+    });
+
+  results = {
+    status: true,
+    mesg: "",
+  };
+
+  return results;
+};
+
 export {
   _validateAdmin,
   _validateAgent,
   _validatePass,
   _validateProp,
   _validateUser,
+  _validateRegister,
 };

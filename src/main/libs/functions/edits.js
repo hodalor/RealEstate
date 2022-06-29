@@ -1,4 +1,4 @@
-import { adminUrl, agentUrl, propertyUrl } from "../data/baseUrls";
+import { adminUrl, agentUrl, customerUrl, propertyUrl } from "../data/baseUrls";
 
 const _editPass = async ({ data, key, admin }) => {
   var results;
@@ -6,6 +6,7 @@ const _editPass = async ({ data, key, admin }) => {
   var url = "";
   if (key === "agent") url = agentUrl + "updatePassword/" + data.agent._id;
   if (key === "admin") url = adminUrl + "updatePassword/" + admin._id;
+  if (key === "buyer") url = customerUrl + "updatePassword/" + data.buyer._id;
 
   await fetch(url, {
     method: "PATCH",
@@ -37,15 +38,17 @@ const _editPass = async ({ data, key, admin }) => {
 const _editAgent = async (data) => {
   var results;
 
-  const { agent, fields, key, admin } = data;
+  const { agent, fields, key, admin, buyer } = data;
 
   var urlWithImg = "";
   if (key === "agent") urlWithImg = agentUrl + "updateWithImage/" + agent._id;
   if (key === "admin") urlWithImg = adminUrl + "updateWithImage/" + admin._id;
+  if (key === "buyer") urlWithImg = customerUrl + "updateWithImage/" + buyer._id;
 
   var url = "";
   if (key === "agent") url = agentUrl + "update/" + agent._id;
   if (key === "admin") url = adminUrl + "update/" + admin._id;
+  if (key === "buyer") url = customerUrl + "update/" + buyer._id;
 
   if (fields.image !== undefined) {
     var formData = new FormData();
@@ -72,8 +75,16 @@ const _editAgent = async (data) => {
       address: fields.address === "" ? admin.address : fields.address,
     });
 
+    const by = JSON.stringify({
+      firstName: fields.firstName === "" ? buyer.firstName : fields.firstName,
+      lastName: fields.lastName === "" ? buyer.lastName : fields.lastName,
+      phone: fields.phone === "" ? buyer.phone : fields.phone,
+      email: fields.email === "" ? buyer.email : fields.email,
+    });
+
     if (key === "agent") objData = agnt;
     if (key === "admin") objData = adm;
+    if (key === "buyer") objData = by;
 
     formData.append("profileImg", fields.image);
     formData.append("data", objData);

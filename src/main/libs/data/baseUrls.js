@@ -4,5 +4,14 @@ const uploadUrl = "http://localhost:8900/api/upload/";
 const propertyUrl = "http://localhost:8900/api/properties/";
 const customerUrl = "http://localhost:8900/api/customers/";
 const signUrl = "http://localhost:8900/api/signin/";
+const requestsUrl = "http://localhost:8900/api/requests/";
 
-export { adminUrl, agentUrl, uploadUrl, propertyUrl, customerUrl, signUrl };
+export {
+  adminUrl,
+  agentUrl,
+  uploadUrl,
+  propertyUrl,
+  customerUrl,
+  signUrl,
+  requestsUrl,
+};

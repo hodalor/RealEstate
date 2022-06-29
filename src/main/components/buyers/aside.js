@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { BuyersContext } from "../../libs/contexts/buyersContext";
 
 export default function Aside() {
-  const {_navigateToAgents} = useContext(BuyersContext)
+  const { _navigateToAgents, buyerState } = useContext(BuyersContext);
+  const buyer = buyerState.buyer;
+
   return (
     <div>
       <aside id="leftsidebar" className="sidebar">
@@ -26,16 +28,17 @@ export default function Aside() {
                 <li>
                   <div className="user-info">
                     <div className="image">
-                      <Link to="/properties/profile">
-                        <img
-                          src="../assets2/images/profile_av.jpg"
-                          alt="User"
-                        />
-                      </Link>
+                      {buyer.image === "" || buyer.image === undefined ? (
+                        <span>No image uploaded</span>
+                      ) : (
+                        <Link to="/properties/profile">
+                          <img src={buyer.image} alt="User" />
+                        </Link>
+                      )}
                     </div>
                     <div className="detail">
-                      <h4>Michael</h4>
-                      <small>user</small>
+                      <h4>{buyer.firstName + " " + buyer.lastName}</h4>
+                      <small>{buyer.role}</small>
                     </div>
                   </div>
                 </li>
@@ -45,7 +48,7 @@ export default function Aside() {
                     <span>Properties</span>
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <a href="javascript:void(0);" className="menu-toggle">
                     <i className="fa fa-city" />
                     <span>Categories</span>
@@ -106,19 +109,19 @@ export default function Aside() {
                       </span>
                     </li>
                   </ul>
-                </li>
+                </li> */}
                 <li role="button" type="button" onClick={_navigateToAgents}>
                   <Link>
                     <i className="fa fa-users" />
                     <span>Agents</span>
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link to="/properties/favorites">
                     <i className="fa fa-heart" />
                     <span>favorites</span>
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/support">
                     <i className="fa fa-headset" />
@@ -135,27 +138,27 @@ export default function Aside() {
                   <div className="user-info m-b-20 p-b-15">
                     <div className="image">
                       <Link to="/properties/profile">
-                        <img
-                          src="../assets2/images/profile_av.jpg"
-                          alt="User"
-                        />
+                        {buyer.image === "" || buyer.image === undefined ? (
+                          <span>No image uploaded</span>
+                        ) : (
+                          <Link to="/properties/profile">
+                            <img src={buyer.image} alt="User" />
+                          </Link>
+                        )}
                       </Link>
                     </div>
                     <div className="detail">
-                      <h4>Michael</h4>
-                      <small>User</small>
+                      <h4>{buyer.firstName + " " + buyer.lastName}</h4>
+                      <small>{buyer.role}</small>
                     </div>
-                    <p className="text-muted">
-                      795 Folsom Ave, Suite 600 San Francisco, CADGE 94107
-                    </p>
                   </div>
                 </li>
                 <li>
                   <small className="text-muted">Email address: </small>
-                  <p>michael@gmail.com</p>
+                  <p>{buyer.email}</p>
                   <hr />
                   <small className="text-muted">Phone: </small>
-                  <p>+ 202-555-0191</p>
+                  <p>{buyer.phone}</p>
                   <hr />
                 </li>
               </ul>

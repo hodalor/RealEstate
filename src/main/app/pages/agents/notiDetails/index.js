@@ -1,8 +1,14 @@
 import { useContext } from "react";
+import Loader from "../../../../components/loader";
+import Notify from "../../../../components/notification";
 import { AgentsContext } from "../../../../libs/contexts/agentsContext";
+import { AuthContext } from "../../../../libs/contexts/authContext";
 
 export default function NotiDetails() {
-  const { agentState, _triggerReply } = useContext(AgentsContext);
+  const { agentState, _triggerReply, _delReq, _goToDetails } =
+    useContext(AgentsContext);
+  const { loading } = useContext(AuthContext);
+  const request = agentState.request;
 
   return (
     <div className="card">
@@ -10,28 +16,50 @@ export default function NotiDetails() {
         <div className="col-4 mt-3">
           <div className="form-group">
             <label>Sender Name</label>
-            <input className="form-control" value="Sender NAme" disabled />
+            <input className="form-control" value={request.userName} disabled />
           </div>
         </div>
-        <div className="col-3 mt-3">
+        <div className="col-4 mt-3">
           <div className="form-group">
-            <label>Sender Email</label>
-            <input className="form-control" value="Sender Email" disabled />
+            <label>Sender Contact</label>
+            <input
+              className="form-control"
+              value={request.userContact}
+              disabled
+            />
           </div>
         </div>
-        <div className="col-3 mt-3">
+        <div className="col-4 mt-3">
           <div className="form-group">
-            <label>Sender phone</label>
-            <input className="form-control" value="Sender phone" disabled />
+            <label>Property Name</label>
+            <input
+              className="form-control"
+              value={request.property.propName}
+              disabled
+            />
+          </div>
+        </div>
+        <div className="col-4 mt-3">
+          <div className="form-group">
+            <label>Property Location</label>
+            <input
+              className="form-control"
+              value={request.property.propLocation}
+              disabled
+            />
           </div>
         </div>
         <div className="col-2 mt-3">
           <div className="form-group">
             <label>Message date</label>
-            <input className="form-control" value="Message date" disabled />
+            <input
+              className="form-control"
+              value={new Date(request.createdAt).toDateString()}
+              disabled
+            />
           </div>
         </div>
-        <div className="col-12 mt-3">
+        {/* <div className="col-12 mt-3">
           <div className="form-group">
             <label>Message</label>
             <textarea
@@ -41,7 +69,7 @@ export default function NotiDetails() {
               disabled
             />
           </div>
-        </div>
+        </div> */}
         {agentState.isReply ? (
           <div className="col-12 mt-3">
             <div className="form-group">
@@ -85,19 +113,38 @@ export default function NotiDetails() {
               Send
             </span>
           </>
+        ) : loading ? (
+          <Loader />
         ) : (
-          <span
-            className="btn btn-sm btn-success"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "10%",
-            }}
-            onClick={() => _triggerReply("reply")}
-          >
-            Reply
-          </span>
+          <>
+            <Notify />
+            <span
+              className="btn btn-sm btn-warning"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "10%",
+              }}
+              // onClick={() => _triggerReply("cancel")}
+              onClick={() => _goToDetails(request.property.propID)}
+            >
+              View Property
+            </span>
+            <span
+              className="btn btn-sm btn-success"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "10%",
+              }}
+              // onClick={() => _triggerReply("reply")}
+              onClick={() => _delReq(request._id)}
+            >
+              Delete
+            </span>
+          </>
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { adminUrl, agentUrl, propertyUrl } from "../data/baseUrls";
+import { adminUrl, agentUrl, propertyUrl, requestsUrl } from "../data/baseUrls";
 
 const _createAdmin = async (data) => {
   var results;
@@ -118,4 +118,37 @@ const _addProperty = async (data) => {
   return results;
 };
 
-export { _createAdmin, _addAgent, _addProperty };
+const _sendRequest = async ({ data, buyer }) => {
+  var results;
+
+  const url = requestsUrl + "create";
+
+  await fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      userName: buyer.firstName + " " + buyer.lastName,
+      userContact: buyer.phone,
+      userID: buyer._id,
+      agentID: data.agentID,
+      property: data,
+    }),
+  })
+    .then((response) => response.json())
+    .then((res) => {
+      return (results = res);
+    })
+    .catch((error) => {
+      return (results = {
+        success: 0,
+        message: "Please check you internet connection!",
+      });
+    });
+
+  return results;
+};
+
+export { _createAdmin, _addAgent, _addProperty, _sendRequest };

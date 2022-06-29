@@ -72,7 +72,7 @@ export default function UsersTable() {
                     var imgUrl = customer.image;
                     return (
                       <tr
-                        onClick={() => _routeToUsers(customer)}
+                        // onClick={() => _routeToUsers(customer)}
                         role="row"
                         className="odd"
                         key={index}

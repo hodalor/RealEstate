@@ -1,4 +1,6 @@
 import { useContext } from "react";
+import Loader from "../../../../components/loader";
+import Notify from "../../../../components/notification";
 import { AgentsContext } from "../../../../libs/contexts/agentsContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 
@@ -285,27 +287,34 @@ export default function PropertyDetails() {
             </div>
           </div>
           <div className="card">
+            <Notify />
             <div className="header">
               <h2>
                 <strong>Actions</strong>
               </h2>
             </div>
-            <div
-              className="badge badge-primary ml-3"
-              type="button"
-              role="button"
-              onClick={() => _removeProp(property._id)}
-            >
-              Delete property
-            </div>
-            <div
-              className="badge badge-primary ml-3"
-              type="button"
-              role="button"
-              onClick={() => _sold(property._id)}
-            >
-              Sold
-            </div>
+            {loading ? (
+              <Loader />
+            ) : (
+              <>
+                <div
+                  className="badge badge-primary ml-3"
+                  type="button"
+                  role="button"
+                  onClick={() => _removeProp(property._id)}
+                >
+                  Delete property
+                </div>
+                <div
+                  className="badge badge-primary ml-3"
+                  type="button"
+                  role="button"
+                  onClick={() => _sold(property._id)}
+                >
+                  Sold
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

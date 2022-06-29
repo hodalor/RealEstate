@@ -1,6 +1,9 @@
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../libs/contexts/authContext";
 
 export default function TopBar() {
+  const { _logout } = useContext(AuthContext);
+
   return (
     <div>
       {/* Overlay For Sidebars */}
@@ -26,7 +29,7 @@ export default function TopBar() {
               <i className="fa fa-bars" />
             </a>
           </li>
-          <li className="hidden-md-down">
+          {/* <li className="hidden-md-down">
             <a href="" title="favorites">
               <i className="fa fa-heart" />
             </a>
@@ -35,138 +38,18 @@ export default function TopBar() {
             <a href="" title="Contact Support">
               <i className="fa fa-phone" />
             </a>
-          </li>
-          {/*           
-          <li className="dropdown">
-            {" "}
-            <a
-              href="javascript:void(0);"
-              className="dropdown-toggle"
-              data-toggle="dropdown"
-              role="button"
-            >
-              <i className="fa fa-bell" />
-              <div className="notify">
-                <span className="heartbit" />
-                <span className="point" />
-              </div>
-            </a>
-            <ul className="dropdown-menu pullDown">
-              <li className="body">
-                <ul className="menu list-unstyled">
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/1.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Sophia <span className="time">For Sale</span>
-                          </span>
-                          <span className="message">Relaxing Apartment</span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/2.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Sophia <span className="time">For Rent</span>
-                          </span>
-                          <span className="message">
-                            Co-op Apartment in Bay Terrace
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/3.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Isabella <span className="time">For Rent</span>
-                          </span>
-                          <span className="message">
-                            A must see Villa on Chicago Ave
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/4.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Alexander <span className="time">For Sale</span>
-                          </span>
-                          <span className="message">
-                            5 Room Apartment Special Deal
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/5.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Grayson <span className="time">For Rent</span>
-                          </span>
-                          <span className="message">
-                            Real House Luxury Villa
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li className="footer">
-                {" "}
-                <a href="javascript:void(0);">View All</a>{" "}
-              </li>
-            </ul>
           </li> */}
-
           <li className="float-right">
-            <Link
-              to="/login"
+            <span
               type="button"
               role="button"
               className="mega-menu"
               data-close="true"
               title="log out"
+              onClick={_logout}
             >
               <i className="fa fa-power-off" />
-            </Link>
+            </span>
             <a
               href="javascript:void(0);"
               className="js-right-sidebar"
@@ -185,7 +68,7 @@ export default function TopBar() {
               <i className="fa fa-cog zmdi-hc-spin" />
             </a>
           </li>
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <a className="nav-link" data-toggle="tab" href="#chat">
               <i className="fa fa-heart" />
             </a>
@@ -194,7 +77,7 @@ export default function TopBar() {
             <a className="nav-link" data-toggle="tab" href="#activity">
               Support
             </a>
-          </li>
+          </li> */}
         </ul>
         <div className="tab-content">
           <div className="tab-pane slideRight active" id="setting">
@@ -269,18 +152,13 @@ export default function TopBar() {
                 <h6>Contact Support</h6>
                 <div className="streamline b-accent">
                   <div className="sl-item">
-                    <img
-                      className="user rounded-circle"
-                      src="../assets2/images/xs/avatar5.jpg"
-                      alt="avt"
-                    />
                     <div className="sl-content">
                       <h5 className="m-b-0">Contacts</h5>
                       <small>
                         <strong>P:</strong> +264-625-2323
                       </small>
                       <small>
-                        <strong>E:</strong> support@@gmail.com
+                        <strong>E:</strong> support@gmail.com
                       </small>
                     </div>
                   </div>

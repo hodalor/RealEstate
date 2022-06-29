@@ -1,6 +1,13 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import Loader from "../../components/loader";
+import Notify from "../../components/notification";
+import { AuthContext } from "../../libs/contexts/authContext";
 
 export default function Register(props) {
+  const { loading, authState, _handleChange, _handleRegister } =
+    useContext(AuthContext);
+
   return (
     <div className="site-wrapper overflow-hidden position-relative">
       {/* Sign In Area */}
@@ -21,15 +28,40 @@ export default function Register(props) {
                   <h2>Sign up</h2>
                   <p>No credit card required</p>
                 </div>
+                <Notify />
                 <form>
                   <div className="form-group">
-                    <label>Name*</label>
+                    <label>First Name*</label>
                     <input
                       type="text"
                       name="name"
                       id="name"
                       className="form-control"
-                      placeholder="ex: Livia Siphron"
+                      placeholder="ex: Livia"
+                      value={authState.firstName}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "firstName",
+                          value: e.target.value.toUpperCase(),
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Last Name*</label>
+                    <input
+                      type="text"
+                      name="name"
+                      id="name"
+                      className="form-control"
+                      placeholder="ex: Siphron"
+                      value={authState.lastName}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "lastName",
+                          value: e.target.value.toUpperCase(),
+                        })
+                      }
                     />
                   </div>
                   <div className="form-group">
@@ -40,6 +72,13 @@ export default function Register(props) {
                       id="name"
                       className="form-control"
                       placeholder="ex: 0546735894"
+                      value={authState.phone}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "phone",
+                          value: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="form-group">
@@ -50,30 +89,51 @@ export default function Register(props) {
                       id="email"
                       className="form-control"
                       placeholder="ex: john@email.com"
+                      value={authState.email}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "email",
+                          value: e.target.value.toUpperCase(),
+                        })
+                      }
                     />
                   </div>
                   <div className="form-group">
                     <label>Password*</label>
                     <input
-                      type="text"
+                      type="password"
                       name="password"
                       id="password"
                       className="form-control"
                       placeholder="i.e. IAmthepreciouspass123 "
+                      value={authState.password}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "pass",
+                          value: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="form-group">
                     <label>Confirm Password*</label>
                     <input
-                      type="text"
+                      type="password"
                       name="password2"
                       id="password2"
                       className="form-control"
                       placeholder="i.e. IAmthepreciouspass123 "
+                      value={authState.con_pass}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "con_pass",
+                          value: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="keep-sign-area">
-                    <div className="check-form d-inline-block">
+                    {/* <div className="check-form d-inline-block">
                       <label
                         htmlFor="terms-check"
                         className="check-input-control d-flex align-items-center mb-0"
@@ -89,11 +149,15 @@ export default function Register(props) {
                           <Link to="/terms">Terms &amp; Conditions</Link>
                         </span>
                       </label>
-                    </div>
+                    </div> */}
                   </div>
                   <div className="sign-in-log-btn">
-                    <button type="button" className="btn focus-reset">
-                      Sign Up
+                    <button
+                      type="button"
+                      className="btn focus-reset"
+                      onClick={loading ? null : _handleRegister}
+                    >
+                      {loading ? <Loader title="auth" /> : " Sign Up"}
                     </button>
                   </div>
                   <div className="create-new-acc-text">

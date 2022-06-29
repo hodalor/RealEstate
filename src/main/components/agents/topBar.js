@@ -1,12 +1,14 @@
 import { useContext } from "react";
+import { AgentsContext } from "../../libs/contexts/agentsContext";
 import { AuthContext } from "../../libs/contexts/authContext";
 
 export default function AgentsTopBar() {
   const { _logout } = useContext(AuthContext);
+  const { agentState } = useContext(AgentsContext);
+  const requests = agentState.requests;
 
   return (
     <div>
-      {/* Overlay For Sidebars */}
       <div className="overlay" />
       {/* Top Bar */}
       <nav className="navbar p-l-5 p-r-5">
@@ -29,129 +31,34 @@ export default function AgentsTopBar() {
               <i className="fa fa-bars" />
             </a>
           </li>
-          <li>
-            <a href="" title="Contact Support">
-              <i className="fa fa-phone" />
-            </a>
-          </li>
-
           <li className="dropdown">
             {" "}
-            <a
-              href="javascript:void(0);"
-              className="dropdown-toggle"
-              data-toggle="dropdown"
-              role="button"
-            >
-              <i className="fa fa-bell" title="notifications" />
-              <div className="notify">
-                <span className="heartbit" />
-                <span className="point" />
-              </div>
-            </a>
-            <ul className="dropdown-menu pullDown">
-              <li className="body">
-                <ul className="menu list-unstyled">
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/1.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Sophia <span className="time">For Sale</span>
-                          </span>
-                          <span className="message">Relaxing Apartment</span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/2.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Sophia <span className="time">For Rent</span>
-                          </span>
-                          <span className="message">
-                            Co-op Apartment in Bay Terrace
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/3.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Isabella <span className="time">For Rent</span>
-                          </span>
-                          <span className="message">
-                            A must see Villa on Chicago Ave
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/4.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Alexander <span className="time">For Sale</span>
-                          </span>
-                          <span className="message">
-                            5 Room Apartment Special Deal
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="javascript:void(0);">
-                      <div className="media">
-                        <img
-                          className="media-object w60"
-                          src="../assets/images/image-gallery/5.jpg"
-                          alt
-                        />
-                        <div className="media-body">
-                          <span className="name">
-                            Grayson <span className="time">For Rent</span>
-                          </span>
-                          <span className="message">
-                            Real House Luxury Villa
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li className="footer">
-                {" "}
-                <a href="javascript:void(0);">View All</a>{" "}
-              </li>
-            </ul>
+            {requests.length === 0 ? (
+              <a
+                href="javascript:void(0);"
+                className="dropdown-toggle"
+                data-toggle="dropdown"
+              >
+                <i className="fa fa-bell" title="requsts" />
+                {/* <div className="notify">
+                  <span className="heartbit" />
+                  <span className="point" />
+                </div> */}
+              </a>
+            ) : (
+              <a
+                href="javascript:void(0);"
+                className="dropdown-toggle"
+                data-toggle="dropdown"
+                role="button"
+              >
+                <i className="fa fa-bell" title="notifications" />
+                <div className="notify">
+                  <span className="heartbit" />
+                  <span className="point" />
+                </div>
+              </a>
+            )}
           </li>
 
           <li className="float-right">

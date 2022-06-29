@@ -1,4 +1,10 @@
+import { useContext } from "react";
+import { BuyersContext } from "../../../../libs/contexts/buyersContext";
+
 export default function AgentDetails() {
+  const { buyerState } = useContext(BuyersContext);
+  const agent = buyerState.agent;
+
   return (
     <div>
       <div className="container-fluid">
@@ -10,31 +16,40 @@ export default function AgentDetails() {
                   <div className="col-lg-4 col-md-4 col-12">
                     <div className="profile-image float-md-right">
                       {" "}
-                      <img
-                        src="../../../assets2/images/profile_av.jpg"
-                        alt
-                      />{" "}
+                      <img src={agent.image} alt="agent" />{" "}
                     </div>
                   </div>
                   <div className="col-lg-8 col-md-8 col-12">
                     <h4 className="m-t-0 m-b-0">
-                      <strong>Michael</strong> Deo
+                      <strong>{agent.firstName}</strong> {agent.lastName}
                     </h4>
-                    <span className="job_post">Agent</span>
+                    <span className="job_post">{agent.role}</span>
                     <p>
-                    againt@gmail.com
-                      <br /> +233 000000
+                      {agent.email}
+                      <br /> {agent.phone}
                     </p>
                     <p className="social-icon m-t-5 m-b-0">
-                      <a title="Twitter" href="javascript:void(0);">
-                        <i className="fab fa-twitter" />
-                      </a>
-                      <a title="Facebook" href="javascript:void(0);">
-                        <i className="fab fa-facebook" />
-                      </a>
-                      <a title="Instagram" href="javascript:void(0);">
-                        <i className="fab fa-instagram " />
-                      </a>
+                      {agent.twAct === "" ? (
+                        <span></span>
+                      ) : (
+                        <a title="Twitter" href={agent.twAct}>
+                          <i className="fab fa-twitter" />
+                        </a>
+                      )}
+                      {agent.fbAct === "" ? (
+                        <span></span>
+                      ) : (
+                        <a title="Facebook" href={agent.fbAct}>
+                          <i className="fab fa-facebook" />
+                        </a>
+                      )}
+                      {agent.insAct === "" ? (
+                        <span></span>
+                      ) : (
+                        <a title="Instagram" href={agent.insAct}>
+                          <i className="fab fa-instagram " />
+                        </a>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -54,7 +69,7 @@ export default function AgentDetails() {
                       data-speed={1000}
                       data-fresh-interval={700}
                     >
-                      2365
+                      {agent.properties.length}
                     </h5>
                     <small>Properties</small>
                   </div>
@@ -69,7 +84,7 @@ export default function AgentDetails() {
                       data-speed={1000}
                       data-fresh-interval={700}
                     >
-                      1203
+                      {agent.deals}
                     </h5>
                     <small>Closed deals</small>
                   </div>
@@ -84,9 +99,9 @@ export default function AgentDetails() {
                       data-speed={1000}
                       data-fresh-interval={700}
                     >
-                      2yrs
+                      {agent.days}
                     </h5>
-                    <small>Member for</small>
+                    <small>Member for days</small>
                   </div>
                 </li>
               </ul>
