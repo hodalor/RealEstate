@@ -2,22 +2,39 @@ import { useContext, useEffect } from "react";
 import Loader from "../../../../components/loader";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
+import { useHistory } from "react-router-dom";
 
 export default function PropertyDetails() {
   const { loading } = useContext(AuthContext);
   const { _resetDetails, adminData, _findAndRouteToAgent, _approve } =
     useContext(AdminContext);
   const property = adminData.propertyDetails;
+  const history = useHistory();
 
   useEffect(() => {
     _resetDetails("property");
   }, []);
+  
+  const handleEditProperty = () => {
+    // Store the property in context/storage for editing
+    // Then navigate to the edit page
+    history.push(`/admin/properties/edit/${property._id}`);
+  };
 
   return (
     <div>
       <div className="row clearfix">
         <div className="col-lg-8 col-md-12">
           <div className="card">
+            <div className="header d-flex justify-content-between align-items-center">
+              <h2><strong>Property</strong> Details</h2>
+              <button 
+                className="btn btn-primary" 
+                onClick={handleEditProperty}
+              >
+                <i className="fa fa-edit mr-2"></i> Edit Property
+              </button>
+            </div>
             <div className="body">
               <div id="demo2" className="carousel slide" data-ride="carousel">
                 <ul className="carousel-indicators">

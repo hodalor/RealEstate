@@ -3,12 +3,15 @@ import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 import Notify from "../../../../components/notification";
 import Loader from "../../../../components/loader";
+import WebsiteSettings from "./WebsiteSettings";
+import { toast } from "react-toastify";
 
 export default function Settings() {
   const { adminData, _handleSettingsChange, _saveSettings, _fetchSettings } = useContext(AdminContext);
   const { loading } = useContext(AuthContext);
   
   const [activeTab, setActiveTab] = useState('general');
+  const [showContentManagement, setShowContentManagement] = useState(false);
   
   // Local state for settings
   const [settings, setSettings] = useState({
@@ -61,6 +64,44 @@ export default function Settings() {
         "Gym",
       ],
     },
+    content: {
+      hero: {
+        title: "Find Your Dream Home",
+        subtitle: "Discover the perfect property with our extensive listings. Whether you're looking to buy or rent, we've got you covered.",
+        buttonText: "Browse Properties",
+        imageUrl: "../assets/image/hero-image.svg"
+      },
+      footer: {
+        aboutText: "We are dedicated to providing the best real estate services to help you find your dream property.",
+        contactAddress: "123 Real Estate St, Accra",
+        contactPhone: "+233 123 456 789",
+        contactEmail: "info@realestate.com",
+        socialLinks: {
+          facebook: "#",
+          twitter: "#",
+          instagram: "#",
+          linkedin: "#"
+        }
+      },
+      advertisements: [
+        {
+          id: 1,
+          title: "Premium Properties",
+          description: "Exclusive listings for our premium customers",
+          imageUrl: "../assets/image/banner1.jpg",
+          link: "/properties",
+          active: true
+        },
+        {
+          id: 2,
+          title: "New Developments",
+          description: "Check out our newest property developments",
+          imageUrl: "../assets/image/banner2.jpg",
+          link: "/properties",
+          active: true
+        }
+      ]
+    }
   });
 
   // New country and province state
@@ -68,6 +109,13 @@ export default function Settings() {
   const [newProvince, setNewProvince] = useState({ name: "", countryId: "" });
   const [newPropertyType, setNewPropertyType] = useState("");
   const [newAmenity, setNewAmenity] = useState("");
+  const [newAdvertisement, setNewAdvertisement] = useState({
+    title: "",
+    description: "",
+    imageUrl: "",
+    link: "",
+    active: true
+  });
 
   // Load settings from context or API when component mounts
   useEffect(() => {
@@ -81,7 +129,13 @@ export default function Settings() {
   }, []);
 
   const handleTabChange = (tab) => {
-    setActiveTab(tab);
+    if (tab === 'content') {
+      setShowContentManagement(true);
+      setActiveTab('');
+    } else {
+      setShowContentManagement(false);
+      setActiveTab(tab);
+    }
   };
 
   const handleGeneralSettingsChange = (e) => {
@@ -203,14 +257,22 @@ export default function Settings() {
     });
   };
 
+  // Handle content settings changes from WebsiteSettings component
+  const handleContentSettingsChange = (contentSettings) => {
+    setSettings({
+      ...settings,
+      content: contentSettings
+    });
+  };
+
   const saveSettings = () => {
     // Call the context function to save settings to backend
     if (_saveSettings) {
       _saveSettings(settings);
     } else {
       console.log("Settings saved:", settings);
-      // For now, just log the settings
-      alert("Settings saved successfully!");
+      // Use toast notification instead of alert
+      toast.success("Settings saved successfully!");
     }
   };
 
@@ -253,6 +315,15 @@ export default function Settings() {
                     onClick={() => handleTabChange('property')}
                   >
                     Property Settings
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a 
+                    className={`nav-link ${showContentManagement ? 'active' : ''}`} 
+                    href="#" 
+                    onClick={() => handleTabChange('content')}
+                  >
+                    <i className="fa fa-edit"></i> Content Management
                   </a>
                 </li>
               </ul>
@@ -567,6 +638,15 @@ export default function Settings() {
                       </div>
                     </div>
                   </div>
+                )}
+                
+                {/* Content Management Tab */}
+                {showContentManagement && (
+                  <WebsiteSettings 
+                    contentSettings={settings.content}
+                    onSettingsChange={handleContentSettingsChange}
+                    parentSaveFunction={saveSettings}
+                  />
                 )}
               </div>
               

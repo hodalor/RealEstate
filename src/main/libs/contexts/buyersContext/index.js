@@ -28,6 +28,7 @@ export default function BuyersContextProvided(props) {
     },
     propertyDetails: {},
     properties: [],
+    filteredProperties: [],
     buyer: {},
     agents: [],
     agent: {},
@@ -65,6 +66,7 @@ export default function BuyersContextProvided(props) {
     setBuyerState({
       ...buyerState,
       properties: properts,
+      filteredProperties: properts,
       buyer: userData,
       agents: agents !== undefined && agents.success === 1 ? agents.data : [],
     });
@@ -107,6 +109,118 @@ export default function BuyersContextProvided(props) {
   const _navigateToAgents = () => {
     history.push("/properties/agents");
     // window.location.reload();
+  };
+
+  const filterProperties = (filterCriteria) => {
+    // If no filter criteria or empty object, show all properties
+    if (!filterCriteria || Object.keys(filterCriteria).length === 0) {
+      setBuyerState({
+        ...buyerState,
+        filteredProperties: buyerState.properties
+      });
+      return;
+    }
+
+    // Filter properties based on criteria
+    const filtered = buyerState.properties.filter(property => {
+      // Filter by area/location
+      if (filterCriteria.area && 
+          !property.digitalAddress?.toLowerCase().includes(filterCriteria.area.toLowerCase()) &&
+          !property.location?.toLowerCase().includes(filterCriteria.area.toLowerCase()) &&
+          !property.country?.toLowerCase().includes(filterCriteria.area.toLowerCase()) &&
+          !property.province?.toLowerCase().includes(filterCriteria.area.toLowerCase()) &&
+          !property.city?.toLowerCase().includes(filterCriteria.area.toLowerCase())) {
+        return false;
+      }
+
+      // Filter by price range
+      if (filterCriteria.priceRange) {
+        const price = parseFloat(property.price.replace(/[^0-9.]/g, ''));
+        const [min, max] = filterCriteria.priceRange.split('-');
+        
+        if (min && max) {
+          if (price < parseFloat(min) || price > parseFloat(max)) {
+            return false;
+          }
+        } else if (min && min.includes('+')) {
+          const minValue = parseFloat(min.replace('+', ''));
+          if (price < minValue) {
+            return false;
+          }
+        }
+      }
+
+      // Filter by property type (rent/sale)
+      if (filterCriteria.propertyType && property.rentOrSale !== filterCriteria.propertyType) {
+        return false;
+      }
+
+      // Filter by bedrooms
+      if (filterCriteria.bedrooms) {
+        if (filterCriteria.bedrooms.includes('+')) {
+          const minBedrooms = parseInt(filterCriteria.bedrooms.replace('+', ''));
+          if (property.others?.noOfBedrooms < minBedrooms) {
+            return false;
+          }
+        } else if (property.others?.noOfBedrooms !== parseInt(filterCriteria.bedrooms)) {
+          return false;
+        }
+      }
+
+      // Filter by bathrooms
+      if (filterCriteria.bathrooms) {
+        if (filterCriteria.bathrooms.includes('+')) {
+          const minBathrooms = parseInt(filterCriteria.bathrooms.replace('+', ''));
+          if (property.others?.bathrooms < minBathrooms) {
+            return false;
+          }
+        } else if (property.others?.bathrooms !== parseInt(filterCriteria.bathrooms)) {
+          return false;
+        }
+      }
+
+      // Filter by country
+      if (filterCriteria.country && property.country !== filterCriteria.country) {
+        return false;
+      }
+
+      // Filter by province/region
+      if (filterCriteria.province && property.province !== filterCriteria.province) {
+        return false;
+      }
+
+      // Filter by city
+      if (filterCriteria.city && property.city !== filterCriteria.city) {
+        return false;
+      }
+
+      // Filter by amenities
+      if (filterCriteria.amenities) {
+        if (filterCriteria.amenities.wifi && !property.amenities?.internet) {
+          return false;
+        }
+        if (filterCriteria.amenities.airCondition && !property.amenities?.airCondition) {
+          return false;
+        }
+        if (filterCriteria.amenities.swimmingPool && !property.amenities?.swimmingPool) {
+          return false;
+        }
+        if (filterCriteria.amenities.pipeWater && !property.amenities?.pipeWater) {
+          return false;
+        }
+        if (filterCriteria.amenities.carPark && !property.carPark) {
+          return false;
+        }
+      }
+
+      // If passed all filters
+      return true;
+    });
+
+    setBuyerState({
+      ...buyerState,
+      filteredProperties: filtered
+    });
   };
 
   const _handleChange = (data) => {
@@ -293,6 +407,7 @@ export default function BuyersContextProvided(props) {
         _saveChanges,
         _handleChange,
         _send,
+        filterProperties,
       }}
     >
       {props.children}

@@ -3,6 +3,13 @@ import { Link, useParams } from 'react-router-dom';
 import { _fetchProperties } from '../libs/functions/fetches';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import BookTourModal from './components/modals/BookTourModal';
+import BookPropertyModal from './components/modals/BookPropertyModal';
+import ChatAgentModal from './components/modals/ChatAgentModal';
+import './styles/chat-modal.css';
+
+// This would typically come from your auth context
+const isAdmin = false; // Set to true to test admin functionality
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -69,12 +76,17 @@ export default function PropertyDetail() {
       
       <div className="property-detail-section py-5">
         <div className="container">
-          <nav aria-label="breadcrumb" className="mb-4">
-            <ol className="breadcrumb">
+          <nav aria-label="breadcrumb" className="mb-4 d-flex justify-content-between align-items-center">
+            <ol className="breadcrumb mb-0">
               <li className="breadcrumb-item"><Link to="/">Home</Link></li>
               <li className="breadcrumb-item"><Link to="/properties">Properties</Link></li>
               <li className="breadcrumb-item active" aria-current="page">{property.name}</li>
             </ol>
+            {isAdmin && (
+              <Link to={`/admin/properties/edit/${property._id}`} className="btn btn-sm btn-primary">
+                <i className="fa fa-edit me-1"></i> Edit Property
+              </Link>
+            )}
           </nav>
 
           <div className="row">
@@ -250,8 +262,28 @@ export default function PropertyDetail() {
             </div>
 
             <div className="col-lg-4">
-              {/* Contact Agent Form */}
+              {/* Property Actions */}
               <div className="card mb-4 sticky-top" style={{ top: '100px' }}>
+                <div className="card-header bg-primary text-white">
+                  <h5 className="mb-0">Property Actions</h5>
+                </div>
+                <div className="card-body">
+                  <div className="d-grid gap-3">
+                    <button className="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#bookTourModal">
+                      <i className="fa fa-calendar me-2"></i> Book a Tour
+                    </button>
+                    <button className="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#bookPropertyModal">
+                      <i className="fa fa-home me-2"></i> Book Property
+                    </button>
+                    <button className="btn btn-info w-100" data-bs-toggle="modal" data-bs-target="#chatAgentModal">
+                      <i className="fa fa-comments me-2"></i> Chat with Agent
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Contact Agent Form */}
+              <div className="card mb-4">
                 <div className="card-header bg-primary text-white">
                   <h5 className="mb-0">Contact Agent</h5>
                 </div>
@@ -294,6 +326,11 @@ export default function PropertyDetail() {
       </div>
 
       <Footer />
+      
+      {/* Modals */}
+      <BookTourModal property={property} />
+      <BookPropertyModal property={property} />
+      <ChatAgentModal property={property} />
     </div>
   );
 }

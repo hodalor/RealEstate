@@ -3,7 +3,7 @@ import { BuyersContext } from "../../../libs/contexts/buyersContext";
 
 export default function ItemComp() {
   const { buyerState, _navigateToDetails } = useContext(BuyersContext);
-  const properties = buyerState.properties;
+  const properties = buyerState.filteredProperties || buyerState.properties;
 
   return (
     <div className="row clearfix">

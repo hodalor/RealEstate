@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { _fetchProperties } from '../../libs/functions/fetches';
+import AdvancedFilters from './AdvancedFilters';
 
 export default function PropertyListing({ featured = false, limit = 0 }) {
   const [properties, setProperties] = useState([]);
@@ -14,7 +15,11 @@ export default function PropertyListing({ featured = false, limit = 0 }) {
     province: '',
     city: '',
     suburb: '',
-    sortBy: 'newest' // Add sorting option
+    sortBy: 'newest',
+    hasSwimmingPool: false,
+    hasAirCondition: false,
+    hasCarPark: false,
+    showAdvancedFilters: false
   });
   
   // Extract unique location data for filters
@@ -74,6 +79,27 @@ export default function PropertyListing({ featured = false, limit = 0 }) {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
+    
+    if (name === 'resetAll') {
+      // Reset all filters to default values
+      setFilter({
+        searchTerm: '',
+        propertyType: '',
+        priceRange: '',
+        bedrooms: '',
+        country: '',
+        province: '',
+        city: '',
+        suburb: '',
+        sortBy: 'newest',
+        hasSwimmingPool: false,
+        hasAirCondition: false,
+        hasCarPark: false,
+        showAdvancedFilters: true // Keep advanced filters visible
+      });
+      return;
+    }
+    
     setFilter({
       ...filter,
       [name]: value
@@ -124,6 +150,19 @@ export default function PropertyListing({ featured = false, limit = 0 }) {
     
     // Filter by suburb
     if (filter.suburb && property.suburb !== filter.suburb) {
+      return false;
+    }
+    
+    // Filter by amenities
+    if (filter.hasSwimmingPool && !property.amenities?.swimmingPool) {
+      return false;
+    }
+    
+    if (filter.hasAirCondition && !property.amenities?.airCondition) {
+      return false;
+    }
+    
+    if (filter.hasCarPark && !property.carPark) {
       return false;
     }
     
@@ -286,6 +325,23 @@ export default function PropertyListing({ featured = false, limit = 0 }) {
               </select>
             </div>
           </div>
+          
+          <div className="d-flex justify-content-end mb-3">
+            <button 
+              className="btn btn-sm btn-outline-primary" 
+              onClick={() => setFilter(prev => ({ ...prev, showAdvancedFilters: !prev.showAdvancedFilters }))}
+            >
+              {filter.showAdvancedFilters ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
+            </button>
+          </div>
+          
+          {filter.showAdvancedFilters && (
+            <AdvancedFilters 
+              filter={filter} 
+              handleFilterChange={handleFilterChange} 
+              locationData={locationData} 
+            />
+          )}
         </div>
       )}
       
