@@ -1,20 +1,27 @@
-import { useContext } from "react";
-import { Redirect } from "react-router-dom";
+import React, { useContext } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { AuthContext } from "../libs/contexts/authContext";
+import AdminContextProvider from "../libs/contexts/adminContext";
+import AgentsContextProvider from "../libs/contexts/agentsContext";
+import BuyersContextProvided from "../libs/contexts/buyersContext";
+import Admins from "./pages/admins";
+import Agents from "./pages/agents";
+import Buyers from "./pages/byers";
+import NotAuth from "./pages/errPages/not-auth";
+import Support from "./pages/others/support";
+import Settings from "./pages/admins/settings";
 
 export default function MainApp() {
-  const { authState } = useContext(AuthContext);
-  // get role from props
-  const userType = authState.user.role;
+  const { user } = useContext(AuthContext);
 
-  // show page based on user type
-  if (userType === "" || userType === undefined) {
-    return <Redirect to="/forbidden" />;
-  } else if (userType === "Buyer") {
-    return <Redirect to="/properties" />;
-  } else if (userType === "Agent") {
-    return <Redirect to="/agents" />;
-  } else if (userType === "Admin") {
-    return <Redirect to="/admin" />;
-  }
+  return (
+    <Switch>
+      <Route path="/admin" component={Admins} />
+      <Route path="/agents" component={Agents} />
+      <Route path="/buyers" component={Buyers} />
+      <Route path="/support" component={Support} />
+      <Route path="/settings" component={Settings} />
+      <Route path="/forbidden" component={NotAuth} />
+    </Switch>
+  );
 }

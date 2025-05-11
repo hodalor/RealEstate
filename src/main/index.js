@@ -1,7 +1,8 @@
 import { Route, Switch } from "react-router-dom";
 import AuthContextProvider from "./libs/contexts/authContext";
 
-// import Web from "./website";
+import NewLandingPage from "./website/NewLandingPage";
+import PropertyDetail from "./website/PropertyDetail";
 import Login from "./auth/signin";
 import Register from "./auth/register";
 import Terms from "./auth/termsAndConditions";
@@ -12,16 +13,22 @@ import Agents from "./app/pages/agents";
 import Admin from "./app/pages/admins";
 import Support from "./app/pages/others/support";
 
+// Import custom styles
+import "./website/styles/custom.css";
+import "./website/styles/header-fix.css";
+
+
 export default function Main() {
   return (
     <Switch>
-      {/* <Route exact path="/" render={(props) => <Web {...props} />} /> */}
+      <Route exact path="/" component={NewLandingPage} />
       <AuthContextProvider>
-        <Route exact path="/" component={Login} />
+        <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/terms" component={Terms} />
         <Route path="/forbidden" component={NotAuth} />
-        <Route path="/properties" component={Buyers} />
+        <Route path="/properties/:id" component={PropertyDetail} />
+        <Route exact path="/properties" component={Buyers} />
         <Route path="/agents" component={Agents} />
         <Route path="/admin" component={Admin} />
         <Route path="/check" component={MainApp} />

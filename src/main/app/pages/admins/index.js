@@ -1,18 +1,22 @@
-import { Switch, Route } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import { Route, Switch, useHistory, useRouteMatch } from "react-router-dom";
+import { AuthContext } from "../../../libs/contexts/authContext";
+import AdminContextProvider from "../../../libs/contexts/adminContext";
 import AdminStart from "../../../components/admin";
 import AdminPageTitle from "../../../components/admin/pageTitle";
-import AdminContextProvider from "../../../libs/contexts/adminContext";
+import AdminProperties from "./properties";
 import AddAdmin from "./addAdmin";
 import AddAgent from "./addAgent";
 import AddProp from "./addProperty";
-import AgentProfile from "./agentDetails";
+import AgentDetails from "./agentDetails";
 import Agents from "./agents";
 import Notifications from "./notifications";
-import AdminProfile from "./profile";
-import AdminProperties from "./properties";
+import Profile from "./profile";
+import Properties from "./properties";
 import PropertyDetails from "./propertyDetails";
 import User from "./user";
 import Users from "./users";
+import Settings from "./settings";
 
 export default function Admin() {
   return (
@@ -35,18 +39,19 @@ export default function Admin() {
               <Route exact path="/admin/agents/" component={Agents} />
               <Route
                 path="/admin/agents/details/:ID"
-                component={AgentProfile}
+                component={AgentDetails}
               />
               <Route path="/admin/add-agent/" component={AddAgent} />
               <Route path="/admin/add-admin/" component={AddAdmin} />
               <Route path="/admin/users/" component={Users} />
               <Route path="/admin/users/user/:ID" component={User} />
-              <Route path="/admin/profile/" component={AdminProfile} />
+              <Route path="/admin/profile/" component={Profile} />
               <Route
                 exact
                 path="/admin/notifications"
                 component={Notifications}
               />
+              <Route path="/admin/settings" component={Settings} />
               <Route path="/admin/create-property" component={AddProp} />
             </Switch>
           </div>

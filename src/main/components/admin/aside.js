@@ -77,6 +77,12 @@ export default function AdminAside() {
                     <span>Notifications</span>
                   </Link>
                 </li>
+                <li>
+                  <Link to="/admin/settings">
+                    <i className="fa fa-cog" />
+                    <span>Settings</span>
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

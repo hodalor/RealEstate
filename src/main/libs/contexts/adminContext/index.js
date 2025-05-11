@@ -23,6 +23,7 @@ import {
 } from "../../functions/edits";
 import { _delAgent } from "../../functions/deletes";
 import { _retrieveFromStroage, _saveToStorage } from "../../functions/storage";
+import { adminUrl } from "../../data/baseUrls";
 
 export const AdminContext = createContext();
 
@@ -70,6 +71,10 @@ export default function AdminContextProvider(props) {
       year: "",
       agentID: "",
       address: "",
+      country: "",
+      province: "",
+      city: "",
+      suburb: "",
       dRoom: Boolean,
       kitchen: Boolean,
       livRoom: Boolean,
@@ -85,6 +90,57 @@ export default function AdminContextProvider(props) {
       pets: Boolean,
       rooms: Number,
       propImages: [],
+    },
+    settings: {
+      general: {
+        siteName: "RealEstate",
+        currency: "GHC",
+        currencySymbol: "₵",
+        defaultLanguage: "English",
+      },
+      location: {
+        countries: [
+          { id: 1, name: "Ghana" },
+          { id: 2, name: "Nigeria" },
+          { id: 3, name: "South Africa" },
+          { id: 4, name: "Kenya" },
+          { id: 5, name: "Egypt" },
+        ],
+        provinces: [
+          { id: 1, countryId: 1, name: "Greater Accra" },
+          { id: 2, countryId: 1, name: "Ashanti" },
+          { id: 3, countryId: 1, name: "Western" },
+          { id: 4, countryId: 1, name: "Eastern" },
+          { id: 5, countryId: 1, name: "Central" },
+          { id: 6, countryId: 1, name: "Volta" },
+          { id: 7, countryId: 1, name: "Northern" },
+          { id: 8, countryId: 2, name: "Lagos" },
+          { id: 9, countryId: 2, name: "Abuja" },
+        ],
+      },
+      property: {
+        propertyTypes: [
+          "Single room",
+          "Apartment",
+          "Full house",
+          "Office",
+          "Shop",
+          "Land",
+          "Warehouse",
+        ],
+        amenities: [
+          "Swimming Pool",
+          "Pipe Water",
+          "Air Conditioning",
+          "Electricity",
+          "Near Main Road",
+          "Near Supermarket",
+          "Pets Allowed",
+          "Security",
+          "Internet",
+          "Gym",
+        ],
+      },
     },
     categories: {
       all: true,
@@ -216,6 +272,42 @@ export default function AdminContextProvider(props) {
         user: {
           ...adminData.user,
           firstName: value,
+        },
+      });
+      
+    if (field === "country")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          country: value,
+        },
+      });
+      
+    if (field === "province")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          province: value,
+        },
+      });
+      
+    if (field === "city")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          city: value,
+        },
+      });
+      
+    if (field === "suburb")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          suburb: value,
         },
       });
 
@@ -1244,6 +1336,79 @@ export default function AdminContextProvider(props) {
     });
   };
 
+  // Handle settings changes
+  const _handleSettingsChange = (data) => {
+    setAdminData({
+      ...adminData,
+      settings: data
+    });
+  };
+
+  // Save settings to backend
+  const _saveSettings = async (settingsData) => {
+    try {
+      setLoading(true);
+      const response = await fetch(adminUrl + 'settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settingsData)
+      });
+
+      const result = await response.json();
+
+      if (result.success === 1) {
+        setAdminData({
+          ...adminData,
+          settings: settingsData
+        });
+
+        setNotiData({
+          type: "success",
+          show: true,
+          msg: "Settings saved successfully!",
+        });
+      } else {
+        throw new Error(result.message || 'Failed to save settings');
+      }
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      setNotiData({
+        type: "error",
+        show: true,
+        msg: "Failed to save settings. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch settings from backend
+  const _fetchSettings = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(adminUrl + 'settings');
+      const result = await response.json();
+
+      if (result.success === 1 && result.settings) {
+        setAdminData({
+          ...adminData,
+          settings: result.settings
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      setNotiData({
+        type: 'error',
+        show: true,
+        msg: 'Failed to load settings. Please refresh the page.'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AdminContext.Provider
       value={{
@@ -1265,6 +1430,9 @@ export default function AdminContextProvider(props) {
         _findAndRouteToAgent,
         _handleCategory,
         _approve,
+        _handleSettingsChange,
+        _saveSettings,
+        _fetchSettings,
       }}
     >
       {props.children}

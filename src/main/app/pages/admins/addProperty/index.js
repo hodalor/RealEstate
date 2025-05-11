@@ -123,6 +123,107 @@ export default function AddProp() {
                   </div>
                 </div>
               </div>
+              <h6 className="mt-4">Location Information</h6>
+              <div className="row clearfix">
+                <div className="col-sm-3">
+                  <div className="form-group">
+                    <select
+                      className="form-control"
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "country",
+                          value: e.target.value,
+                        })
+                      }
+                    >
+                      <option className="form-control" value="">
+                        Select Country
+                      </option>
+                      {adminData.settings?.location?.countries?.map((country) => (
+                        <option key={country.id} value={country.name}>
+                          {country.name}
+                        </option>
+                      )) || (
+                        <option value="Ghana">Ghana</option>
+                      )}
+                    </select>
+                  </div>
+                </div>
+                <div className="col-sm-3">
+                  <div className="form-group">
+                    <select
+                      className="form-control"
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "province",
+                          value: e.target.value,
+                        })
+                      }
+                    >
+                      <option className="form-control" value="">
+                        Select Province/State
+                      </option>
+                      {adminData.settings?.location?.provinces
+                        ?.filter(province => {
+                          // If a country is selected, filter provinces by that country
+                          if (adminData.property.country) {
+                            const countryObj = adminData.settings.location.countries.find(
+                              c => c.name === adminData.property.country
+                            );
+                            return countryObj ? province.countryId === countryObj.id : true;
+                          }
+                          return true;
+                        })
+                        .map((province) => (
+                          <option key={province.id} value={province.name}>
+                            {province.name}
+                          </option>
+                        )) || (
+                          <>
+                            <option value="Greater Accra">Greater Accra</option>
+                            <option value="Ashanti">Ashanti</option>
+                            <option value="Western">Western</option>
+                            <option value="Eastern">Eastern</option>
+                            <option value="Central">Central</option>
+                          </>
+                        )}
+                    </select>
+                  </div>
+                </div>
+                <div className="col-sm-3">
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="City"
+                      value={adminData.property.city || ""}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "city",
+                          value: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="col-sm-3">
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Suburb/Neighborhood"
+                      value={adminData.property.suburb || ""}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "suburb",
+                          value: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+              
               <h6 className="mt-4">Property Information</h6>
               <div className="row clearfix">
                 <div className="col-sm-3">
