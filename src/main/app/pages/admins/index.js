@@ -17,6 +17,9 @@ import PropertyDetails from "./propertyDetails";
 import User from "./user";
 import Users from "./users";
 import Settings from "./settings";
+import AdminChats from "./chats";
+import TourBookings from "./tourBookings";
+import PaymentHistory from "./payments";
 
 export default function Admin() {
   return (
@@ -53,6 +56,9 @@ export default function Admin() {
               />
               <Route path="/admin/settings" component={Settings} />
               <Route path="/admin/create-property" component={AddProp} />
+              <Route path="/admin/chats" component={AdminChats} />
+              <Route path="/admin/tour-bookings" component={TourBookings} />
+              <Route path="/admin/payments" component={PaymentHistory} />
             </Switch>
           </div>
         </div>

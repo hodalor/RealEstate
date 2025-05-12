@@ -4,6 +4,7 @@ import { AuthContext } from "../../../../libs/contexts/authContext";
 import Notify from "../../../../components/notification";
 import Loader from "../../../../components/loader";
 import WebsiteSettings from "./WebsiteSettings";
+import DeveloperSettings from "./DeveloperSettings";
 import { toast } from "react-toastify";
 
 export default function Settings() {
@@ -12,6 +13,7 @@ export default function Settings() {
   
   const [activeTab, setActiveTab] = useState('general');
   const [showContentManagement, setShowContentManagement] = useState(false);
+  const [showDeveloperSettings, setShowDeveloperSettings] = useState(false);
   
   // Local state for settings
   const [settings, setSettings] = useState({
@@ -63,6 +65,39 @@ export default function Settings() {
         "Internet",
         "Gym",
       ],
+    },
+    developer: {
+      apiKeys: {
+        firebase: {
+          apiKey: '',
+          authDomain: '',
+          projectId: '',
+          storageBucket: '',
+          messagingSenderId: '',
+          appId: ''
+        },
+        payment: {
+          paystack: {
+            publicKey: '',
+            secretKey: ''
+          },
+          flutterwave: {
+            publicKey: '',
+            secretKey: ''
+          },
+          momo: {
+            apiKey: '',
+            userId: ''
+          }
+        },
+        maps: {
+          googleMaps: {
+            apiKey: ''
+          }
+        }
+      },
+      generatedApis: [],
+      webhooks: []
     },
     content: {
       hero: {
@@ -131,9 +166,15 @@ export default function Settings() {
   const handleTabChange = (tab) => {
     if (tab === 'content') {
       setShowContentManagement(true);
+      setShowDeveloperSettings(false);
+      setActiveTab('');
+    } else if (tab === 'developer') {
+      setShowDeveloperSettings(true);
+      setShowContentManagement(false);
       setActiveTab('');
     } else {
       setShowContentManagement(false);
+      setShowDeveloperSettings(false);
       setActiveTab(tab);
     }
   };
@@ -265,6 +306,14 @@ export default function Settings() {
     });
   };
 
+  // Handle developer settings changes from DeveloperSettings component
+  const handleDeveloperSettingsChange = (field, developerSettings) => {
+    setSettings({
+      ...settings,
+      developer: developerSettings
+    });
+  };
+
   const saveSettings = () => {
     // Call the context function to save settings to backend
     if (_saveSettings) {
@@ -324,6 +373,15 @@ export default function Settings() {
                     onClick={() => handleTabChange('content')}
                   >
                     <i className="fa fa-edit"></i> Content Management
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a 
+                    className={`nav-link ${showDeveloperSettings ? 'active' : ''}`} 
+                    href="#" 
+                    onClick={() => handleTabChange('developer')}
+                  >
+                    <i className="fa fa-code"></i> Developer Settings
                   </a>
                 </li>
               </ul>
@@ -646,6 +704,13 @@ export default function Settings() {
                     contentSettings={settings.content}
                     onSettingsChange={handleContentSettingsChange}
                     parentSaveFunction={saveSettings}
+                  />
+                )}
+                
+                {showDeveloperSettings && (
+                  <DeveloperSettings 
+                    settings={settings}
+                    onSettingsChange={handleDeveloperSettingsChange}
                   />
                 )}
               </div>
