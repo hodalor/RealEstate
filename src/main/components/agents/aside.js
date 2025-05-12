@@ -122,6 +122,24 @@ export default function AgentsAside() {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/agents/live-chat">
+                    <i className="fa fa-comments" />
+                    <span>Live Chat</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/agents/tour-bookings">
+                    <i className="fa fa-calendar" />
+                    <span>Tour Bookings</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/agents/payment-history">
+                    <i className="fa fa-money" />
+                    <span>Payment History</span>
+                  </Link>
+                </li>
+                <li>
                   <Link to="/support">
                     <i className="fa fa-headset" />
                     <span>Support</span>

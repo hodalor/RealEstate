@@ -72,6 +72,24 @@ export default function AdminAside() {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/admin/chats">
+                    <i className="fa fa-comments" />
+                    <span>Live Chat</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/admin/tour-bookings">
+                    <i className="fa fa-calendar" />
+                    <span>Tour Bookings</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/admin/payments">
+                    <i className="fa fa-money" />
+                    <span>Payment History</span>
+                  </Link>
+                </li>
+                <li>
                   <Link to="/admin/notifications">
                     <i className="fa fa-bell" />
                     <span>Notifications</span>

@@ -8,6 +8,9 @@ import Notifications from "./notifications";
 import AgentProfile from "./profile";
 import AgentsProperties from "./properties";
 import PropertyDetails from "./propertyDetails";
+import LiveChat from "./liveChat";
+import TourBookings from "./tourBookings";
+import PaymentHistory from "./paymentHistory";
 
 export default function Agents() {
   return (
@@ -40,6 +43,18 @@ export default function Agents() {
               <Route
                 path="/agents/create-property"
                 component={AddProp}
+              />
+              <Route
+                path="/agents/live-chat"
+                component={LiveChat}
+              />
+              <Route
+                path="/agents/tour-bookings"
+                component={TourBookings}
+              />
+              <Route
+                path="/agents/payment-history"
+                component={PaymentHistory}
               />
             </Switch>
           </div>

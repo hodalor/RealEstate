@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { _fetchProperties } from '../../libs/functions/fetches';
 import AdvancedFilters from './AdvancedFilters';
 
-export default function PropertyListing({ featured = false, limit = 0 }) {
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function PropertyListing({ featured = false, limit = 0, properties = [], loading = false }) {
+  
   const [filter, setFilter] = useState({
     searchTerm: '',
     propertyType: '',
@@ -30,9 +28,7 @@ export default function PropertyListing({ featured = false, limit = 0 }) {
     suburbs: []
   });
 
-  useEffect(() => {
-    fetchApprovedProperties();
-  }, []); // Empty dependency array ensures this only runs once on mount
+  
   
   // Extract location data from properties for filters
   useEffect(() => {
@@ -49,33 +45,9 @@ export default function PropertyListing({ featured = false, limit = 0 }) {
         suburbs
       });
     }
-  }, [properties]); // Only depend on properties to avoid infinite loop
+  }, []); // Only depend on properties to avoid infinite loop
 
-  const fetchApprovedProperties = async () => {
-    setLoading(true);
-    try {
-      const results = await _fetchProperties();
-      if (results && results.success !== 0) {
-        // Filter only approved properties
-        const approvedProperties = results.data.filter(property => property.isApproved);
-        
-        // Sort by creation date (newest first)
-        const sortedProperties = approvedProperties.sort((a, b) => 
-          new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        
-        // Apply limit if specified
-        const limitedProperties = limit > 0 ? sortedProperties.slice(0, limit) : sortedProperties;
-        setProperties(limitedProperties);
-      } else {
-        setProperties([]);
-      }
-    } catch (error) {
-      console.error("Error fetching properties:", error);
-      setProperties([]);
-    }
-    setLoading(false);
-  };
+
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -208,6 +180,7 @@ export default function PropertyListing({ featured = false, limit = 0 }) {
     
     return result;
   }, [filteredProperties, filter.sortBy]);
+console.log(sortedAndFilteredProperties);
 
   return (
     <div className="property-listing">
@@ -362,10 +335,7 @@ export default function PropertyListing({ featured = false, limit = 0 }) {
                     className="card-img-top"
                     alt={property.name}
                     style={{ height: "220px", objectFit: "cover" }}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/assets/image/property-placeholder.jpg";
-                    }}
+                    
                   />
                   <div className={`property-tag position-absolute top-0 end-0 px-3 py-1 m-2 rounded ${property.rentOrSale === 'Rent' ? 'bg-info' : 'bg-success'} text-white`}>
                     For {property.rentOrSale}

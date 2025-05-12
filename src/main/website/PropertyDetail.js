@@ -98,10 +98,7 @@ export default function PropertyDetail() {
                   alt={property.name} 
                   className="img-fluid rounded shadow"
                   style={{ width: '100%', height: '500px', objectFit: 'cover' }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/assets/image/property-placeholder.jpg";
-                  }}
+                  
                 />
               </div>
               
@@ -121,10 +118,7 @@ export default function PropertyDetail() {
                           alt={`${property.name} - ${key}`} 
                           className="img-fluid rounded"
                           style={{ width: '100px', height: '75px', objectFit: 'cover' }}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "/assets/image/property-placeholder.jpg";
-                          }}
+                         
                         />
                       </div>
                     );
