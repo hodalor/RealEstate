@@ -138,3 +138,78 @@ export const closeSocket = () => {
     socket = null;
   }
 };
+
+// Create a new chat request from client
+export const createLiveChatRequest = async (propertyId, clientInfo) => {
+  try {
+    const response = await fetch(`${adminUrl}chats/request`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        propertyId,
+        clientInfo,
+        requestType: 'liveChat',
+        timestamp: new Date().toISOString()
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create live chat request');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating live chat request:', error);
+    throw error;
+  }
+};
+
+// Initialize client socket for live chat requests
+export const initializeClientSocket = () => {
+  // Close any existing connections
+  if (socket) {
+    socket.close();
+  }
+  
+  // Create new connection to chat server
+  const socketUrl = adminUrl.replace('/api/admin/', '');
+  socket = io(socketUrl, {
+    query: { isClient: true }
+  });
+  
+  socket.on('connect', () => {
+    console.log('Client socket connected');
+  });
+  
+  socket.on('connect_error', (error) => {
+    console.error('Client socket connection error:', error);
+  });
+  
+  return socket;
+};
+
+// Emit live chat request event
+export const emitLiveChatRequest = (requestData) => {
+  if (!socket) {
+    throw new Error('Socket not initialized');
+  }
+  
+  socket.emit('live_chat_request', requestData);
+};
+
+// Listen for agent response to live chat request
+export const subscribeToAgentResponse = (callback) => {
+  if (!socket) {
+    throw new Error('Socket not initialized');
+  }
+  
+  socket.on('agent_response', (response) => {
+    callback(response);
+  });
+  
+  return () => {
+    socket.off('agent_response');
+  };
+};

@@ -92,6 +92,7 @@ export default function AuthContextProvider(props) {
     }
 
     setLoading(false);
+    _showToast("success", results.message || "Login successful");
 
     const store = await _saveToStorage({ data: results.user, key: "user" });
     if (store) {

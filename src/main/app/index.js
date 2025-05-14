@@ -13,7 +13,7 @@ import Settings from "./pages/admins/settings";
 
 export default function MainApp() {
   const { user } = useContext(AuthContext);
-
+console.log(user)
   return (
     <Switch>
       <Route path="/admin" component={Admins} />

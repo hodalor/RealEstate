@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { initializeClientSocket, createLiveChatRequest, emitLiveChatRequest, subscribeToAgentResponse } from '../../../libs/services/chatService';
 
 export default function ChatAgentModal({ property }) {
   const [messages, setMessages] = useState([
@@ -6,15 +7,108 @@ export default function ChatAgentModal({ property }) {
   ]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [waitingForAgent, setWaitingForAgent] = useState(false);
+  const [liveChatRequested, setLiveChatRequested] = useState(false);
   const messagesEndRef = useRef(null);
+  const socketCleanupRef = useRef(null);
 
   // Scroll to bottom of messages when new messages are added
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+  
+  // Cleanup socket connection when component unmounts
+  useEffect(() => {
+    return () => {
+      if (socketCleanupRef.current) {
+        socketCleanupRef.current();
+        socketCleanupRef.current = null;
+      }
+    };
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Handle live chat request button click
+  const handleLiveChatRequest = async () => {
+    try {
+      setWaitingForAgent(true);
+      
+      // Add system message to chat
+      const systemMessage = { 
+        sender: 'agent', 
+        text: 'Live chat requested. Please wait while we connect you with an available agent...', 
+        time: new Date() 
+      };
+      setMessages(prev => [...prev, systemMessage]);
+      
+      // Initialize socket connection
+      const socket = initializeClientSocket();
+      
+      // Create client info object
+      const clientInfo = {
+        propertyId: property?._id,
+        propertyName: property?.name,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Create live chat request in the database
+      const response = await createLiveChatRequest(property?._id, clientInfo);
+      
+      if (response.success) {
+        // Emit live chat request event to notify agents
+        emitLiveChatRequest({
+          requestId: response.data.requestId,
+          propertyId: property?._id,
+          propertyName: property?.name,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Subscribe to agent response
+        socketCleanupRef.current = subscribeToAgentResponse((response) => {
+          if (response.status === 'accepted') {
+            // Add system message that agent has accepted the chat
+            const acceptedMessage = { 
+              sender: 'agent', 
+              text: `${response.agentName || 'An agent'} has accepted your chat request and will be with you shortly.`, 
+              time: new Date() 
+            };
+            setMessages(prev => [...prev, acceptedMessage]);
+            setWaitingForAgent(false);
+            setLiveChatRequested(true);
+          } else if (response.status === 'rejected') {
+            // Add system message that no agents are available
+            const rejectedMessage = { 
+              sender: 'agent', 
+              text: 'We apologize, but all agents are currently busy. Please try again later or leave a message.', 
+              time: new Date() 
+            };
+            setMessages(prev => [...prev, rejectedMessage]);
+            setWaitingForAgent(false);
+          }
+        });
+        
+        // Set live chat requested flag
+        setLiveChatRequested(true);
+      } else {
+        throw new Error(response.message || 'Failed to create live chat request');
+      }
+    } catch (error) {
+      console.error('Error requesting live chat:', error);
+      
+      // Add error message to chat
+      const errorMessage = { 
+        sender: 'agent', 
+        text: 'There was an error connecting to the live chat. Please try again later.', 
+        time: new Date() 
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      
+      // Reset states
+      setWaitingForAgent(false);
+    }
   };
 
   const handleSendMessage = async (e) => {
@@ -148,7 +242,16 @@ export default function ChatAgentModal({ property }) {
                 >
                   <i className="fa fa-paper-plane"></i>
                 </button>
+              
               </div>
+              <button 
+                type="button"
+                onClick={handleLiveChatRequest} 
+                disabled={waitingForAgent || liveChatRequested}
+                style={{width:"40%", marginLeft:"25%", borderRadius:"5px", backgroundColor:"#fd2658", border:"none", color:"white"}}
+              >
+                {waitingForAgent ? 'Waiting for agent...' : liveChatRequested ? 'Live chat requested' : 'Request a live chat'}
+              </button>
             </form>
           </div>
           <div className="modal-footer bg-light">
