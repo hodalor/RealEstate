@@ -60,6 +60,7 @@ export default function AdminChats() {
       } catch (error) {
         console.error('Socket initialization error:', error);
         setError('Failed to connect to chat server');
+        toast.error('Failed to connect to chat server. Please refresh the page.');
       }
     }
   }, [adminData]);
@@ -74,6 +75,7 @@ export default function AdminChats() {
           setChats(response.data);
         } else {
           setError(response.message || 'Failed to load chats');
+          toast.error(response.message || 'Failed to load chats');
         }
       } catch (error) {
         console.error('Error loading chats:', error);
@@ -101,7 +103,10 @@ export default function AdminChats() {
       const loadMessages = async () => {
         try {
           // Mark chat as read
-          await markChatAsRead(activeChat.id);
+          const readResponse = await markChatAsRead(activeChat.id);
+          if (readResponse.success) {
+            toast.success('Chat marked as read');
+          }
           
           // Update unread count in chat list
           setChats(prevChats => {
@@ -126,6 +131,7 @@ export default function AdminChats() {
             setMessages(response.data);
           } else {
             setError(response.message || 'Failed to load messages');
+            toast.error(response.message || 'Failed to load messages');
           }
           
           // Subscribe to new messages for this chat
@@ -215,6 +221,8 @@ export default function AdminChats() {
             return msg;
           });
         });
+        
+        toast.success('Message sent successfully');
         
         // Update the last message in the chat list
         setChats(prevChats => {

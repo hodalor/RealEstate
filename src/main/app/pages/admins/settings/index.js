@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
-import Notify from "../../../../components/notification";
 import Loader from "../../../../components/loader";
 import WebsiteSettings from "./WebsiteSettings";
 import DeveloperSettings from "./DeveloperSettings";
@@ -335,7 +334,6 @@ export default function Settings() {
                 <strong>System</strong> Settings
               </h2>
             </div>
-            <Notify />
             <div className="body">
               {/* Tabs */}
               <ul className="nav nav-tabs">

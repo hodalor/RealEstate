@@ -15,13 +15,13 @@ export default function AddProp() {
       <div className="row clearfix">
         <div className="col-lg-12">
           <div className="card">
+            <Notify />
             <div className="header">
               <h2>
                 <strong>Basic</strong> Information{" "}
                 <small>Property Description...</small>{" "}
               </h2>
             </div>
-            <Notify />
             <div className="body">
               <div className="row clearfix">
                 <div className="col-sm-3">

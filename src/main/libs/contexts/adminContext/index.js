@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "../authContext";
+import { toast } from "react-toastify";
 import {
   _validateAdmin,
   _validateAgent,
@@ -812,13 +813,10 @@ export default function AdminContextProvider(props) {
   const _submit = async () => {
     const validate = await _validateAdmin(adminData.user);
 
-    if (validate.status === false)
-      return setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: validate.mesg,
-        show: true,
-      });
+    if (validate.status === false) {
+      toast.warning(validate.mesg);
+      return;
+    }
 
     setLoading(true);
 
@@ -826,32 +824,21 @@ export default function AdminContextProvider(props) {
 
     _cancelAdd();
     setLoading(false);
-    if (results === undefined || results.success === 0)
-      return setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
+    if (results === undefined || results.success === 0) {
+      toast.error(results?.message || "Failed to create admin");
+      return;
+    }
 
-    setNotiData({
-      ...notiData,
-      type: "info",
-      msg: results.message,
-      show: true,
-    });
+    toast.success(results.message || "Admin created successfully!");
   };
 
   const _createAgent = async () => {
     const validate = await _validateAgent(adminData.user);
 
-    if (validate.status === false)
-      return setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: validate.mesg,
-        show: true,
-      });
+    if (validate.status === false) {
+      toast.warning(validate.mesg);
+      return;
+    }
 
     setLoading(true);
 
@@ -860,13 +847,7 @@ export default function AdminContextProvider(props) {
     _cancelAdd();
     if (results === undefined || results.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
-
+      toast.error(results?.message || "Failed to create agent");
       return;
     }
 
@@ -874,12 +855,7 @@ export default function AdminContextProvider(props) {
 
     setLoading(false);
     if (getData === undefined || getData.success === 0) {
-      setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: getData.message,
-        show: true,
-      });
+      toast.warning(getData?.message || "Failed to fetch agents");
 
       setAdminData({
         ...adminData,
@@ -894,24 +870,16 @@ export default function AdminContextProvider(props) {
       agents: getData.data,
     });
 
-    setNotiData({
-      ...notiData,
-      type: "info",
-      msg: "Agent created successfully!",
-      show: true,
-    });
+    toast.success("Agent created successfully!");
   };
 
   const _changePass = async (key) => {
     const validate = await _validatePass(adminData.user);
 
-    if (!validate.status)
-      return setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: validate.mesg,
-        show: true,
-      });
+    if (!validate.status) {
+      toast.warning(validate.mesg);
+      return;
+    }
 
     setLoading(true);
 
@@ -924,13 +892,7 @@ export default function AdminContextProvider(props) {
     _cancelAdd();
     if (res === undefined || res.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: res.message,
-        show: true,
-      });
-
+      toast.error(res?.message || "Failed to update password");
       return;
     }
 
@@ -938,12 +900,7 @@ export default function AdminContextProvider(props) {
 
     setLoading(false);
     if (getData === undefined || getData.success === 0) {
-      setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: getData.message,
-        show: true,
-      });
+      toast.warning(getData?.message || "Failed to fetch agents");
 
       setAdminData({
         ...adminData,
@@ -958,12 +915,7 @@ export default function AdminContextProvider(props) {
       agents: getData.data,
     });
 
-    setNotiData({
-      ...notiData,
-      type: "info",
-      msg: "Password updated successfully!",
-      show: true,
-    });
+    toast.success("Password updated successfully!");
   };
 
   const _saveChanges = async (key) => {
@@ -979,13 +931,7 @@ export default function AdminContextProvider(props) {
     _cancelAdd();
     if (results === undefined || results.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
-
+      toast.error(results?.message || "Failed to update agent data");
       return;
     }
 
@@ -993,12 +939,7 @@ export default function AdminContextProvider(props) {
 
     setLoading(false);
     if (getData === undefined || getData.success === 0) {
-      setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: getData.message,
-        show: true,
-      });
+      toast.warning(getData?.message || "Failed to fetch agents");
 
       setAdminData({
         ...adminData,
@@ -1013,12 +954,7 @@ export default function AdminContextProvider(props) {
       agents: getData.data,
     });
 
-    setNotiData({
-      ...notiData,
-      type: "info",
-      msg: "Agent data updated successfully!",
-      show: true,
-    });
+    toast.success("Agent data updated successfully!");
   };
 
   const _blockAgent = async () => {
@@ -1031,13 +967,7 @@ export default function AdminContextProvider(props) {
     _cancelAdd();
     if (results === undefined || results.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
-
+      toast.error(results?.message || "Failed to block agent");
       return;
     }
 
@@ -1045,12 +975,7 @@ export default function AdminContextProvider(props) {
 
     setLoading(false);
     if (getData === undefined || getData.success === 0) {
-      setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: getData.message,
-        show: true,
-      });
+      toast.warning(getData?.message || "Failed to fetch agents");
 
       setAdminData({
         ...adminData,
@@ -1065,12 +990,7 @@ export default function AdminContextProvider(props) {
       agents: getData.data,
     });
 
-    setNotiData({
-      ...notiData,
-      type: "info",
-      msg: "Agent data updated successfully!",
-      show: true,
-    });
+    toast.success("Agent blocked successfully!");
   };
 
   const _unblockAgent = async () => {
@@ -1083,13 +1003,7 @@ export default function AdminContextProvider(props) {
     _cancelAdd();
     if (results === undefined || results.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
-
+      toast.error(results?.message || "Failed to unblock agent");
       return;
     }
 
@@ -1097,12 +1011,7 @@ export default function AdminContextProvider(props) {
 
     setLoading(false);
     if (getData === undefined || getData.success === 0) {
-      setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: getData.message,
-        show: true,
-      });
+      toast.warning(getData?.message || "Failed to fetch agents");
 
       setAdminData({
         ...adminData,
@@ -1117,12 +1026,7 @@ export default function AdminContextProvider(props) {
       agents: getData.data,
     });
 
-    setNotiData({
-      ...notiData,
-      type: "info",
-      msg: "Agent data updated successfully!",
-      show: true,
-    });
+    toast.success("Agent unblocked successfully!");
   };
 
   const _removeAgent = async () => {
@@ -1132,13 +1036,7 @@ export default function AdminContextProvider(props) {
     _cancelAdd();
     if (results === undefined || results.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
-
+      toast.error(results?.message || "Failed to delete agent");
       return;
     }
 
@@ -1146,12 +1044,7 @@ export default function AdminContextProvider(props) {
 
     setLoading(false);
     if (getData === undefined || getData.success === 0) {
-      setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: getData.message,
-        show: true,
-      });
+      toast.warning(getData?.message || "Failed to fetch agents");
 
       setAdminData({
         ...adminData,
@@ -1166,12 +1059,7 @@ export default function AdminContextProvider(props) {
       agents: getData.data,
     });
 
-    setNotiData({
-      ...notiData,
-      type: "info",
-      msg: "Agent data updated successfully!",
-      show: true,
-    });
+    toast.success("Agent deleted successfully!");
 
     history.push("/admin/agents/");
   };
@@ -1179,13 +1067,10 @@ export default function AdminContextProvider(props) {
   const _createProperty = async () => {
     const validate = await _validateProp(adminData.property);
 
-    if (!validate.status)
-      return setNotiData({
-        ...notiData,
-        type: "error",
-        msg: validate.mesg,
-        show: true,
-      });
+    if (validate.status === false) {
+      toast.warning(validate.mesg);
+      return;
+    }
 
     setLoading(true);
 
@@ -1194,13 +1079,7 @@ export default function AdminContextProvider(props) {
     _cancelAdd();
     if (results === undefined || results.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
-
+      toast.error(results?.message || "Failed to create property");
       return;
     }
 
@@ -1208,12 +1087,7 @@ export default function AdminContextProvider(props) {
 
     setLoading(false);
     if (getData === undefined || getData.success === 0) {
-      setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: getData.message,
-        show: true,
-      });
+      toast.warning(getData?.message || "Failed to fetch properties");
 
       setAdminData({
         ...adminData,
@@ -1236,12 +1110,7 @@ export default function AdminContextProvider(props) {
       pending: pend,
     });
 
-    setNotiData({
-      ...notiData,
-      type: "info",
-      msg: "Property added successfully!",
-      show: true,
-    });
+    toast.success("Property added successfully!");
   };
 
   const _findAndRouteToAgent = (_id) => {
@@ -1284,13 +1153,7 @@ export default function AdminContextProvider(props) {
 
     if (results === undefined || results.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
-
+      toast.error(results?.message || "Failed to approve property");
       return;
     }
 
@@ -1298,12 +1161,7 @@ export default function AdminContextProvider(props) {
 
     if (getData === undefined || getData.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: getData.message,
-        show: true,
-      });
+      toast.warning(getData?.message || "Failed to fetch properties");
 
       setAdminData({
         ...adminData,
@@ -1328,12 +1186,7 @@ export default function AdminContextProvider(props) {
 
     setLoading(false);
 
-    setNotiData({
-      ...notiData,
-      type: "info",
-      msg: "Property Approved successfully!",
-      show: true,
-    });
+    toast.success("Property approved successfully!");
   };
 
   // Handle settings changes
@@ -1364,21 +1217,15 @@ export default function AdminContextProvider(props) {
           settings: settingsData
         });
 
-        setNotiData({
-          type: "success",
-          show: true,
-          msg: "Settings saved successfully!",
-        });
+        // Use toast notification instead of Notify component
+        toast.success("Settings saved successfully!");
       } else {
         throw new Error(result.message || 'Failed to save settings');
       }
     } catch (error) {
       console.error("Error saving settings:", error);
-      setNotiData({
-        type: "error",
-        show: true,
-        msg: "Failed to save settings. Please try again.",
-      });
+      // Use toast notification instead of Notify component
+      toast.error(error.message || "Failed to save settings. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -1396,14 +1243,12 @@ export default function AdminContextProvider(props) {
           ...adminData,
           settings: result.settings
         });
+        toast.success("Settings loaded successfully");
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
-      setNotiData({
-        type: 'error',
-        show: true,
-        msg: 'Failed to load settings. Please refresh the page.'
-      });
+      // Use toast notification instead of Notify component
+      toast.error('Failed to load settings. Please refresh the page.');
     } finally {
       setLoading(false);
     }

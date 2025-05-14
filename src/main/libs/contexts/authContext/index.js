@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import { _login, _register } from "../../functions/auth";
 import { _saveToStorage, _removeFromStorage } from "../../functions/storage";
 import { _validateRegister, _validateUser } from "../../functions/validations";
+import { toast } from "react-toastify";
 
 export const AuthContext = createContext();
 
@@ -25,6 +26,28 @@ export default function AuthContextProvider(props) {
   });
 
   const [loading, setLoading] = useState(false);
+
+  // Helper function to show toast notifications
+  const _showToast = (type, message) => {
+    if (!message) return;
+    
+    switch(type) {
+      case "success":
+        toast.success(message);
+        break;
+      case "error":
+        toast.error(message);
+        break;
+      case "warning":
+        toast.warning(message);
+        break;
+      case "info":
+        toast.info(message);
+        break;
+      default:
+        toast.info(message);
+    }
+  };
 
   const _closeNoti = () => {
     setNotiData({
@@ -52,13 +75,10 @@ export default function AuthContextProvider(props) {
   const _handleLogin = async () => {
     const validate = await _validateUser(authState);
 
-    if (!validate.status)
-      return setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: validate.mesg,
-        show: true,
-      });
+    if (!validate.status) {
+      _showToast("warning", validate.mesg);
+      return;
+    }
 
     setLoading(true);
 
@@ -67,13 +87,7 @@ export default function AuthContextProvider(props) {
     _clearFields();
     if (results === undefined || results.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
-
+      _showToast("error", results?.message || "Login failed");
       return;
     }
 
@@ -133,13 +147,10 @@ export default function AuthContextProvider(props) {
   const _handleRegister = async () => {
     const validate = await _validateRegister(authState);
 
-    if (!validate.status)
-      return setNotiData({
-        ...notiData,
-        type: "warning",
-        msg: validate.mesg,
-        show: true,
-      });
+    if (!validate.status) {
+      _showToast("warning", validate.mesg);
+      return;
+    }
 
     setLoading(true);
 
@@ -148,25 +159,12 @@ export default function AuthContextProvider(props) {
     _clearFields();
     if (results === undefined || results.success === 0) {
       setLoading(false);
-      setNotiData({
-        ...notiData,
-        type: "error",
-        msg: results.message,
-        show: true,
-      });
-
+      _showToast("error", results?.message || "Registration failed");
       return;
     }
 
     setLoading(false);
-
-    setLoading(false);
-    setNotiData({
-      ...notiData,
-      type: "success",
-      msg: results.message,
-      show: true,
-    });
+    _showToast("success", results.message || "Registration successful");
   };
 
   const _logout = async () => {
@@ -188,6 +186,7 @@ export default function AuthContextProvider(props) {
         _handleChange,
         _logout,
         _handleRegister,
+        _showToast,
       }}
     >
       {props.children}
