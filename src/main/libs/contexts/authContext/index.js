@@ -171,7 +171,7 @@ export default function AuthContextProvider(props) {
   const _logout = async () => {
     const out = await _removeFromStorage("user");
 
-    if (out) return history.push("/");
+    if (out) return history.push("/login");
   };
 
   return (

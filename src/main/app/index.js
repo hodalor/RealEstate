@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, useHistory } from "react-router-dom";
 import { AuthContext } from "../libs/contexts/authContext";
 import AdminContextProvider from "../libs/contexts/adminContext";
 import AgentsContextProvider from "../libs/contexts/agentsContext";
@@ -12,8 +12,10 @@ import Support from "./pages/others/support";
 import Settings from "./pages/admins/settings";
 
 export default function MainApp() {
-  const { user } = useContext(AuthContext);
-console.log(user)
+  const history = useHistory();
+  const { authState } = useContext(AuthContext);
+  if (!authState.user) return history.push("/login");
+  console.log(authState.user);
   return (
     <Switch>
       <Route path="/admin" component={Admins} />

@@ -1,12 +1,18 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Loader from "../../components/loader";
 import Notify from "../../components/notification";
 import { AuthContext } from "../../libs/contexts/authContext";
+import { _removeFromStorage } from "../../libs/functions/storage";
+
 
 export default function Login() {
-  const { _handleLogin, _handleChange, authState, loading } =
+  const { _handleLogin, _handleChange, authState, loading, _logout } =
     useContext(AuthContext);
+
+ useEffect(() => {
+    if (Object.keys(authState.user)) {_removeFromStorage("user")};
+  }, []);
 
   return (
     <div className="site-wrapper overflow-hidden position-relative">
