@@ -14,16 +14,39 @@ import Settings from "./pages/admins/settings";
 export default function MainApp() {
   const history = useHistory();
   const { authState } = useContext(AuthContext);
-  if (!authState.user) return history.push("/login");
-  console.log(authState.user);
-  return (
-    <Switch>
-      <Route path="/admin" component={Admins} />
-      <Route path="/agents" component={Agents} />
-      <Route path="/buyers" component={Buyers} />
-      <Route path="/support" component={Support} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/forbidden" component={NotAuth} />
-    </Switch>
-  );
+  if (!authState.user) return history.push("/forbidden");
+  const role = authState.user.role; 
+  if (role === "Admin") {
+    return (
+      <AdminContextProvider>
+        <Admins />
+      </AdminContextProvider>
+    );
+  }
+  if (role === "Agent") {
+    return (
+      <AgentsContextProvider>
+        <Agents />
+      </AgentsContextProvider>
+    );
+  }
+  if (role === "Buyer") {
+    return (
+      <BuyersContextProvided>
+        <Buyers />
+      </BuyersContextProvided>
+    )
+  }
+  
+  // console.log(authState.user);
+  // return (
+  //   <Switch>
+  //     <Route path="/admin" component={Admins} />
+  //     <Route path="/agents" component={Agents} />
+  //     <Route path="/buyers" component={Buyers} />
+  //     <Route path="/support" component={Support} />
+  //     <Route path="/settings" component={Settings} />
+  //     <Route path="/forbidden" component={NotAuth} />
+  //   </Switch>
+  // );
 }

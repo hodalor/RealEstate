@@ -327,6 +327,7 @@ console.log(sortedAndFilteredProperties);
       ) : sortedAndFilteredProperties.length > 0 ? (
         <div className="row">
           {sortedAndFilteredProperties.map((property, index) => (
+            console.log(property),
             <div className="col-lg-4 col-md-6 mb-4" key={property._id}>
               <div className="card property-card h-100 shadow-sm hover-effect">
                 <div className="property-image position-relative">

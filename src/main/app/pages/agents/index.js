@@ -11,8 +11,14 @@ import PropertyDetails from "./propertyDetails";
 import LiveChat from "./liveChat";
 import TourBookings from "./tourBookings";
 import PaymentHistory from "./paymentHistory";
+import { AuthContext } from "../../../libs/contexts/authContext";
+import { useContext } from "react";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function Agents() {
+  const history = useHistory()
+  const { authState } = useContext(AuthContext);
+  if (authState.user && authState.user.role !== "Agent") return history.push("/login") 
   return (
     <AgentContextProvider>
       <AgentsStart />

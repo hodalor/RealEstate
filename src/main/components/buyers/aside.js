@@ -5,7 +5,6 @@ import { BuyersContext } from "../../libs/contexts/buyersContext";
 export default function Aside() {
   const { _navigateToAgents, buyerState } = useContext(BuyersContext);
   const buyer = buyerState.buyer;
-
   return (
     <div>
       <aside id="leftsidebar" className="sidebar">
@@ -28,7 +27,7 @@ export default function Aside() {
                 <li>
                   <div className="user-info">
                     <div className="image">
-                      {buyer.image === "" || buyer.image === undefined ? (
+                      {buyer === null || buyer.image === "" || buyer.image === undefined ? (
                         <span>No image uploaded</span>
                       ) : (
                         <Link to="/properties/profile">
@@ -37,8 +36,8 @@ export default function Aside() {
                       )}
                     </div>
                     <div className="detail">
-                      <h4>{buyer.firstName + " " + buyer.lastName}</h4>
-                      <small>{buyer.role}</small>
+                      <h4>{buyer === null ? "" : buyer.firstName + " " + buyer.lastName}</h4>
+                      <small>{buyer === null ? "" : buyer.role}</small>
                     </div>
                   </div>
                 </li>
@@ -122,12 +121,12 @@ export default function Aside() {
                     <span>favorites</span>
                   </Link>
                 </li> */}
-                <li>
+                {/* <li>
                   <Link to="/support">
                     <i className="fa fa-headset" />
                     <span>Support</span>
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>
@@ -138,27 +137,27 @@ export default function Aside() {
                   <div className="user-info m-b-20 p-b-15">
                     <div className="image">
                       <Link to="/properties/profile">
-                        {buyer.image === "" || buyer.image === undefined ? (
+                        {buyer === null || buyer.image === "" || buyer.image === undefined ? (
                           <span>No image uploaded</span>
                         ) : (
                           <Link to="/properties/profile">
-                            <img src={buyer.image} alt="User" />
+                            <img src={buyer === null ? "" : buyer.image} alt="User" />
                           </Link>
                         )}
                       </Link>
                     </div>
                     <div className="detail">
-                      <h4>{buyer.firstName + " " + buyer.lastName}</h4>
-                      <small>{buyer.role}</small>
+                      <h4>{buyer === null ? "" : buyer.firstName + " " + buyer.lastName}</h4>
+                      <small>{buyer === null ? "" : buyer.role}</small>
                     </div>
                   </div>
                 </li>
                 <li>
                   <small className="text-muted">Email address: </small>
-                  <p>{buyer.email}</p>
+                  <p>{buyer === null ? "" : buyer.email}</p>
                   <hr />
                   <small className="text-muted">Phone: </small>
-                  <p>{buyer.phone}</p>
+                  <p>{buyer === null ? "" : buyer.phone}</p>
                   <hr />
                 </li>
               </ul>
