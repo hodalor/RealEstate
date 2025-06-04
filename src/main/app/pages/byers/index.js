@@ -5,7 +5,7 @@ import BuyersContextProvided from "../../../libs/contexts/buyersContext";
 import AgentDetails from "./agentDetils";
 import Agents from "./agents";
 import Favorites from "./favorites";
-import Properties from "./properties";
+import PropertyListing from "../../../website/components/PropertyListing";
 import ItemDetails from "./propertyDetails";
 import Profile from "./userProfile";
 
@@ -22,7 +22,7 @@ export default function Buyers() {
                 <Route
                   exact
                   path="/properties/listings"
-                  component={Properties}
+                  component={PropertyListing}
                 />
                 <Route exact path="/properties/agents" component={Agents} />
                 <Route path="/properties/favorites" component={Favorites} />

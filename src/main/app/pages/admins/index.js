@@ -22,6 +22,11 @@ import TourBookings from "./tourBookings";
 import PaymentHistory from "./payments";
 
 export default function Admin() {
+  const history = useHistory()
+  const { authState } = useContext(AuthContext);
+ 
+ if (authState.user && authState.user.role !== "Admin") return history.push("/login") 
+  
   return (
     <AdminContextProvider>
       <AdminStart />

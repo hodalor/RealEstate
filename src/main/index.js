@@ -13,6 +13,7 @@ import Agents from "./app/pages/agents";
 import Admin from "./app/pages/admins";
 import Support from "./app/pages/others/support";
 import ToastProvider from "./components/toastProvider";
+import PublicProperties from "./website/PublicProperties";
 
 // Import custom styles
 import "./website/styles/custom.css";
@@ -24,12 +25,14 @@ export default function Main() {
     <ToastProvider>
       <Switch>
         <Route exact path="/" component={NewLandingPage} />
+        <Route exact path="/property-listing" component={PublicProperties} />
+        <Route exact path="/properties/:id" component={PropertyDetail} />
         <AuthContextProvider>
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/terms" component={Terms} />
           <Route path="/forbidden" component={NotAuth} />
-          <Route path="/properties/:id" component={PropertyDetail} />
+          {/* <Route path="/properties/:id" component={PropertyDetail} /> */}
           <Route exact path="/properties" component={Buyers} />
           <Route path="/agents" component={Agents} />
           <Route path="/admin" component={Admin} />

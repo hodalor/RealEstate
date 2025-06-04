@@ -42,15 +42,15 @@ export default function Header() {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link fw-medium px-3" to="/properties">
+                <Link className="nav-link fw-medium px-3" to="/property-listing">
                   Properties
                 </Link>
               </li>
-              <li className="nav-item">
+              {/* <li className="nav-item">
                 <Link className="nav-link fw-medium px-3" to="/agents">
                   Agents
                 </Link>
-              </li>
+              </li> */}
               <li className="nav-item">
                 <Link className="nav-link fw-medium px-3" to="/support">
                   Support
