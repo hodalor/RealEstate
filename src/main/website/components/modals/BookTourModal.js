@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { _bookTour } from '../../libs/functions/creates';
 
 export default function BookTourModal({ property }) {
   const [formData, setFormData] = useState({
@@ -27,28 +28,44 @@ export default function BookTourModal({ property }) {
     setError('');
     
     try {
-      // Here you would typically send the data to your backend API
-      // For now, we'll simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Tour booking submitted:', {
-        property: property?._id,
-        propertyName: property?.name,
-        ...formData
-      });
-      
-      setSuccess(true);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        date: '',
-        time: '',
-        message: ''
-      });
+      // Validate required fields
+      if (!formData.name || !formData.email || !formData.phone || !formData.date || !formData.time) {
+        setError('Please fill in all required fields.');
+        setLoading(false);
+        return;
+      }
+
+      // Prepare tour booking data
+      const tourBookingData = {
+        userName: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        tourDate: formData.date,
+        tourTime: formData.time,
+        note: formData.message || '',
+        propertyId: property?._id,
+        agentid: property?.agentID || property?.agentId // Handle different property structures
+      };
+
+      // Send tour booking request to backend
+      const result = await _bookTour(tourBookingData);
+
+      if (result && result.success !== 0) {
+        setSuccess(true);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          date: '',
+          time: '',
+          message: ''
+        });
+      } else {
+        setError(result?.message || 'Failed to book tour. Please try again.');
+      }
     } catch (err) {
       console.error('Error booking tour:', err);
-      setError('Failed to book tour. Please try again.');
+      setError('Failed to book tour. Please check your internet connection and try again.');
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,4 @@
-import { adminUrl, agentUrl, propertyUrl, requestsUrl } from "../data/baseUrls";
+import { adminUrl, agentUrl, propertyUrl, requestsUrl, toursUrl } from "../data/baseUrls";
 
 const _createAdmin = async (data) => {
   var results;
@@ -151,4 +151,31 @@ const _sendRequest = async ({ data, buyer }) => {
   return results;
 };
 
-export { _createAdmin, _addAgent, _addProperty, _sendRequest };
+const _bookTour = async (tourData) => {
+  var results;
+
+  const url = toursUrl + "book";
+
+  await fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(tourData),
+  })
+    .then((response) => response.json())
+    .then((res) => {
+      return (results = res);
+    })
+    .catch((error) => {
+      return (results = {
+        success: 0,
+        message: "Please check your internet connection!",
+      });
+    });
+
+  return results;
+};
+
+export { _createAdmin, _addAgent, _addProperty, _sendRequest, _bookTour };
