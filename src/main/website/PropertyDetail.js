@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { _fetchProperties } from "../libs/functions/fetches";
+import { resolveImageUrl } from "../libs/functions/images";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import BookTourModal from "./components/modals/BookTourModal";
@@ -31,7 +32,7 @@ export default function PropertyDetail() {
 
           if (foundProperty) {
             setProperty(foundProperty);
-            setActiveImage(foundProperty.images?.image1 || null);
+            setActiveImage(resolveImageUrl(foundProperty.images?.image1, null));
           } else {
             setProperty(null);
             setActiveImage(null);
@@ -56,7 +57,7 @@ export default function PropertyDetail() {
     }
 
     return Object.entries(property.images)
-      .map(([key, value]) => ({ key, value }))
+      .map(([key, value]) => ({ key, value: resolveImageUrl(value, "") }))
       .filter((item) => Boolean(item.value));
   }, [property]);
 
@@ -161,7 +162,7 @@ export default function PropertyDetail() {
             <div className="col-lg-8">
               <div className="detail-panel">
                 <img
-                  src={activeImage || property.images?.image1 || "/assets/image/hero-image.svg"}
+                  src={activeImage || resolveImageUrl(property.images?.image1)}
                   alt={property.name}
                   className="detail-main-image"
                 />

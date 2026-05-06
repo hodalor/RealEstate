@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { AdminContext } from "../../libs/contexts/adminContext";
+import { resolveImageUrl } from "../../libs/functions/images";
 
 export default function AgentsTable() {
   const { _routeToDetails, adminData } = useContext(AdminContext);
@@ -80,9 +81,9 @@ export default function AgentsTable() {
                       >
                         <td>
                           <img
-                            src={property.images.image1}
+                            src={resolveImageUrl(property.images.image1, "")}
                             className="w30 rounded mr-2"
-                            alt
+                            alt=""
                           />{" "}
                           {property.name}
                         </td>

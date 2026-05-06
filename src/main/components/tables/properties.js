@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { AgentsContext } from "../../libs/contexts/agentsContext";
+import { resolveImageUrl } from "../../libs/functions/images";
 
 export default function AgentsTable() {
   const { _routeToDetails, agentState } = useContext(AgentsContext);
@@ -81,7 +82,7 @@ export default function AgentsTable() {
               <tbody>
                 {properties !== undefined || properties.length !== 0 ? (
                   properties.map((property, index) => {
-                    const image = property.images.image1;
+                    const image = resolveImageUrl(property.images.image1, "");
                     return (
                       <tr
                         role="row"

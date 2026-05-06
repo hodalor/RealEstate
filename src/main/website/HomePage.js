@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { _fetchProperties } from "../libs/functions/fetches";
+import { resolveImageUrl } from "../libs/functions/images";
 
 const formatPrice = (price) => {
   const numericPrice = parseFloat(String(price || "0").replace(/[^0-9.]/g, "")) || 0;
@@ -149,7 +150,7 @@ export default function HomePage() {
                 <>
                   <div className="home-carousel-frame">
                     <img
-                      src={activeProperty.images?.image1 || "/assets/image/hero-image.svg"}
+                      src={resolveImageUrl(activeProperty.images?.image1)}
                       alt={activeProperty.name || "Property"}
                     />
                     <div className="home-carousel-overlay">
@@ -256,7 +257,7 @@ export default function HomePage() {
                       <div className="property-card-modern compact-card h-100">
                         <div className="property-card-image-wrap">
                           <img
-                            src={property.images?.image1 || "/assets/image/hero-image.svg"}
+                            src={resolveImageUrl(property.images?.image1)}
                             className="property-card-image"
                             alt={property.name || "Property"}
                           />

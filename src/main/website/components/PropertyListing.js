@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { resolveImageUrl } from "../../libs/functions/images";
 
 const defaultFilter = {
   searchTerm: "",
@@ -354,7 +355,7 @@ export default function PropertyListing({
               <div className="property-card-modern h-100">
                 <div className="property-card-image-wrap">
                   <img
-                    src={property.images?.image1 || "/assets/image/hero-image.svg"}
+                    src={resolveImageUrl(property.images?.image1)}
                     className="property-card-image"
                     alt={property.name || "Property"}
                   />

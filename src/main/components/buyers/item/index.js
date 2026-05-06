@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { BuyersContext } from "../../../libs/contexts/buyersContext";
+import { resolveImageUrl } from "../../../libs/functions/images";
 
 export default function ItemComp() {
   const { buyerState, _navigateToDetails } = useContext(BuyersContext);
@@ -15,7 +16,7 @@ export default function ItemComp() {
                 <div className="body">
                   <img
                     className="img-thumbnail img-fluid"
-                    src={property.images.image1}
+                    src={resolveImageUrl(property.images.image1)}
                     alt="item-view"
                     type="button"
                     role="button"
