@@ -1,0 +1,114 @@
+.internal-form-page {
+  width: 100%;
+}
+
+.internal-form-shell {
+  overflow: hidden;
+  border: 1px solid #dbe5ff;
+  border-radius: 24px;
+  box-shadow: 0 18px 44px rgba(12, 31, 207, 0.08);
+}
+
+.internal-form-header {
+  padding: 1.6rem 1.8rem;
+  background: linear-gradient(135deg, #0c1fcf, #3949ff);
+  color: #fff;
+  border-bottom: 0;
+}
+
+.internal-form-header h2,
+.internal-form-header strong,
+.internal-form-header small {
+  color: #fff;
+}
+
+.internal-form-header small {
+  display: block;
+  margin-top: 0.4rem;
+  opacity: 0.84;
+}
+
+.internal-form-body {
+  padding: 1.75rem;
+  background: #ffffff;
+}
+
+.internal-section-label {
+  margin: 1.5rem 0 1rem;
+  color: #24324a;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.internal-form-shell .form-group,
+.internal-form-shell .form-line {
+  margin-bottom: 1rem;
+}
+
+.internal-form-shell .form-control,
+.internal-form-shell textarea.form-control,
+.internal-form-shell select.form-control {
+  min-height: 52px;
+  border-radius: 16px;
+  border: 1px solid #dbe5ff;
+  background: #f9fbff;
+  color: #1f2937;
+  padding: 0.85rem 1rem;
+  box-shadow: none;
+}
+
+.internal-form-shell textarea.form-control {
+  min-height: 120px;
+}
+
+.internal-form-shell .form-control:focus,
+.internal-form-shell select.form-control:focus,
+.internal-form-shell textarea.form-control:focus {
+  border-color: rgba(12, 31, 207, 0.35);
+  box-shadow: 0 0 0 3px rgba(12, 31, 207, 0.08);
+}
+
+.internal-form-shell .inlineblock {
+  margin-right: 1rem;
+}
+
+.internal-form-shell .btn-round {
+  border-radius: 14px;
+  min-height: 48px;
+  padding: 0.75rem 1.2rem;
+}
+
+.internal-primary-btn {
+  background: linear-gradient(135deg, #0c1fcf, #3949ff);
+  border: 0;
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(12, 31, 207, 0.18);
+}
+
+.internal-secondary-btn {
+  margin-left: 0.75rem;
+  background: #eef2ff;
+  border: 1px solid #dbe5ff;
+  color: #0c1fcf;
+}
+
+.internal-upload-block {
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px dashed #c7d7ff;
+  background: #f8faff;
+}
+
+@media (max-width: 767.98px) {
+  .internal-form-header,
+  .internal-form-body {
+    padding: 1.2rem;
+  }
+
+  .internal-secondary-btn {
+    margin-left: 0;
+    margin-top: 0.75rem;
+  }
+}

@@ -10,18 +10,19 @@ export default function AddAdmin(params) {
     useContext(AdminContext);
   const { loading } = useContext(AuthContext);
   return (
-    <div>
+    <div className="internal-form-page">
       <div className="container-fluid">
         <div className="row clearfix">
           <div className="col-lg-12">
-            <div className="card">
+            <div className="card internal-form-shell">
               <Notify />
-              <div className="header">
+              <div className="header internal-form-header">
                 <h2>
-                  <strong>Basic</strong> Information{" "}
+                  <strong>Create</strong> Admin
+                  <small>Set up admin identity, credentials, and profile image.</small>
                 </h2>
               </div>
-              <div className="body">
+              <div className="body internal-form-body">
                 <div className="row clearfix">
                   <div className="col-sm-4">
                     <div className="form-group">
@@ -72,7 +73,7 @@ export default function AddAdmin(params) {
                     </div>
                   </div>
                 </div>
-                <h6 className="mt-4">Account Information</h6>
+                <h6 className="internal-section-label">Account Information</h6>
                 <div className="row clearfix">
                   <div className="col-md-3 col-sm-6">
                     <div className="form-group">
@@ -139,10 +140,10 @@ export default function AddAdmin(params) {
                     </div>
                   </div>
                 </div>
-                <h6 className="mt-4">Account Information</h6>
+                <h6 className="internal-section-label">Profile Image</h6>
                 <div className="row clearfix">
                   <div className="col-sm-12">
-                    <form className="form-group">
+                    <form className="form-group internal-upload-block">
                       <ImageUpload
                         onUpload={(v) =>
                           _handleChange({
@@ -160,14 +161,14 @@ export default function AddAdmin(params) {
                       <>
                         <button
                           type="button"
-                          className="btn btn-primary btn-round"
+                          className="btn btn-primary btn-round internal-primary-btn"
                           onClick={_submit}
                         >
                           Submit
                         </button>
                         <button
                           type="button"
-                          className="btn btn-default btn-round btn-simple"
+                          className="btn btn-default btn-round btn-simple internal-secondary-btn"
                           onClick={_cancelAdd}
                         >
                           Cancel

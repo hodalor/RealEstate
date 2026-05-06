@@ -11,18 +11,18 @@ export default function AddProp() {
   const { loading } = useContext(AuthContext);
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid internal-form-page">
       <div className="row clearfix">
         <div className="col-lg-12">
-          <div className="card">
+          <div className="card internal-form-shell">
             <Notify />
-            <div className="header">
+            <div className="header internal-form-header">
               <h2>
-                <strong>Basic</strong> Information{" "}
-                <small>Property Description...</small>{" "}
+                <strong>Create</strong> Property
+                <small>Add the core details, location, rooms, amenities, and images.</small>
               </h2>
             </div>
-            <div className="body">
+            <div className="body internal-form-body">
               <div className="row clearfix">
                 <div className="col-sm-3">
                   <div className="form-group">
@@ -123,7 +123,7 @@ export default function AddProp() {
                   </div>
                 </div>
               </div>
-              <h6 className="mt-4">Location Information</h6>
+              <h6 className="internal-section-label">Location Information</h6>
               <div className="row clearfix">
                 <div className="col-sm-3">
                   <div className="form-group">
@@ -224,7 +224,7 @@ export default function AddProp() {
                 </div>
               </div>
               
-              <h6 className="mt-4">Property Information</h6>
+              <h6 className="internal-section-label">Property Information</h6>
               <div className="row clearfix">
                 <div className="col-sm-3">
                   <div className="form-group">
@@ -403,7 +403,7 @@ export default function AddProp() {
                   </div>
                 </div>
               </div>
-              <h6 className="mt-4">Other rooms(yes/no)</h6>
+              <h6 className="internal-section-label">Other Rooms</h6>
               <div className="row">
                 <div className="col-lg-2 col-md-4 col-sm-6">
                   <div className="form-line">
@@ -508,7 +508,7 @@ export default function AddProp() {
                   </div>
                 </div>
               </div>
-              <h6 className="mt-4">General Amenities</h6>
+              <h6 className="internal-section-label">General Amenities</h6>
               <div className="row">
                 <div className="col-sm-12">
                   <div className="form-group inlineblock">
@@ -613,7 +613,7 @@ export default function AddProp() {
               </div>
               <div className="row clearfix">
                 <div className="col-sm-12">
-                  <form className="form-group m-b-15 m-t-15 row">
+                  <form className="form-group m-b-15 m-t-15 row internal-upload-block">
                     <ImageUpload
                       onUpload={(v) =>
                         _handleChange({
@@ -662,7 +662,7 @@ export default function AddProp() {
                   ) : (
                     <button
                       type="button"
-                      className="btn btn-primary btn-round"
+                      className="btn btn-primary btn-round internal-primary-btn"
                       onClick={_createProperty}
                     >
                       Submit

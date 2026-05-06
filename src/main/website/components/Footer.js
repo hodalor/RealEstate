@@ -1,58 +1,112 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
+
+const quickLinks = [
+  { label: "Home", to: "/" },
+  { label: "Property Listing", to: "/property-listing" },
+  { label: "Login", to: "/login" },
+  { label: "Register", to: "/register" },
+];
+
+const socialLinks = [
+  { label: "Facebook", icon: "fab fa-facebook-f", href: "https://facebook.com/" },
+  { label: "Instagram", icon: "fab fa-instagram", href: "https://instagram.com/" },
+  { label: "X", icon: "fab fa-twitter", href: "https://x.com/" },
+  { label: "LinkedIn", icon: "fab fa-linkedin-in", href: "https://linkedin.com/" },
+];
 
 export default function Footer() {
   return (
-    <>
-      {/* Footer */}
-      <footer className="footer bg-dark text-white py-5">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-4 col-md-6 mb-4 mb-md-0">
-              <h5 className="mb-4">About Us</h5>
-              <p>We are dedicated to providing the best real estate services to help you find your dream property.</p>
-              <div className="social-icons mt-4">
-                <a href="#" className="text-white me-3"><i className="fab fa-facebook-f"></i></a>
-                <a href="#" className="text-white me-3"><i className="fab fa-twitter"></i></a>
-                <a href="#" className="text-white me-3"><i className="fab fa-instagram"></i></a>
-                <a href="#" className="text-white"><i className="fab fa-linkedin-in"></i></a>
+    <footer className="site-footer">
+      <div className="container">
+        <div className="footer-panel">
+          <div className="row g-4 align-items-start">
+            <div className="col-lg-4">
+              <div className="footer-brand">
+                <span className="brand-badge">
+                  <i className="fa fa-building" aria-hidden="true"></i>
+                </span>
+                <div>
+                  <h5>BrightEstate</h5>
+                  <p>
+                    A brighter, easier property experience for buyers, renters,
+                    and owners across every stage of the journey.
+                  </p>
+                </div>
+              </div>
+
+              <div className="footer-socials">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={social.label}
+                  >
+                    <i className={social.icon} aria-hidden="true"></i>
+                  </a>
+                ))}
               </div>
             </div>
-            <div className="col-lg-2 col-md-6 mb-4 mb-md-0">
-              <h5 className="mb-4">Quick Links</h5>
-              <ul className="list-unstyled">
-                <li className="mb-2"><Link to="/" className="text-white">Home</Link></li>
-                <li className="mb-2"><Link to="/properties" className="text-white">Properties</Link></li>
-                <li className="mb-2"><Link to="/agents" className="text-white">Agents</Link></li>
-                <li className="mb-2"><Link to="/support" className="text-white">Support</Link></li>
+
+            <div className="col-lg-2 col-md-4">
+              <h6 className="footer-title">Explore</h6>
+              <ul className="footer-links">
+                {quickLinks.map((item) => (
+                  <li key={item.to}>
+                    <Link to={item.to}>{item.label}</Link>
+                  </li>
+                ))}
               </ul>
             </div>
-            <div className="col-lg-3 col-md-6 mb-4 mb-md-0">
-              <h5 className="mb-4">Contact Us</h5>
-              <ul className="list-unstyled">
-                <li className="mb-2"><i className="fa fa-map-marker-alt me-2"></i> 123 Real Estate St, Accra</li>
-                <li className="mb-2"><i className="fa fa-phone me-2"></i> +233 123 456 789</li>
-                <li className="mb-2"><i className="fa fa-envelope me-2"></i> info@realestate.com</li>
+
+            <div className="col-lg-3 col-md-4">
+              <h6 className="footer-title">Contact</h6>
+              <ul className="footer-links footer-contact">
+                <li>
+                  <i className="fa fa-map-marker-alt" aria-hidden="true"></i>
+                  <span>East Legon, Accra</span>
+                </li>
+                <li>
+                  <i className="fa fa-phone" aria-hidden="true"></i>
+                  <a href="tel:+233123456789">+233 123 456 789</a>
+                </li>
+                <li>
+                  <i className="fa fa-envelope" aria-hidden="true"></i>
+                  <a href="mailto:hello@brightestate.com">
+                    hello@brightestate.com
+                  </a>
+                </li>
               </ul>
             </div>
-            <div className="col-lg-3 col-md-6">
-              <h5 className="mb-4">Newsletter</h5>
-              <p>Subscribe to our newsletter for the latest property updates.</p>
-              <div className="input-group mb-3">
-                <input type="email" className="form-control" placeholder="Your Email" />
-                <button className="btn btn-primary" type="button">Subscribe</button>
+
+            <div className="col-lg-3 col-md-4">
+              <h6 className="footer-title">Stay Updated</h6>
+              <p className="footer-copy">
+                Get notified when a new approved property matches your search.
+              </p>
+              <div className="footer-newsletter">
+                <input
+                  type="email"
+                  className="form-control"
+                  placeholder="Enter your email"
+                />
+                <button className="btn btn-primary" type="button">
+                  Join List
+                </button>
               </div>
             </div>
           </div>
-        </div>
-      </footer>
-      
-      {/* Copyright */}
-      <div className="copyright bg-dark text-white-50 py-3 border-top border-secondary">
-        <div className="container text-center">
-          <small>© {new Date().getFullYear()} Real Estate. All Rights Reserved.</small>
+
+          <div className="footer-bottom">
+            <small>
+              © {new Date().getFullYear()} BrightEstate. All rights reserved.
+            </small>
+            <small>Built for a cleaner property discovery experience.</small>
+          </div>
         </div>
       </div>
-    </>
+    </footer>
   );
 }

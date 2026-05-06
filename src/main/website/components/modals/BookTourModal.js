@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { _bookTour } from '../../libs/functions/creates';
+import { _bookTour } from '../../../libs/functions/creates';
 
 export default function BookTourModal({ property }) {
   const [formData, setFormData] = useState({

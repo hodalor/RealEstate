@@ -1,5 +1,19 @@
 import { customerUrl, signUrl } from "../data/baseUrls";
 
+const parseResponse = async (response) => {
+  const contentType = response.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  const text = await response.text();
+  return {
+    success: response.ok ? 1 : 0,
+    message: text || "Unexpected server response",
+  };
+};
+
 const _login = async (data) => {
   var results;
 
@@ -18,14 +32,14 @@ const _login = async (data) => {
       password,
     }),
   })
-    .then((response) => response.json())
+    .then((response) => parseResponse(response))
     .then((res) => {
       return (results = res);
     })
-    .catch((error) => {
+    .catch(() => {
       return (results = {
         success: 0,
-        message: "Please check your internet connection",
+        message: "Unable to reach the server. Please confirm the backend is running.",
       });
     });
 
@@ -54,14 +68,14 @@ const _register = async (data) => {
       role: "Buyer",
     }),
   })
-    .then((response) => response.json())
+    .then((response) => parseResponse(response))
     .then((res) => {
       return (results = res);
     })
-    .catch((error) => {
+    .catch(() => {
       return (results = {
         success: 0,
-        message: "Please check your internet connection",
+        message: "Unable to reach the server. Please confirm the backend is running.",
       });
     });
 

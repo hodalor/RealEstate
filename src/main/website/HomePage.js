@@ -1,175 +1,325 @@
-import React, {useEffect, useState} from 'react';
-import { Link } from 'react-router-dom';
-import { _fetchProperties } from '../libs/functions/fetches';
-import PropertyListing from './components/PropertyListing';
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { _fetchProperties } from "../libs/functions/fetches";
+
+const formatPrice = (price) => {
+  const numericPrice = parseFloat(String(price || "0").replace(/[^0-9.]/g, "")) || 0;
+  return numericPrice ? `GHC ${numericPrice.toLocaleString()}` : "Price on request";
+};
 
 export default function HomePage() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [recentPage, setRecentPage] = useState(1);
+
   useEffect(() => {
-    fetchApprovedProperties();
-  }, []); // Empty dependency array ensures this only runs once on mount
-  const fetchApprovedProperties = async () => {
-    
-    setLoading(true);
-    try {
-      const results = await _fetchProperties();
-      if (results && results.success !== 0) {
-        // Filter only approved properties
-        const approvedProperties = results.data.filter(property => property.isApproved);
-        
-        // Sort by creation date (newest first)
-        const sortedProperties = approvedProperties.sort((a, b) => 
-          new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        
-        // Apply limit if specified
-        // const limitedProperties = limit > 0 ? sortedProperties.slice(0, limit) : sortedProperties;
-        setProperties(sortedProperties);
-      } else {
+    const fetchApprovedProperties = async () => {
+      setLoading(true);
+
+      try {
+        const results = await _fetchProperties();
+
+        if (results && results.success !== 0) {
+          const approvedProperties = results.data
+            .filter((property) => property.isApproved)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+          setProperties(approvedProperties);
+        } else {
+          setProperties([]);
+        }
+      } catch (error) {
+        console.error("Error fetching properties:", error);
         setProperties([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching properties:", error);
-      setProperties([]);
+    };
+
+    fetchApprovedProperties();
+  }, []);
+
+  const heroSlides = useMemo(() => properties.slice(0, 4), [properties]);
+
+  useEffect(() => {
+    if (activeSlide >= heroSlides.length) {
+      setActiveSlide(0);
     }
-    setLoading(false);
-  };
+  }, [activeSlide, heroSlides.length]);
+
+  useEffect(() => {
+    if (heroSlides.length <= 1) {
+      return undefined;
+    }
+
+    const timer = setInterval(() => {
+      setActiveSlide((current) => (current + 1) % heroSlides.length);
+    }, 4500);
+
+    return () => clearInterval(timer);
+  }, [heroSlides]);
+
+  useEffect(() => {
+    if (recentPage > 1) {
+      setRecentPage(1);
+    }
+  }, [properties, recentPage]);
+
+  const propertyTypes = useMemo(() => {
+    const types = [...new Set(properties.map((property) => property.propType).filter(Boolean))];
+    return types.slice(0, 5);
+  }, [properties]);
+
+  const cities = useMemo(() => {
+    const cityMap = properties.reduce((acc, property) => {
+      if (!property.city) {
+        return acc;
+      }
+
+      acc[property.city] = (acc[property.city] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(cityMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+  }, [properties]);
+
+  const featuredProperties = useMemo(
+    () => properties.filter((property) => property.isFeatured),
+    [properties]
+  );
+
+  const recentProperties = useMemo(() => properties.slice(0, 12), [properties]);
+  const recentPerPage = 4;
+  const recentPageCount = Math.max(1, Math.ceil(recentProperties.length / recentPerPage));
+  const paginatedRecent = useMemo(() => {
+    const start = (recentPage - 1) * recentPerPage;
+    return recentProperties.slice(start, start + recentPerPage);
+  }, [recentPage, recentProperties]);
+
+  const activeProperty = heroSlides[activeSlide] || properties[0];
+
   return (
     <div className="site-wrapper overflow-hidden position-relative">
-      {/* Hero Section */}
-      <section className="hero-section bg-gradient-primary text-white py-5" style={{ marginTop: "60px" }}>
+      <section className="hero-section">
         <div className="container">
-          <div className="row align-items-center">
-            <div className="col-lg-6 col-md-12 mb-5 mb-lg-0">
-              <h1 className="display-4 fw-bold mb-4">Find Your Dream Home</h1>
-              <p className="lead mb-5">
-                Discover the perfect property with our extensive listings. 
-                Whether you're looking to buy or rent, we've got you covered.
-              </p>
-              <div className="d-flex gap-3">
-                <Link to="/register" className="btn btn-light btn-lg">
-                  Get Started
+          <div className="home-dashboard-grid">
+            <aside className="home-side-panel">
+              <div className="home-side-card">
+                <h4>Property Types</h4>
+                <div className="home-side-list">
+                  {propertyTypes.length > 0 ? (
+                    propertyTypes.map((type) => (
+                      <Link key={type} to="/property-listing">
+                        <span>{type}</span>
+                        <strong>
+                          {
+                            properties.filter((property) => property.propType === type).length
+                          }
+                        </strong>
+                      </Link>
+                    ))
+                  ) : (
+                    <span className="home-side-empty">No property types yet</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="home-side-card">
+                <h4>Top Cities</h4>
+                <div className="home-side-list">
+                  {cities.length > 0 ? (
+                    cities.map(([city, count]) => (
+                      <Link key={city} to="/property-listing">
+                        <span>{city}</span>
+                        <strong>{count}</strong>
+                      </Link>
+                    ))
+                  ) : (
+                    <span className="home-side-empty">No city data yet</span>
+                  )}
+                </div>
+              </div>
+            </aside>
+
+            <div className="home-carousel-card">
+              {activeProperty ? (
+                <>
+                  <div className="home-carousel-frame">
+                    <img
+                      src={activeProperty.images?.image1 || "/assets/image/hero-image.svg"}
+                      alt={activeProperty.name || "Property"}
+                    />
+                    <div className="home-carousel-overlay">
+                      <span className="eyebrow-pill">Now showing</span>
+                      <h1>{activeProperty.name}</h1>
+                      <p>
+                        {activeProperty.city || activeProperty.digitalAddress || "Prime area"} ·{" "}
+                        {activeProperty.propType || "Property"} · For{" "}
+                        {activeProperty.rentOrSale || "Listing"}
+                      </p>
+                      <div className="home-carousel-actions">
+                        <Link
+                          to={`/properties/${activeProperty._id}`}
+                          className="btn btn-primary"
+                        >
+                          View Property
+                        </Link>
+                        <Link to="/property-listing" className="btn btn-soft-primary">
+                          Browse Listings
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+
+                  {heroSlides.length > 1 && (
+                    <div className="home-carousel-dots">
+                      {heroSlides.map((property, index) => (
+                        <button
+                          type="button"
+                          key={property._id}
+                          className={index === activeSlide ? "active" : ""}
+                          onClick={() => setActiveSlide(index)}
+                          aria-label={`Show slide ${index + 1}`}
+                        ></button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="empty-state-card">
+                  <h4>No approved listings yet.</h4>
+                  <p>Add or approve properties to populate the homepage carousel.</p>
+                </div>
+              )}
+            </div>
+
+            <aside className="home-side-panel">
+              <div className="home-side-card advert-card">
+                <span className="eyebrow-pill">Advert</span>
+                <h4>List your property with faster visibility.</h4>
+                <p>Agents and admins can publish and manage stock from the dashboard.</p>
+                <Link to="/login" className="btn btn-primary btn-sm">
+                  Go to Dashboard
                 </Link>
-                <Link to="/properties" className="btn btn-outline-light btn-lg">
-                  Browse Properties
+              </div>
+
+              <div className="home-side-card mini-stat-card">
+                <h4>Available Now</h4>
+                <p>{properties.length} approved listings are ready for browsing.</p>
+              </div>
+
+              <div className="home-side-card mini-stat-card">
+                <h4>Need More?</h4>
+                <p>Open the full listing page to search by budget, city, and amenities.</p>
+                <Link to="/property-listing" className="home-inline-link">
+                  Open property listing
                 </Link>
               </div>
-            </div>
-            <div className="col-lg-6 col-md-12">
-              <img
-                src="../assets/image/hero-image.svg"
-                alt="Modern Real Estate Property"
-                className="img-fluid rounded shadow-lg"
-                loading="eager"
-                width="800"
-                height="600"
-              />
-            </div>
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* Search Section */}
-      <section className="search-section py-5 bg-light">
+      <section className="section-space home-list-section">
         <div className="container">
-          <div className="card shadow border-0">
-            <div className="card-body p-4">
-              <h4 className="mb-4">Find Your Perfect Property</h4>
-              <PropertyListing featured={true} limit={6} properties={properties} loading={loading} />
+          <div className="section-heading section-heading-row">
+            <div>
+              <span className="eyebrow-pill">
+                {featuredProperties.length > 0 ? "Featured properties" : "Recently listed"}
+              </span>
+              <h2>
+                {featuredProperties.length > 0
+                  ? "Featured properties ready to explore"
+                  : "Freshly approved properties"}
+              </h2>
             </div>
+            <Link to="/property-listing" className="btn btn-soft-primary">
+              View all listings
+            </Link>
           </div>
-        </div>
-      </section>
 
-      {/* Featured Properties Section */}
-      <section className="featured-properties py-5">
-        <div className="container">
-          <div className="row mb-4">
-            <div className="col-md-8">
-              <h2 className="section-title">Featured Properties</h2>
-              <p className="text-muted">Explore our handpicked selection of premium properties</p>
-            </div>
-            <div className="col-md-4 text-md-end">
-              <Link to="/properties" className="btn btn-outline-primary">
-                View All Properties
-              </Link>
-            </div>
-          </div>
-          
-          <PropertyListing featured={true} limit={6} properties={properties} loading={loading}/>
-        </div>
-      </section>
-
-      {/* All Properties Section */}
-      <section className="all-properties py-5 bg-light">
-        <div className="container">
-          <h2 className="section-title mb-4">All Properties</h2>
-          
-          <PropertyListing properties={properties} loading={loading}/>
-        </div>
-      </section>
-
-      {/* Why Choose Us Section */}
-      <section className="why-choose-us py-5">
-        <div className="container">
-          <div className="text-center mb-5">
-            <h2 className="section-title">Why Choose Us</h2>
-            <p className="text-muted">We provide the best real estate experience</p>
-          </div>
-          
-          <div className="row g-4">
-            <div className="col-lg-4 col-md-6">
-              <div className="card h-100 border-0 shadow-sm">
-                <div className="card-body text-center p-4">
-                  <div className="feature-icon mb-3">
-                    <i className="fa fa-home fa-3x text-primary"></i>
-                  </div>
-                  <h4>Wide Range of Properties</h4>
-                  <p className="text-muted">Explore our extensive collection of properties to find your perfect match.</p>
-                </div>
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
               </div>
             </div>
-            <div className="col-lg-4 col-md-6">
-              <div className="card h-100 border-0 shadow-sm">
-                <div className="card-body text-center p-4">
-                  <div className="feature-icon mb-3">
-                    <i className="fa fa-dollar-sign fa-3x text-primary"></i>
-                  </div>
-                  <h4>Best Price Guarantee</h4>
-                  <p className="text-muted">We ensure you get the best value for your investment with our competitive pricing.</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-4 col-md-6">
-              <div className="card h-100 border-0 shadow-sm">
-                <div className="card-body text-center p-4">
-                  <div className="feature-icon mb-3">
-                    <i className="fa fa-user-tie fa-3x text-primary"></i>
-                  </div>
-                  <h4>Expert Agents</h4>
-                  <p className="text-muted">Our professional agents are here to guide you through every step of your property journey.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+          ) : (
+            <>
+              <div className="row g-3 property-card-grid compact-home-grid">
+                {(featuredProperties.length > 0 ? featuredProperties.slice(0, 4) : paginatedRecent).map(
+                  (property) => (
+                    <div className="col-xl-3 col-lg-4 col-md-6" key={property._id}>
+                      <div className="property-card-modern compact-card h-100">
+                        <div className="property-card-image-wrap">
+                          <img
+                            src={property.images?.image1 || "/assets/image/hero-image.svg"}
+                            className="property-card-image"
+                            alt={property.name || "Property"}
+                          />
+                          <span className="property-chip">
+                            {property.propType || "Property"}
+                          </span>
+                        </div>
 
-      {/* Call to Action */}
-      <section className="cta-section py-5 bg-primary text-white">
-        <div className="container">
-          <div className="row align-items-center">
-            <div className="col-lg-9 col-md-8">
-              <h3 className="mb-2">Ready to Find Your Dream Property?</h3>
-              <p className="mb-lg-0">Join us today and discover the perfect home that suits your needs.</p>
-            </div>
-            <div className="col-lg-3 col-md-4 text-md-end">
-              <Link to="/register" className="btn btn-light btn-lg">
-                Get Started
-              </Link>
-            </div>
-          </div>
+                        <div className="property-card-body">
+                          <div className="property-card-topline">
+                            <span className="property-location">
+                              <i className="fa fa-map-marker-alt" aria-hidden="true"></i>
+                              {property.city || property.digitalAddress || "Location not specified"}
+                            </span>
+                          </div>
+
+                          <h4>{property.name}</h4>
+                          <strong className="property-price">{formatPrice(property.price)}</strong>
+
+                          <div className="property-card-facts">
+                            <span>
+                              <i className="fa fa-bed" aria-hidden="true"></i>
+                              {property.others?.noOfBedrooms || "N/A"}
+                            </span>
+                            <span>
+                              <i className="fa fa-bath" aria-hidden="true"></i>
+                              {property.others?.bathrooms || "N/A"}
+                            </span>
+                            <span>
+                              <i className="fa fa-home" aria-hidden="true"></i>
+                              {property.squareFt || "N/A"}
+                            </span>
+                          </div>
+
+                          <Link
+                            to={`/properties/${property._id}`}
+                            className="btn btn-primary w-100"
+                          >
+                            View Details
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+
+              {featuredProperties.length === 0 && recentPageCount > 1 && (
+                <div className="home-pagination">
+                  {Array.from({ length: recentPageCount }).map((_, index) => (
+                    <button
+                      type="button"
+                      key={`recent-page-${index + 1}`}
+                      className={recentPage === index + 1 ? "active" : ""}
+                      onClick={() => setRecentPage(index + 1)}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
     </div>

@@ -1,52 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
-import AdvancedFilters from "./components/AdvancedFilters";
-import { _fetchProperties } from '../libs/functions/fetches';
-import PropertyListing from './components/PropertyListing';
-import { useState, useEffect } from "react";
+import Footer from "./components/Footer";
+import { _fetchProperties } from "../libs/functions/fetches";
+import PropertyListing from "./components/PropertyListing";
+
 export default function PublicProperties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    fetchApprovedProperties();
-  }, []); // Empty dependency array ensures this only runs once on mount
-  const fetchApprovedProperties = async () => {
-    
-    setLoading(true);
-    try {
-      const results = await _fetchProperties();
-      if (results && results.success !== 0) {
-        // Filter only approved properties
-        const approvedProperties = results.data.filter(property => property.isApproved);
-        
-        // Sort by creation date (newest first)
-        const sortedProperties = approvedProperties.sort((a, b) => 
-          new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        
-        // Apply limit if specified
-        // const limitedProperties = limit > 0 ? sortedProperties.slice(0, limit) : sortedProperties;
-        setProperties(sortedProperties);
-      } else {
+    const fetchApprovedProperties = async () => {
+      setLoading(true);
+
+      try {
+        const results = await _fetchProperties();
+
+        if (results && results.success !== 0) {
+          const approvedProperties = results.data
+            .filter((property) => property.isApproved)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+          setProperties(approvedProperties);
+        } else {
+          setProperties([]);
+        }
+      } catch (error) {
+        console.error("Error fetching properties:", error);
         setProperties([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching properties:", error);
-      setProperties([]);
-    }
-    setLoading(false);
-  };
+    };
+
+    fetchApprovedProperties();
+  }, []);
+
   return (
-    <div>
+    <div className="site-wrapper">
       <Header />
-      {/* <AdvancedFilters /> */}
-      <section className="all-properties py-5 bg-light">
+
+      <section className="section-space section-muted listing-page-section">
         <div className="container">
-          <h2 className="section-title mb-4">All Properties</h2>
-          
-          <PropertyListing properties={properties} loading={loading}/>
+          <PropertyListing properties={properties} loading={loading} />
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

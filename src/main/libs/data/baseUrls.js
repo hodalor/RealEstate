@@ -1,13 +1,24 @@
-const adminUrl = process.env.REACT_APP_API_URL+"/admin/";
-const agentUrl = process.env.REACT_APP_API_URL+"/agent/";
-const uploadUrl = process.env.REACT_APP_API_URL+"/upload/";
-const propertyUrl = process.env.REACT_APP_API_URL+"/properties/";
-const customerUrl = process.env.REACT_APP_API_URL+"/customers/";
-const signUrl = process.env.REACT_APP_API_URL+"/signin/";
-const requestsUrl = process.env.REACT_APP_API_URL+"/requests/";
-const toursUrl = process.env.REACT_APP_API_URL+"/api/tours/";
+const browserHost =
+  typeof window !== "undefined"
+    ? `${window.location.protocol}//${window.location.hostname}:8900`
+    : "http://localhost:8900";
+
+const rawApiBaseUrl = (process.env.REACT_APP_API_URL || `${browserHost}/api`).replace(/\/$/, "");
+const apiBaseUrl = /\/api$/i.test(rawApiBaseUrl)
+  ? rawApiBaseUrl
+  : `${rawApiBaseUrl}/api`;
+
+const adminUrl = `${apiBaseUrl}/admin/`;
+const agentUrl = `${apiBaseUrl}/agent/`;
+const uploadUrl = `${apiBaseUrl}/upload/`;
+const propertyUrl = `${apiBaseUrl}/properties/`;
+const customerUrl = `${apiBaseUrl}/customers/`;
+const signUrl = `${apiBaseUrl}/signin/`;
+const requestsUrl = `${apiBaseUrl}/requests/`;
+const toursUrl = `${apiBaseUrl}/api/tours/`;
 
 export {
+  apiBaseUrl,
   adminUrl,
   agentUrl,
   uploadUrl,

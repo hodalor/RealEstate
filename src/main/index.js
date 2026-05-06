@@ -18,6 +18,7 @@ import PublicProperties from "./website/PublicProperties";
 // Import custom styles
 import "./website/styles/custom.css";
 import "./website/styles/header-fix.css";
+import "./app/styles/internal-forms.css";
 
 
 export default function Main() {
