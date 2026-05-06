@@ -1,6 +1,8 @@
 /* Layout helpers for the refreshed public experience */
 
 .site-header {
+  position: sticky;
+  top: 0;
   width: 100%;
   left: 0;
   right: 0;
@@ -19,6 +21,6 @@
 }
 
 .site-wrapper {
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }

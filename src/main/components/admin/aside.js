@@ -4,7 +4,13 @@ import { AdminContext } from "../../libs/contexts/adminContext";
 
 export default function AdminAside() {
   const { adminData } = useContext(AdminContext);
-  const admin = adminData.admin;
+  const admin = adminData.admin || {};
+  const adminImage = admin.image || "/assets/image/user.jpg";
+  const adminName = [admin.firstName, admin.lastName].filter(Boolean).join(" ") || "Admin";
+  const adminRole = admin.role || "Administrator";
+  const adminAddress = admin.address || "Address";
+  const adminEmail = admin.email || "Email";
+  const adminPhone = admin.phone || "Phone";
 
   return (
     <div>
@@ -29,15 +35,12 @@ export default function AdminAside() {
                   <div className="user-info">
                     <div className="image">
                       <Link to="/admin/profile/">
-                        <img
-                          src={admin !== undefined ? admin.image : ""}
-                          alt="User"
-                        />
+                        <img src={adminImage} alt="User" />
                       </Link>
                     </div>
                     <div className="detail">
-                      <h4>{admin.firstName + " " + admin.lastName}</h4>
-                      <small>{admin.role}</small>
+                      <h4>{adminName}</h4>
+                      <small>{adminRole}</small>
                     </div>
                   </div>
                 </li>
@@ -111,27 +114,22 @@ export default function AdminAside() {
                   <div className="user-info m-b-20 p-b-15">
                     <div className="image">
                       <Link to="/admin/profile/">
-                        <img
-                          src={admin !== undefined ? admin.image : ""}
-                          alt="User"
-                        />
+                        <img src={adminImage} alt="User" />
                       </Link>
                     </div>
                     <div className="detail">
-                      <h4>{admin.firstName + " " + admin.lastName}</h4>
-                      <small>{admin.role}</small>
+                      <h4>{adminName}</h4>
+                      <small>{adminRole}</small>
                     </div>
-                    <p className="text-muted">
-                      {admin !== undefined ? admin.address : "Address"}
-                    </p>
+                    <p className="text-muted">{adminAddress}</p>
                   </div>
                 </li>
                 <li>
                   <small className="text-muted">Email address: </small>
-                  <p>{admin !== undefined ? admin.email : "Email"}</p>
+                  <p>{adminEmail}</p>
                   <hr />
                   <small className="text-muted">Phone: </small>
-                  <p>{admin !== undefined ? admin.phone : "Phone"}</p>
+                  <p>{adminPhone}</p>
                   <hr />
                 </li>
                 <li>

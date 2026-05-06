@@ -1206,6 +1206,9 @@ a {
   background: #0c1fcf;
   backdrop-filter: none;
   border-bottom: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1040;
 }
 
 .site-navbar {
@@ -1246,8 +1249,8 @@ a {
 
 .listing-page-section .filter-shell {
   position: sticky;
-  top: 82px;
-  z-index: 14;
+  top: 96px;
+  z-index: 30;
 }
 
 .filter-shell {

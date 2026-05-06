@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from "react";
-import { Route, Switch, useHistory, useRouteMatch } from "react-router-dom";
+import React, { useContext } from "react";
+import { Redirect, Route, Switch } from "react-router-dom";
 import { AuthContext } from "../../../libs/contexts/authContext";
 import AdminContextProvider from "../../../libs/contexts/adminContext";
 import AdminStart from "../../../components/admin";
@@ -12,7 +12,6 @@ import AgentDetails from "./agentDetails";
 import Agents from "./agents";
 import Notifications from "./notifications";
 import Profile from "./profile";
-import Properties from "./properties";
 import PropertyDetails from "./propertyDetails";
 import User from "./user";
 import Users from "./users";
@@ -22,11 +21,17 @@ import TourBookings from "./tourBookings";
 import PaymentHistory from "./payments";
 
 export default function Admin() {
-  const history = useHistory()
   const { authState } = useContext(AuthContext);
- 
- if (authState.user && authState.user.role !== "Admin") return history.push("/login") 
-  
+  const userRole = authState.user?.role;
+
+  if (!userRole) {
+    return <Redirect to="/login" />;
+  }
+
+  if (userRole !== "Admin") {
+    return <Redirect to="/login" />;
+  }
+
   return (
     <AdminContextProvider>
       <AdminStart />
@@ -35,6 +40,9 @@ export default function Admin() {
         <div className="container-fluid">
           <div className="row clearfix">
             <Switch>
+              <Route exact path="/admin">
+                <Redirect to="/admin/properties/" />
+              </Route>
               <Route
                 exact
                 path="/admin/properties/"
@@ -64,6 +72,9 @@ export default function Admin() {
               <Route path="/admin/chats" component={AdminChats} />
               <Route path="/admin/tour-bookings" component={TourBookings} />
               <Route path="/admin/payments" component={PaymentHistory} />
+              <Route path="*">
+                <Redirect to="/admin/properties/" />
+              </Route>
             </Switch>
           </div>
         </div>
