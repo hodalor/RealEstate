@@ -112,3 +112,136 @@
     margin-top: 0.75rem;
   }
 }
+
+body.dashboard-mode {
+  background: #f5f7ff;
+}
+
+.internal-dashboard-shell .overlay {
+  background: rgba(13, 31, 207, 0.16);
+}
+
+.internal-dashboard-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.4rem;
+  background: linear-gradient(135deg, #0c1fcf, #3949ff);
+  box-shadow: 0 12px 32px rgba(12, 31, 207, 0.18);
+}
+
+.internal-topbar-left,
+.internal-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.internal-icon-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.internal-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+  color: #fff;
+}
+
+.internal-brand strong,
+.internal-user-pill strong {
+  display: block;
+  font-weight: 700;
+}
+
+.internal-brand small,
+.internal-user-pill small {
+  display: block;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.78rem;
+}
+
+.internal-brand-badge,
+.internal-user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-weight: 800;
+}
+
+.internal-topbar-chip,
+.internal-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 42px;
+  padding: 0.65rem 0.95rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  text-decoration: none;
+}
+
+.internal-topbar-chip span {
+  font-weight: 600;
+}
+
+.internal-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 42px;
+  padding: 0.65rem 0.95rem;
+  border: 0;
+  border-radius: 14px;
+  background: #fff;
+  color: #0c1fcf;
+  font-weight: 700;
+}
+
+.dashboard-mode .content {
+  padding-top: 94px;
+}
+
+.dashboard-mode .sidebar {
+  top: 76px;
+}
+
+.dashboard-mode .sidebar .menu .list a,
+.dashboard-mode .sidebar .menu .list .user-info {
+  border-radius: 14px;
+}
+
+@media (max-width: 991.98px) {
+  .internal-dashboard-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .internal-topbar-left,
+  .internal-topbar-right {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .internal-topbar-chip span,
+  .internal-logout-btn span,
+  .internal-brand small,
+  .internal-user-pill small {
+    display: none;
+  }
+}
