@@ -81,7 +81,7 @@ export default function Login() {
                         onChange={(e) =>
                           _handleChange({
                             field: "email",
-                            value: e.target.value.toUpperCase(),
+                            value: e.target.value,
                           })
                         }
                       />

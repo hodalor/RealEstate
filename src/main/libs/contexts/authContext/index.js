@@ -73,7 +73,12 @@ export default function AuthContextProvider(props) {
   };
 
   const _handleLogin = async () => {
-    const validate = await _validateUser(authState);
+    const normalizedAuthState = {
+      ...authState,
+      email: authState.email.trim().toLowerCase(),
+    };
+
+    const validate = await _validateUser(normalizedAuthState);
 
     if (!validate.status) {
       _showToast("warning", validate.mesg);
@@ -82,7 +87,7 @@ export default function AuthContextProvider(props) {
 
     setLoading(true);
 
-    const results = await _login(authState);
+    const results = await _login(normalizedAuthState);
 
     _clearFields();
     if (results === undefined || results.success === 0) {
@@ -146,7 +151,14 @@ export default function AuthContextProvider(props) {
   };
 
   const _handleRegister = async () => {
-    const validate = await _validateRegister(authState);
+    const normalizedAuthState = {
+      ...authState,
+      email: authState.email.trim().toLowerCase(),
+      firstName: authState.firstName.trim(),
+      lastName: authState.lastName.trim(),
+    };
+
+    const validate = await _validateRegister(normalizedAuthState);
 
     if (!validate.status) {
       _showToast("warning", validate.mesg);
@@ -155,7 +167,7 @@ export default function AuthContextProvider(props) {
 
     setLoading(true);
 
-    const results = await _register(authState);
+    const results = await _register(normalizedAuthState);
 
     _clearFields();
     if (results === undefined || results.success === 0) {

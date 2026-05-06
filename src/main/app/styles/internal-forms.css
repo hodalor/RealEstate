@@ -218,6 +218,56 @@ body.dashboard-mode {
 
 .dashboard-mode .sidebar {
   top: 76px;
+  background: #ffffff;
+  border-right: 1px solid #e7ecff;
+  box-shadow: 8px 0 24px rgba(15, 23, 42, 0.04);
+}
+
+.dashboard-mode .sidebar .menu {
+  padding: 1rem 0.75rem 1.5rem;
+}
+
+.dashboard-mode .sidebar .user-info {
+  margin: 0 0.5rem 1rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0c1fcf, #3949ff);
+  color: #fff;
+}
+
+.dashboard-mode .sidebar .user-info .detail h4,
+.dashboard-mode .sidebar .user-info .detail small,
+.dashboard-mode .sidebar .user-info a,
+.dashboard-mode .sidebar .user-info i {
+  color: #fff !important;
+}
+
+.dashboard-mode .sidebar .menu .list {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.dashboard-mode .sidebar .menu .list a {
+  margin-bottom: 0.25rem;
+  padding: 0.8rem 0.95rem;
+  color: #334155;
+  transition: all 0.2s ease;
+}
+
+.dashboard-mode .sidebar .menu .list a:hover,
+.dashboard-mode .sidebar .menu .list .active > a {
+  background: #eef2ff;
+  color: #0c1fcf;
+}
+
+.dashboard-mode .sidebar .menu .list i.material-icons,
+.dashboard-mode .sidebar .menu .list i.fa {
+  color: inherit;
+}
+
+.dashboard-mode .sidebar .menu .list .ml-menu {
+  margin-top: 0.35rem;
+  padding-left: 0.75rem;
 }
 
 .dashboard-mode .sidebar .menu .list a,

@@ -75,7 +75,7 @@ export default function Register() {
                             onChange={(e) =>
                               _handleChange({
                                 field: "firstName",
-                                value: e.target.value.toUpperCase(),
+                                value: e.target.value,
                               })
                             }
                           />
@@ -94,7 +94,7 @@ export default function Register() {
                             onChange={(e) =>
                               _handleChange({
                                 field: "lastName",
-                                value: e.target.value.toUpperCase(),
+                                value: e.target.value,
                               })
                             }
                           />
@@ -132,7 +132,7 @@ export default function Register() {
                             onChange={(e) =>
                               _handleChange({
                                 field: "email",
-                                value: e.target.value.toUpperCase(),
+                                value: e.target.value,
                               })
                             }
                           />
