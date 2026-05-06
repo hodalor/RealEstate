@@ -8,6 +8,13 @@ export default function PropertyDetails() {
   const { loading } = useContext(AuthContext);
   const { agentState, _removeProp, _sold } = useContext(AgentsContext);
   const property = agentState.propertyDetails;
+  const propertyImages = [
+    property?.images?.image1,
+    property?.images?.image2,
+    property?.images?.image3,
+    property?.images?.image4,
+    property?.images?.image5,
+  ].filter(Boolean);
 
   return (
     <div>
@@ -30,21 +37,21 @@ export default function PropertyDetails() {
                     <img
                       src={property.images.image1}
                       className="img-fluid"
-                      alt="presentational images"
+                      alt={property.name}
                     />
                   </div>
                   <div className="carousel-item">
                     <img
                       src={property.images.image2}
                       className="img-fluid"
-                      alt="presentational images"
+                      alt={property.name}
                     />
                   </div>
                   <div className="carousel-item">
                     <img
                       src={property.images.image3}
                       className="img-fluid"
-                      alt="presentational images"
+                      alt={property.name}
                     />
                   </div>
                   {property.images.image4 !== undefined ? (
@@ -52,7 +59,7 @@ export default function PropertyDetails() {
                       <img
                         src={property.images.image4}
                         className="img-fluid"
-                        alt="presentational images"
+                        alt={property.name}
                       />
                     </div>
                   ) : null}
@@ -61,7 +68,7 @@ export default function PropertyDetails() {
                       <img
                         src={property.images.image5}
                         className="img-fluid"
-                        alt="presentational images"
+                        alt={property.name}
                       />
                     </div>
                   ) : null}
@@ -86,9 +93,7 @@ export default function PropertyDetails() {
                 GHC {property.price + " for " + property.rentOrSale}
               </h6>
               <h5 className="mt-0">
-                <a href="#" className="col-blue-grey">
-                  {property.name}
-                </a>
+                <span className="col-blue-grey font-weight-bold">{property.name}</span>
               </h5>
               <p className="text-muted">{property.propDescription}</p>
               <small className="text-muted">
@@ -96,22 +101,33 @@ export default function PropertyDetails() {
                 {property.digitalAddress}
               </small>
               <div className="d-flex flex-wrap justify-content-start mt-3 p-3 bg-light">
-                <a href="#" className="w100" title="Square Feet">
+                <span className="w100" title="Square Feet">
                   <i className="fa fa-home mr-2" />
                   <span>{property.squareFt}</span>
-                </a>
-                <a href="#" className="w100" title="Bedrooms">
+                </span>
+                <span className="w100" title="Bedrooms">
                   <i className="fa fa-bed mr-2" />
                   <span>{property.others.noOfBedrooms}</span>
-                </a>
-                <a href="#" className="w100" title="Parking space">
+                </span>
+                <span className="w100" title="Parking space">
                   <i className="fa fa-car mr-2" />
-                  <span>{property.carPark ? "Yes" : "No"}</span>
-                </a>
-                <a href="#" className="w100" title="bath rooms">
+                  <span>{property.others.carPark ? "Yes" : "No"}</span>
+                </span>
+                <span className="w100" title="bath rooms">
                   <i className="fa fa-shower mr-2" />
                   <span>{property.others.bathrooms}</span>
-                </a>
+                </span>
+              </div>
+              <div className="d-flex flex-wrap gap-2 mt-3">
+                {propertyImages.map((image, index) => (
+                  <img
+                    key={`${image}-${index}`}
+                    src={image}
+                    alt=""
+                    className="rounded"
+                    style={{ width: "76px", height: "76px", objectFit: "cover" }}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -173,13 +189,13 @@ export default function PropertyDetails() {
                       Electricity
                     </li>
                     <li className="list-group-item">
-                      {property.amenities.kitchen ? (
+                      {property.others.kitchen ? (
                         <i className="fa fa-check-circle mr-2" />
                       ) : null}
                       Kitchen
                     </li>
                     <li className="list-group-item">
-                      {property.amenities.masterBedroom ? (
+                      {property.others.masterBedroom ? (
                         <i className="fa fa-check-circle mr-2" />
                       ) : null}
                       Master bedroom
@@ -195,7 +211,7 @@ export default function PropertyDetails() {
                 <div className="col-sm-4">
                   <ul className="list-group">
                     <li className="list-group-item">
-                      {property.amenities.storeRoom ? (
+                      {property.others.storeRoom ? (
                         <i className="fa fa-check-circle mr-2" />
                       ) : null}
                       Store room

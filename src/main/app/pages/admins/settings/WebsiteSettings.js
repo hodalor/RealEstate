@@ -158,31 +158,31 @@ export default function WebsiteSettings({ contentSettings, onSettingsChange, par
             <div className="body">
               <ul className="nav nav-tabs">
                 <li className="nav-item">
-                  <a 
+                  <button
+                    type="button"
                     className={`nav-link ${activeTab === 'hero' ? 'active' : ''}`} 
-                    href="#" 
-                    onClick={(e) => { e.preventDefault(); handleTabChange('hero'); }}
+                    onClick={() => handleTabChange('hero')}
                   >
                     Hero Section
-                  </a>
+                  </button>
                 </li>
                 <li className="nav-item">
-                  <a 
+                  <button
+                    type="button"
                     className={`nav-link ${activeTab === 'footer' ? 'active' : ''}`} 
-                    href="#" 
-                    onClick={(e) => { e.preventDefault(); handleTabChange('footer'); }}
+                    onClick={() => handleTabChange('footer')}
                   >
                     Footer Information
-                  </a>
+                  </button>
                 </li>
                 <li className="nav-item">
-                  <a 
+                  <button
+                    type="button"
                     className={`nav-link ${activeTab === 'ads' ? 'active' : ''}`} 
-                    href="#" 
-                    onClick={(e) => { e.preventDefault(); handleTabChange('ads'); }}
+                    onClick={() => handleTabChange('ads')}
                   >
                     Advertisement Banners
-                  </a>
+                  </button>
                 </li>
               </ul>
 

@@ -7,7 +7,7 @@ import DeveloperSettings from "./DeveloperSettings";
 import { toast } from "react-toastify";
 
 export default function Settings() {
-  const { adminData, _handleSettingsChange, _saveSettings, _fetchSettings } = useContext(AdminContext);
+  const { adminData, _saveSettings, _fetchSettings } = useContext(AdminContext);
   const { loading } = useContext(AuthContext);
   
   const [activeTab, setActiveTab] = useState('general');
@@ -143,14 +143,6 @@ export default function Settings() {
   const [newProvince, setNewProvince] = useState({ name: "", countryId: "" });
   const [newPropertyType, setNewPropertyType] = useState("");
   const [newAmenity, setNewAmenity] = useState("");
-  const [newAdvertisement, setNewAdvertisement] = useState({
-    title: "",
-    description: "",
-    imageUrl: "",
-    link: "",
-    active: true
-  });
-
   // Load settings from context or API when component mounts
   useEffect(() => {
     // If settings exist in adminData, use them
@@ -160,7 +152,7 @@ export default function Settings() {
       // Fetch settings from backend
       _fetchSettings();
     }
-  }, []);
+  }, [_fetchSettings, adminData.settings]);
 
   const handleTabChange = (tab) => {
     if (tab === 'content') {
@@ -338,49 +330,49 @@ export default function Settings() {
               {/* Tabs */}
               <ul className="nav nav-tabs">
                 <li className="nav-item">
-                  <a 
+                  <button
+                    type="button"
                     className={`nav-link ${activeTab === 'general' ? 'active' : ''}`} 
-                    href="#" 
                     onClick={() => handleTabChange('general')}
                   >
                     General
-                  </a>
+                  </button>
                 </li>
                 <li className="nav-item">
-                  <a 
+                  <button
+                    type="button"
                     className={`nav-link ${activeTab === 'location' ? 'active' : ''}`} 
-                    href="#" 
                     onClick={() => handleTabChange('location')}
                   >
                     Location
-                  </a>
+                  </button>
                 </li>
                 <li className="nav-item">
-                  <a 
+                  <button
+                    type="button"
                     className={`nav-link ${activeTab === 'property' ? 'active' : ''}`} 
-                    href="#" 
                     onClick={() => handleTabChange('property')}
                   >
                     Property Settings
-                  </a>
+                  </button>
                 </li>
                 <li className="nav-item">
-                  <a 
+                  <button
+                    type="button"
                     className={`nav-link ${showContentManagement ? 'active' : ''}`} 
-                    href="#" 
                     onClick={() => handleTabChange('content')}
                   >
                     <i className="fa fa-edit"></i> Content Management
-                  </a>
+                  </button>
                 </li>
                 <li className="nav-item">
-                  <a 
+                  <button
+                    type="button"
                     className={`nav-link ${showDeveloperSettings ? 'active' : ''}`} 
-                    href="#" 
                     onClick={() => handleTabChange('developer')}
                   >
                     <i className="fa fa-code"></i> Developer Settings
-                  </a>
+                  </button>
                 </li>
               </ul>
               

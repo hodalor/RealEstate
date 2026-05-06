@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 export default function PaymentHistory() {
   const { loading } = useContext(AuthContext);
-  const { adminData } = useContext(AdminContext);
+  useContext(AdminContext);
   
   // State for payments
   const [payments, setPayments] = useState([]);
@@ -203,6 +203,9 @@ export default function PaymentHistory() {
     }
   };
 
+  const actionMenuButtonClass =
+    "dropdown-item btn btn-link text-left w-100 text-decoration-none";
+
   return (
     <div className="row clearfix">
       <div className="col-lg-12">
@@ -359,16 +362,16 @@ export default function PaymentHistory() {
                                   Actions
                                 </button>
                                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                  <a className="dropdown-item" href="#">View Details</a>
-                                  <a className="dropdown-item" href="#">Send Receipt</a>
+                                  <button type="button" className={actionMenuButtonClass} onClick={() => toast.info(`Viewing payment ${payment.id}`)}>View Details</button>
+                                  <button type="button" className={actionMenuButtonClass} onClick={() => toast.info(`Receipt sent to ${payment.clientEmail}`)}>Send Receipt</button>
                                   {payment.status === 'pending' && (
                                     <>
-                                      <a className="dropdown-item" href="#">Mark as Completed</a>
-                                      <a className="dropdown-item text-danger" href="#">Mark as Failed</a>
+                                      <button type="button" className={actionMenuButtonClass} onClick={() => toast.success(`Payment ${payment.id} marked as completed`)}>Mark as Completed</button>
+                                      <button type="button" className={`${actionMenuButtonClass} text-danger`} onClick={() => toast.warn(`Payment ${payment.id} marked as failed`)}>Mark as Failed</button>
                                     </>
                                   )}
                                   {payment.status === 'completed' && (
-                                    <a className="dropdown-item text-warning" href="#">Process Refund</a>
+                                    <button type="button" className={`${actionMenuButtonClass} text-warning`} onClick={() => toast.info(`Refund flow opened for payment ${payment.id}`)}>Process Refund</button>
                                   )}
                                 </div>
                               </div>

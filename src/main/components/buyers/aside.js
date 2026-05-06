@@ -110,10 +110,14 @@ export default function Aside() {
                   </ul>
                 </li> */}
                 <li role="button" type="button" onClick={_navigateToAgents}>
-                  <Link>
+                  <button
+                    type="button"
+                    className="btn border-0 bg-transparent p-0 d-flex align-items-center w-100 text-left"
+                    onClick={_navigateToAgents}
+                  >
                     <i className="fa fa-users" />
                     <span>Agents</span>
-                  </Link>
+                  </button>
                 </li>
                 {/* <li>
                   <Link to="/properties/favorites">
@@ -136,15 +140,13 @@ export default function Aside() {
                 <li>
                   <div className="user-info m-b-20 p-b-15">
                     <div className="image">
-                      <Link to="/properties/profile">
-                        {buyer === null || buyer.image === "" || buyer.image === undefined ? (
-                          <span>No image uploaded</span>
-                        ) : (
-                          <Link to="/properties/profile">
-                            <img src={buyer === null ? "" : buyer.image} alt="User" />
-                          </Link>
-                        )}
-                      </Link>
+                      {buyer === null || buyer.image === "" || buyer.image === undefined ? (
+                        <Link to="/properties/profile">No image uploaded</Link>
+                      ) : (
+                        <Link to="/properties/profile">
+                          <img src={buyer === null ? "" : buyer.image} alt="User" />
+                        </Link>
+                      )}
                     </div>
                     <div className="detail">
                       <h4>{buyer === null ? "" : buyer.firstName + " " + buyer.lastName}</h4>

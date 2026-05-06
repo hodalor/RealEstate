@@ -1,52 +1,31 @@
 import React, { useContext } from "react";
-import { BrowserRouter as Router, Route, Switch, useHistory } from "react-router-dom";
+import { Redirect, useLocation } from "react-router-dom";
 import { AuthContext } from "../libs/contexts/authContext";
-import AdminContextProvider from "../libs/contexts/adminContext";
-import AgentsContextProvider from "../libs/contexts/agentsContext";
-import BuyersContextProvided from "../libs/contexts/buyersContext";
-import Admins from "./pages/admins";
-import Agents from "./pages/agents";
-import Buyers from "./pages/byers";
-import NotAuth from "./pages/errPages/not-auth";
-import Support from "./pages/others/support";
-import Settings from "./pages/admins/settings";
 
 export default function MainApp() {
-  const history = useHistory();
+  const location = useLocation();
   const { authState } = useContext(AuthContext);
-  if (!authState.user) return history.push("/forbidden");
-  const role = authState.user.role; 
-  if (role === "Admin") {
-    return (
-      <AdminContextProvider>
-        <Admins />
-      </AdminContextProvider>
-    );
+  const role = authState.user?.role;
+
+  if (!role) {
+    return <Redirect to="/login" />;
   }
-  if (role === "Agent") {
-    return (
-      <AgentsContextProvider>
-        <Agents />
-      </AgentsContextProvider>
-    );
+
+  const routeMap = {
+    Admin: "/admin/properties/",
+    Agent: "/agents/properties/",
+    Buyer: "/properties/listings",
+  };
+
+  const targetRoute = routeMap[role];
+
+  if (!targetRoute) {
+    return <Redirect to="/forbidden" />;
   }
-  if (role === "Buyer") {
-    return (
-      <BuyersContextProvided>
-        <Buyers />
-      </BuyersContextProvided>
-    )
+
+  if (location.pathname === targetRoute) {
+    return null;
   }
-  
-  // console.log(authState.user);
-  // return (
-  //   <Switch>
-  //     <Route path="/admin" component={Admins} />
-  //     <Route path="/agents" component={Agents} />
-  //     <Route path="/buyers" component={Buyers} />
-  //     <Route path="/support" component={Support} />
-  //     <Route path="/settings" component={Settings} />
-  //     <Route path="/forbidden" component={NotAuth} />
-  //   </Switch>
-  // );
+
+  return <Redirect to={targetRoute} />;
 }

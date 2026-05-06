@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 export default function TourBookings() {
   const { loading } = useContext(AuthContext);
-  const { adminData } = useContext(AdminContext);
+  useContext(AdminContext);
   
   // State for tour bookings
   const [bookings, setBookings] = useState([]);
@@ -209,6 +209,9 @@ export default function TourBookings() {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  const actionMenuButtonClass =
+    "dropdown-item btn btn-link text-left w-100 text-decoration-none";
   
   // Get status badge class
   const getStatusBadgeClass = (status) => {
@@ -338,9 +341,9 @@ export default function TourBookings() {
                                     Assign Agent
                                   </button>
                                   <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a className="dropdown-item" href="#" onClick={() => handleAssignAgent(booking.id, 'Sarah Johnson')}>Sarah Johnson</a>
-                                    <a className="dropdown-item" href="#" onClick={() => handleAssignAgent(booking.id, 'Michael Brown')}>Michael Brown</a>
-                                    <a className="dropdown-item" href="#" onClick={() => handleAssignAgent(booking.id, 'David Wilson')}>David Wilson</a>
+                                    <button type="button" className={actionMenuButtonClass} onClick={() => handleAssignAgent(booking.id, 'Sarah Johnson')}>Sarah Johnson</button>
+                                    <button type="button" className={actionMenuButtonClass} onClick={() => handleAssignAgent(booking.id, 'Michael Brown')}>Michael Brown</button>
+                                    <button type="button" className={actionMenuButtonClass} onClick={() => handleAssignAgent(booking.id, 'David Wilson')}>David Wilson</button>
                                   </div>
                                 </div>
                               ) : (
@@ -358,12 +361,12 @@ export default function TourBookings() {
                                   Actions
                                 </button>
                                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                  <a className="dropdown-item" href="#" onClick={() => handleStatusChange(booking.id, 'confirmed')}>Confirm</a>
-                                  <a className="dropdown-item" href="#" onClick={() => handleStatusChange(booking.id, 'completed')}>Mark as Completed</a>
-                                  <a className="dropdown-item" href="#" onClick={() => handleStatusChange(booking.id, 'cancelled')}>Cancel</a>
+                                  <button type="button" className={actionMenuButtonClass} onClick={() => handleStatusChange(booking.id, 'confirmed')}>Confirm</button>
+                                  <button type="button" className={actionMenuButtonClass} onClick={() => handleStatusChange(booking.id, 'completed')}>Mark as Completed</button>
+                                  <button type="button" className={actionMenuButtonClass} onClick={() => handleStatusChange(booking.id, 'cancelled')}>Cancel</button>
                                   <div className="dropdown-divider"></div>
-                                  <a className="dropdown-item" href="#">View Details</a>
-                                  <a className="dropdown-item" href="#">Send Reminder</a>
+                                  <button type="button" className={actionMenuButtonClass} onClick={() => toast.info(`Viewing booking ${booking.id}`)}>View Details</button>
+                                  <button type="button" className={actionMenuButtonClass} onClick={() => toast.info(`Reminder queued for ${booking.clientName}`)}>Send Reminder</button>
                                 </div>
                               </div>
                             </td>

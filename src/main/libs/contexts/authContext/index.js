@@ -7,6 +7,19 @@ import { toast } from "react-toastify";
 
 export const AuthContext = createContext();
 
+const getStoredUser = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default function AuthContextProvider(props) {
   const [authState, setAuthState] = useState({
     userType: "",
@@ -16,7 +29,7 @@ export default function AuthContextProvider(props) {
     firstName: "",
     lastName: "",
     phone: "",
-    user: {},
+    user: getStoredUser(),
   });
 
   const [notiData, setNotiData] = useState({
@@ -101,12 +114,18 @@ export default function AuthContextProvider(props) {
 
     const store = await _saveToStorage({ data: results.user, key: "user" });
     if (store) {
+      const roleRoutes = {
+        Admin: "/admin/properties/",
+        Agent: "/agents/properties/",
+        Buyer: "/properties/listings",
+      };
+
       setAuthState({
         ...authState,
         user: results.user,
       });
 
-      history.push("/check");
+      history.push(roleRoutes[results.user.role] || "/check");
     }
   };
 
@@ -183,7 +202,14 @@ export default function AuthContextProvider(props) {
   const _logout = async () => {
     const out = await _removeFromStorage("user");
 
-    if (out) return history.push("/login");
+    if (out) {
+      setAuthState((prevState) => ({
+        ...prevState,
+        user: null,
+      }));
+
+      return history.push("/login");
+    }
   };
 
   return (
