@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { _addProperty } from "../../functions/creates";
 import { _calcDays } from "../../functions/dateDiff";
 import { _delNoti, _delProp, _sellProp } from "../../functions/deletes";
-import { _editAgent, _editPass } from "../../functions/edits";
+import { _editAgent, _editPass, _updateProperty } from "../../functions/edits";
 import { _fetchProperties, _fetchReq, _fetchSiteSettings } from "../../functions/fetches";
 import { _retrieveFromStroage, _saveToStorage } from "../../functions/storage";
 import { _validatePass, _validateProp } from "../../functions/validations";
@@ -74,6 +74,12 @@ export default function AgentContextProvider(props) {
       pets: Boolean,
       rooms: Number,
       propImages: [],
+      shortStayMinimumNights: 1,
+      shortStayCheckInTime: "14:00",
+      shortStayCheckOutTime: "11:00",
+      shortStayAvailabilityStart: "",
+      shortStayAvailabilityEnd: "",
+      shortStayBlockedDates: "",
     },
     propertyDetails: {},
     properties: [],
@@ -449,6 +455,60 @@ export default function AgentContextProvider(props) {
         },
       });
 
+    if (field === "shortStayMinimumNights")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          shortStayMinimumNights: value,
+        },
+      });
+
+    if (field === "shortStayCheckInTime")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          shortStayCheckInTime: value,
+        },
+      });
+
+    if (field === "shortStayCheckOutTime")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          shortStayCheckOutTime: value,
+        },
+      });
+
+    if (field === "shortStayAvailabilityStart")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          shortStayAvailabilityStart: value,
+        },
+      });
+
+    if (field === "shortStayAvailabilityEnd")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          shortStayAvailabilityEnd: value,
+        },
+      });
+
+    if (field === "shortStayBlockedDates")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          shortStayBlockedDates: value,
+        },
+      });
+
     if (field === "price")
       return setAgentState({
         ...agentState,
@@ -782,6 +842,12 @@ export default function AgentContextProvider(props) {
         pets: Boolean,
         rooms: Number,
         propImages: [],
+        shortStayMinimumNights: 1,
+        shortStayCheckInTime: "14:00",
+        shortStayCheckOutTime: "11:00",
+        shortStayAvailabilityStart: "",
+        shortStayAvailabilityEnd: "",
+        shortStayBlockedDates: "",
       },
     });
   };
@@ -1083,6 +1149,60 @@ export default function AgentContextProvider(props) {
     });
   };
 
+  const _updateShortStayAvailability = async (_id, shortStay) => {
+    setLoading(true);
+
+    const results = await _updateProperty(_id, {
+      rentOrSale: "Short Stay",
+      shortStay,
+    });
+
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      setNotiData({
+        ...notiData,
+        type: "error",
+        msg: results?.message || "Failed to update short stay availability",
+        show: true,
+      });
+      return false;
+    }
+
+    const getData = await _fetchProperties();
+
+    setLoading(false);
+    if (getData === undefined || getData.success === 0) {
+      setNotiData({
+        ...notiData,
+        type: "warning",
+        msg: getData?.message || "Failed to refresh properties",
+        show: true,
+      });
+      return false;
+    }
+
+    const ownProperties = getData.data.filter(
+      (property) => property.agentID === agentState.agent._id
+    );
+    const refreshedProperty =
+      ownProperties.find((property) => property._id === _id) || agentState.propertyDetails;
+
+    setAgentState({
+      ...agentState,
+      properties: ownProperties,
+      propertyDetails: refreshedProperty,
+    });
+
+    setNotiData({
+      ...notiData,
+      type: "info",
+      msg: "Short stay availability updated!",
+      show: true,
+    });
+
+    return refreshedProperty;
+  };
+
   return (
     <AgentsContext.Provider
       value={{
@@ -1100,6 +1220,7 @@ export default function AgentContextProvider(props) {
         _sold,
         _goToDetails,
         _delReq,
+        _updateShortStayAvailability,
       }}
     >
       {props.children}

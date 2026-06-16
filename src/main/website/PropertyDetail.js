@@ -83,6 +83,8 @@ export default function PropertyDetail() {
     { label: "Dining Room", enabled: property?.others?.diningRoom },
   ];
   const localDisplayCurrency = getDisplayCurrency(siteSettings, property?.country);
+  const isShortStay =
+    String(property?.rentOrSale || "").trim().toLowerCase() === "short stay";
   const showOriginalPrice =
     property?.currency &&
     String(property.currency).toUpperCase() !== String(localDisplayCurrency).toUpperCase();
@@ -141,13 +143,14 @@ export default function PropertyDetail() {
                 {formatPriceWithCurrency(property.price, property.currency, siteSettings, {
                   displayCurrency: localDisplayCurrency,
                 })}
+                {isShortStay ? " / night" : ""}
               </strong>
               {showOriginalPrice ? (
                 <small>
                   Original {formatPriceWithCurrency(property.price, property.currency, siteSettings)}
                 </small>
               ) : null}
-              <span>For {property.rentOrSale || "listing"}</span>
+              <span>{isShortStay ? "Per night" : `For ${property.rentOrSale || "listing"}`}</span>
             </div>
           </div>
         </div>
@@ -257,14 +260,16 @@ export default function PropertyDetail() {
                     <i className="fa fa-calendar me-2" aria-hidden="true"></i>
                     Book a Tour
                   </button>
-                  <button
-                    className="btn btn-soft-warning"
-                    data-bs-toggle="modal"
-                    data-bs-target="#bookPropertyModal"
-                  >
-                    <i className="fa fa-home me-2" aria-hidden="true"></i>
-                    Book Property
-                  </button>
+                  {isShortStay ? (
+                    <button
+                      className="btn btn-soft-warning"
+                      data-bs-toggle="modal"
+                      data-bs-target="#bookPropertyModal"
+                    >
+                      <i className="fa fa-home me-2" aria-hidden="true"></i>
+                      Reserve Short Stay
+                    </button>
+                  ) : null}
                   <button
                     className="btn btn-soft-info"
                     data-bs-toggle="modal"
@@ -304,7 +309,21 @@ export default function PropertyDetail() {
       <Footer />
 
       <BookTourModal property={property} />
-      <BookPropertyModal property={property} />
+      <BookPropertyModal
+        property={property}
+        siteSettings={siteSettings}
+        onBooked={(bookedDates) =>
+          setProperty((current) => ({
+            ...current,
+            shortStay: {
+              ...(current?.shortStay || {}),
+              bookedDates: [
+                ...new Set([...(current?.shortStay?.bookedDates || []), ...(bookedDates || [])]),
+              ],
+            },
+          }))
+        }
+      />
       <ChatAgentModal property={property} />
     </div>
   );

@@ -159,8 +159,10 @@ export default function HomePage() {
                       <h1>{activeProperty.name}</h1>
                       <p>
                         {activeProperty.city || activeProperty.digitalAddress || "Prime area"} ·{" "}
-                        {activeProperty.propType || "Property"} · For{" "}
-                        {activeProperty.rentOrSale || "Listing"}
+                        {activeProperty.propType || "Property"} ·{" "}
+                        {String(activeProperty.rentOrSale || "").toLowerCase() === "short stay"
+                          ? "Short Stay"
+                          : `For ${activeProperty.rentOrSale || "Listing"}`}
                       </p>
                       <div className="home-carousel-actions">
                         <Link

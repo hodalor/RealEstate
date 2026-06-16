@@ -17,6 +17,7 @@ const signUrl = `${apiBaseUrl}/signin/`;
 const requestsUrl = `${apiBaseUrl}/requests/`;
 const settingsUrl = `${apiBaseUrl}/settings/`;
 const toursUrl = `${apiBaseUrl}/tours/`;
+const bookingsUrl = `${apiBaseUrl}/bookings/`;
 
 export {
   apiBaseUrl,
@@ -29,4 +30,5 @@ export {
   requestsUrl,
   settingsUrl,
   toursUrl,
+  bookingsUrl,
 };

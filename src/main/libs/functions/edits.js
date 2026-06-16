@@ -235,4 +235,38 @@ const _approveProperty = async (_id) => {
   return results;
 };
 
-export { _editPass, _editAgent, _blockAgnt, _unblockAgnt, _approveProperty };
+const _updateProperty = async (_id, payload) => {
+  let results;
+
+  const url = propertyUrl + "update/" + _id;
+
+  await fetch(url, {
+    method: "PATCH",
+    headers: {
+      Accept: "application/json",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => response.json())
+    .then((res) => {
+      results = res;
+    })
+    .catch(() => {
+      results = {
+        success: 0,
+        message: "Please check your internet connection!",
+      };
+    });
+
+  return results;
+};
+
+export {
+  _editPass,
+  _editAgent,
+  _blockAgnt,
+  _unblockAgnt,
+  _approveProperty,
+  _updateProperty,
+};

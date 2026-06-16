@@ -21,6 +21,7 @@ import {
   _blockAgnt,
   _editAgent,
   _editPass,
+  _updateProperty,
   _unblockAgnt,
 } from "../../functions/edits";
 import { _delAgent } from "../../functions/deletes";
@@ -91,6 +92,12 @@ const getEmptyPropertyState = () => ({
   pets: Boolean,
   rooms: Number,
   propImages: [],
+  shortStayMinimumNights: 1,
+  shortStayCheckInTime: "14:00",
+  shortStayCheckOutTime: "11:00",
+  shortStayAvailabilityStart: "",
+  shortStayAvailabilityEnd: "",
+  shortStayBlockedDates: "",
 });
 
 export default function AdminContextProvider(props) {
@@ -301,6 +308,60 @@ export default function AdminContextProvider(props) {
         property: {
           ...adminData.property,
           currency: value,
+        },
+      });
+
+    if (field === "shortStayMinimumNights")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          shortStayMinimumNights: value,
+        },
+      });
+
+    if (field === "shortStayCheckInTime")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          shortStayCheckInTime: value,
+        },
+      });
+
+    if (field === "shortStayCheckOutTime")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          shortStayCheckOutTime: value,
+        },
+      });
+
+    if (field === "shortStayAvailabilityStart")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          shortStayAvailabilityStart: value,
+        },
+      });
+
+    if (field === "shortStayAvailabilityEnd")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          shortStayAvailabilityEnd: value,
+        },
+      });
+
+    if (field === "shortStayBlockedDates")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          shortStayBlockedDates: value,
         },
       });
 
@@ -1187,6 +1248,49 @@ export default function AdminContextProvider(props) {
     toast.success("Property approved successfully!");
   };
 
+  const _updateShortStayAvailability = async (_id, shortStay) => {
+    setLoading(true);
+
+    const results = await _updateProperty(_id, {
+      rentOrSale: "Short Stay",
+      shortStay,
+    });
+
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      toast.error(results?.message || "Failed to update short stay availability");
+      return false;
+    }
+
+    const getData = await _fetchProperties();
+
+    if (getData === undefined || getData.success === 0) {
+      setLoading(false);
+      toast.warning(getData?.message || "Failed to refresh properties");
+      return false;
+    }
+
+    const pending = [];
+    const approved = [];
+    getData.data.forEach((pro) => {
+      if (pro.isApproved) approved.push(pro);
+      if (!pro.isApproved) pending.push(pro);
+    });
+
+    const refreshedProperty = getData.data.find((item) => item._id === _id) || adminData.propertyDetails;
+
+    setAdminData({
+      ...adminData,
+      properties: approved,
+      pending,
+      propertyDetails: refreshedProperty,
+    });
+
+    setLoading(false);
+    toast.success("Short stay availability updated!");
+    return refreshedProperty;
+  };
+
   // Handle settings changes
   const _handleSettingsChange = (data) => {
     setAdminData({
@@ -1277,6 +1381,7 @@ export default function AdminContextProvider(props) {
         _findAndRouteToAgent,
         _handleCategory,
         _approve,
+        _updateShortStayAvailability,
         _handleSettingsChange,
         _saveSettings,
         _fetchSettings,

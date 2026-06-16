@@ -27,6 +27,8 @@ export default function AddProp() {
     selectedCity
   );
   const currencyOptions = getCurrencyOptions(agentState.settings, selectedCountry);
+  const isShortStay =
+    String(agentState.property.rentOrSale || "").trim().toLowerCase() === "short stay";
 
   return (
     <div className="container-fluid internal-form-page">
@@ -221,18 +223,21 @@ export default function AddProp() {
                     onChange={(e) =>
                       _handleChange({
                         field: "rentOrSale",
-                        value: e.target.value.toUpperCase(),
+                        value: e.target.value,
                       })
                     }
                   >
                     <option className="form-control" value="">
-                      Rent / Sale
+                      Listing Mode
                     </option>
-                    <option className="form-control" value="rent">
+                    <option className="form-control" value="Rent">
                       Rent
                     </option>
-                    <option className="form-control" value="sale">
+                    <option className="form-control" value="Sale">
                       Sale
+                    </option>
+                    <option className="form-control" value="Short Stay">
+                      Short Stay
                     </option>
                   </select>
                 </div>
@@ -263,7 +268,9 @@ export default function AddProp() {
                   <input
                     type="number"
                     className="form-control"
-                    placeholder={`Price (${agentState.property.currency || "Currency"})`}
+                    placeholder={`${
+                      isShortStay ? "Nightly Price" : "Price"
+                    } (${agentState.property.currency || "Currency"})`}
                     value={agentState.property.price}
                     onChange={(e) =>
                       _handleChange({
@@ -274,6 +281,118 @@ export default function AddProp() {
                   />
                 </div>
               </div>
+              {isShortStay ? (
+                <>
+                  <div className="col-lg-3 col-md-3 col-sm-6">
+                    <div className="form-group">
+                      <input
+                        type="number"
+                        min="1"
+                        className="form-control"
+                        placeholder="Minimum nights"
+                        value={agentState.property.shortStayMinimumNights || 1}
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "shortStayMinimumNights",
+                            value: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="col-lg-3 col-md-3 col-sm-6">
+                    <div className="form-group">
+                      <input
+                        type="time"
+                        className="form-control"
+                        value={agentState.property.shortStayCheckInTime || "14:00"}
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "shortStayCheckInTime",
+                            value: e.target.value,
+                          })
+                        }
+                      />
+                      <small style={{ fontSize: "12px", marginLeft: "10px" }}>
+                        Check-in time
+                      </small>
+                    </div>
+                  </div>
+                  <div className="col-lg-3 col-md-3 col-sm-6">
+                    <div className="form-group">
+                      <input
+                        type="time"
+                        className="form-control"
+                        value={agentState.property.shortStayCheckOutTime || "11:00"}
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "shortStayCheckOutTime",
+                            value: e.target.value,
+                          })
+                        }
+                      />
+                      <small style={{ fontSize: "12px", marginLeft: "10px" }}>
+                        Check-out time
+                      </small>
+                    </div>
+                  </div>
+                  <div className="col-lg-3 col-md-3 col-sm-6">
+                    <div className="form-group">
+                      <input
+                        type="date"
+                        className="form-control"
+                        value={agentState.property.shortStayAvailabilityStart || ""}
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "shortStayAvailabilityStart",
+                            value: e.target.value,
+                          })
+                        }
+                      />
+                      <small style={{ fontSize: "12px", marginLeft: "10px" }}>
+                        Availability start
+                      </small>
+                    </div>
+                  </div>
+                  <div className="col-lg-3 col-md-3 col-sm-6">
+                    <div className="form-group">
+                      <input
+                        type="date"
+                        className="form-control"
+                        value={agentState.property.shortStayAvailabilityEnd || ""}
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "shortStayAvailabilityEnd",
+                            value: e.target.value,
+                          })
+                        }
+                      />
+                      <small style={{ fontSize: "12px", marginLeft: "10px" }}>
+                        Availability end
+                      </small>
+                    </div>
+                  </div>
+                  <div className="col-sm-12">
+                    <div className="form-group">
+                      <textarea
+                        rows={3}
+                        className="form-control no-resize"
+                        placeholder="Closed dates, one per line or separated with commas"
+                        value={agentState.property.shortStayBlockedDates || ""}
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "shortStayBlockedDates",
+                            value: e.target.value,
+                          })
+                        }
+                      />
+                      <small style={{ fontSize: "12px", marginLeft: "10px" }}>
+                        Add any dates the host wants closed inside the available range.
+                      </small>
+                    </div>
+                  </div>
+                </>
+              ) : null}
               <div className="col-lg-3 col-md-3 col-sm-6">
                 <div className="form-group">
                   <input

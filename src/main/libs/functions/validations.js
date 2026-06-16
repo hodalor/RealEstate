@@ -220,6 +220,9 @@ const _validateProp = async (data) => {
     porch,
     stRoom,
     propImages,
+    shortStayMinimumNights,
+    shortStayAvailabilityStart,
+    shortStayAvailabilityEnd,
   } = data;
 
   if (
@@ -258,6 +261,20 @@ const _validateProp = async (data) => {
       status: false,
       mesg: "Please provide 3 or more images!",
     });
+
+  if (String(rentOrSale || "").trim().toLowerCase() === "short stay") {
+    if (
+      shortStayMinimumNights === undefined ||
+      shortStayMinimumNights === "" ||
+      shortStayAvailabilityStart === "" ||
+      shortStayAvailabilityEnd === ""
+    ) {
+      return (results = {
+        status: false,
+        mesg: "Short stay listings need minimum nights and an available date range!",
+      });
+    }
+  }
 
   results = {
     status: true,

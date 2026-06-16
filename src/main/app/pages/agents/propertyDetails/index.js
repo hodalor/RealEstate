@@ -1,12 +1,14 @@
 import { useContext } from "react";
 import Loader from "../../../../components/loader";
 import Notify from "../../../../components/notification";
+import AvailabilityManager from "../../../../components/shortStay/AvailabilityManager";
 import { AgentsContext } from "../../../../libs/contexts/agentsContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 
 export default function PropertyDetails() {
   const { loading } = useContext(AuthContext);
-  const { agentState, _removeProp, _sold } = useContext(AgentsContext);
+  const { agentState, _removeProp, _sold, _updateShortStayAvailability } =
+    useContext(AgentsContext);
   const property = agentState.propertyDetails;
   const propertyImages = [
     property?.images?.image1,
@@ -332,6 +334,11 @@ export default function PropertyDetails() {
               </>
             )}
           </div>
+          <AvailabilityManager
+            property={property}
+            loading={loading}
+            onSave={(shortStay) => _updateShortStayAvailability(property._id, shortStay)}
+          />
         </div>
       </div>
     </div>

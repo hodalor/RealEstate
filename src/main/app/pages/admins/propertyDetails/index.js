@@ -1,12 +1,19 @@
 import { useContext, useEffect } from "react";
 import Loader from "../../../../components/loader";
+import AvailabilityManager from "../../../../components/shortStay/AvailabilityManager";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 import { useHistory } from "react-router-dom";
 
 export default function PropertyDetails() {
   const { loading } = useContext(AuthContext);
-  const { _resetDetails, adminData, _findAndRouteToAgent, _approve } =
+  const {
+    _resetDetails,
+    adminData,
+    _findAndRouteToAgent,
+    _approve,
+    _updateShortStayAvailability,
+  } =
     useContext(AdminContext);
   const property = adminData.propertyDetails;
   const history = useHistory();
@@ -352,6 +359,11 @@ export default function PropertyDetails() {
               </div>
             )}
           </div>
+          <AvailabilityManager
+            property={property}
+            loading={loading}
+            onSave={(shortStay) => _updateShortStayAvailability(property._id, shortStay)}
+          />
         </div>
       </div>
     </div>

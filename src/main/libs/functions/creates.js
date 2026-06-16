@@ -1,4 +1,4 @@
-import { adminUrl, agentUrl, propertyUrl, requestsUrl, toursUrl } from "../data/baseUrls";
+import { adminUrl, agentUrl, bookingsUrl, propertyUrl, requestsUrl, toursUrl } from "../data/baseUrls";
 
 const _createAdmin = async (data) => {
   var results;
@@ -201,4 +201,44 @@ const _bookTour = async (tourData) => {
   return results;
 };
 
-export { _createAdmin, _addAgent, _addProperty, _sendRequest, _bookTour };
+const _bookShortStay = async (bookingData) => {
+  let results;
+
+  const url = bookingsUrl + "short-stay";
+
+  await fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(bookingData),
+  })
+    .then(async (response) => {
+      const responseText = await response.clone().text();
+
+      try {
+        return responseText ? JSON.parse(responseText) : {};
+      } catch {
+        return {
+          success: 0,
+          message: response.ok
+            ? "Unexpected response received while booking the short stay."
+            : "Short stay booking request failed.",
+        };
+      }
+    })
+    .then((res) => {
+      results = res;
+    })
+    .catch(() => {
+      results = {
+        success: 0,
+        message: "Please check your internet connection!",
+      };
+    });
+
+  return results;
+};
+
+export { _createAdmin, _addAgent, _addProperty, _sendRequest, _bookTour, _bookShortStay };

@@ -323,6 +323,7 @@ export default function PropertyListing({
             <option value="">Type</option>
             <option value="Sale">For Sale</option>
             <option value="Rent">For Rent</option>
+            <option value="Short Stay">Short Stay</option>
           </select>
         </div>
       </div>
@@ -543,7 +544,9 @@ export default function PropertyListing({
                     alt={property.name || "Property"}
                   />
                   <span className="property-chip">
-                    For {property.rentOrSale || "Listing"}
+                    {String(property.rentOrSale || "").toLowerCase() === "short stay"
+                      ? "Short Stay"
+                      : `For ${property.rentOrSale || "Listing"}`}
                   </span>
                 </div>
 
@@ -569,6 +572,9 @@ export default function PropertyListing({
                               {formatPriceWithCurrency(property.price, property.currency, siteSettings, {
                                 displayCurrency: localCurrency,
                               })}
+                              {String(property.rentOrSale || "").toLowerCase() === "short stay"
+                                ? " / night"
+                                : ""}
                             </strong>
                             {showOriginalPrice ? (
                               <small className="property-price-note">
