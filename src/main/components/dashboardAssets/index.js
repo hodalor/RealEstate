@@ -38,7 +38,7 @@ export default function DashboardAssets() {
     const previousStyle = document.body.getAttribute("style");
 
     document.body.setAttribute("data-theme", "light");
-    document.body.classList.add("theme-purple", "dashboard-mode");
+    document.body.classList.add("theme-blue", "dashboard-mode");
     document.body.style.fontFamily = "Mazzard H, Poppins, sans-serif";
 
     dashboardStyles.forEach((href) => {

@@ -5,16 +5,41 @@ import ImageUpload from "../../../../components/uploadImage";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 
-export default function AddAdmin(params) {
+const authorizationOptions = [
+  "dashboard",
+  "properties",
+  "agents",
+  "customers",
+  "admins",
+  "payments",
+  "settings",
+];
+
+export default function AddAdmin({ isModal = false, onClose }) {
   const { _handleChange, adminData, _cancelAdd, _submit } =
     useContext(AdminContext);
   const { loading } = useContext(AuthContext);
+  const handleSubmit = async () => {
+    const created = await _submit();
+
+    if (created && onClose) {
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    _cancelAdd();
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="internal-form-page">
-      <div className="container-fluid">
-        <div className="row clearfix">
-          <div className="col-lg-12">
-            <div className="card internal-form-shell">
+    <div className={isModal ? "" : "internal-form-page"}>
+      <div className={isModal ? "" : "container-fluid"}>
+        <div className={isModal ? "" : "row clearfix"}>
+          <div className={isModal ? "" : "col-lg-12"}>
+            <div className={`${isModal ? "" : "card "}internal-form-shell`}>
               <Notify />
               <div className="header internal-form-header">
                 <h2>
@@ -140,6 +165,26 @@ export default function AddAdmin(params) {
                     </div>
                   </div>
                 </div>
+                <h6 className="internal-section-label">Authorizations</h6>
+                <div className="row clearfix">
+                  {authorizationOptions.map((permission) => (
+                    <div className="col-md-4 col-sm-6" key={permission}>
+                      <label className="d-flex align-items-center" style={{ gap: "10px" }}>
+                        <input
+                          type="checkbox"
+                          checked={(adminData.user.authorizations || []).includes(permission)}
+                          onChange={() =>
+                            _handleChange({
+                              field: "authorizations",
+                              value: permission,
+                            })
+                          }
+                        />
+                        <span style={{ textTransform: "capitalize" }}>{permission}</span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
                 <h6 className="internal-section-label">Profile Image</h6>
                 <div className="row clearfix">
                   <div className="col-sm-12">
@@ -162,14 +207,14 @@ export default function AddAdmin(params) {
                         <button
                           type="button"
                           className="btn btn-primary btn-round internal-primary-btn"
-                          onClick={_submit}
+                          onClick={handleSubmit}
                         >
                           Submit
                         </button>
                         <button
                           type="button"
                           className="btn btn-default btn-round btn-simple internal-secondary-btn"
-                          onClick={_cancelAdd}
+                          onClick={handleClose}
                         >
                           Cancel
                         </button>

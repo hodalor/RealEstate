@@ -4,11 +4,29 @@ import Notify from "../../../../components/notification";
 import ImageUpload from "../../../../components/uploadImage";
 import { AgentsContext } from "../../../../libs/contexts/agentsContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
+import {
+  getCityOptions,
+  getCurrencyOptions,
+  getProvinceOptions,
+  getSuburbOptions,
+} from "../../../../libs/data/siteSettings";
 
 export default function AddProp() {
   const { _handleChange, agentState, _createProperty } =
     useContext(AgentsContext);
   const { loading } = useContext(AuthContext);
+  const selectedCountry = agentState.property.country || agentState.agent.country || "";
+  const selectedProvince = agentState.property.province;
+  const selectedCity = agentState.property.city;
+  const provinceOptions = getProvinceOptions(agentState.settings, selectedCountry);
+  const cityOptions = getCityOptions(agentState.settings, selectedCountry, selectedProvince);
+  const suburbOptions = getSuburbOptions(
+    agentState.settings,
+    selectedCountry,
+    selectedProvince,
+    selectedCity
+  );
+  const currencyOptions = getCurrencyOptions(agentState.settings, selectedCountry);
 
   return (
     <div className="container-fluid internal-form-page">
@@ -76,6 +94,7 @@ export default function AddProp() {
                 <div className="form-group">
                   <select
                     className="form-control"
+                    value={agentState.property.propType || ""}
                     onChange={(e) =>
                       _handleChange({
                         field: "propType",
@@ -86,21 +105,11 @@ export default function AddProp() {
                     <option className="form-control" value="">
                       Select property type
                     </option>
-                    <option className="form-control" value="Single room">
-                      Single room
-                    </option>
-                    <option className="form-control" value="Apartment">
-                      Apartment
-                    </option>
-                    <option className="form-control" value="Full house">
-                      Full house
-                    </option>
-                    <option className="form-control" value="Office">
-                      Office
-                    </option>
-                    <option className="form-control" value="Shop">
-                      Shop
-                    </option>
+                    {(agentState.settings?.property?.propertyTypes || []).map((type) => (
+                      <option className="form-control" value={type} key={type}>
+                        {type}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -123,12 +132,92 @@ export default function AddProp() {
                 </div>
               </div>
             </div>
+            <h6 className="internal-section-label">Location Information</h6>
+            <div className="row clearfix">
+              <div className="col-sm-3">
+                <div className="form-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={selectedCountry}
+                    disabled
+                    placeholder="Country"
+                  />
+                </div>
+              </div>
+              <div className="col-sm-3">
+                <div className="form-group">
+                  <select
+                    className="form-control"
+                    value={agentState.property.province || ""}
+                    onChange={(e) =>
+                      _handleChange({
+                        field: "province",
+                        value: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Select Province/State</option>
+                    {provinceOptions.map((province) => (
+                      <option key={province.id} value={province.name}>
+                        {province.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="col-sm-3">
+                <div className="form-group">
+                  <select
+                    className="form-control"
+                    value={agentState.property.city || ""}
+                    disabled={!selectedProvince}
+                    onChange={(e) =>
+                      _handleChange({
+                        field: "city",
+                        value: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Select City</option>
+                    {cityOptions.map((city) => (
+                      <option key={city.id} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="col-sm-3">
+                <div className="form-group">
+                  <select
+                    className="form-control"
+                    value={agentState.property.suburb || ""}
+                    disabled={!selectedCity}
+                    onChange={(e) =>
+                      _handleChange({
+                        field: "suburb",
+                        value: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Select Suburb/Neighborhood</option>
+                    {suburbOptions.map((suburb) => (
+                      <option key={suburb} value={suburb}>
+                        {suburb}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
             <h6 className="internal-section-label">Property Information</h6>
             <div className="row clearfix">
               <div className="col-sm-3">
                 <div className="form-group">
                   <select
                     className="form-control"
+                    value={agentState.property.rentOrSale || ""}
                     onChange={(e) =>
                       _handleChange({
                         field: "rentOrSale",
@@ -150,10 +239,31 @@ export default function AddProp() {
               </div>
               <div className="col-sm-3">
                 <div className="form-group">
+                  <select
+                    className="form-control"
+                    value={agentState.property.currency || ""}
+                    onChange={(e) =>
+                      _handleChange({
+                        field: "currency",
+                        value: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Select Currency</option>
+                    {currencyOptions.map((currency) => (
+                      <option key={currency} value={currency}>
+                        {currency}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="col-sm-3">
+                <div className="form-group">
                   <input
                     type="number"
                     className="form-control"
-                    placeholder="Price / Rent (GH)"
+                    placeholder={`Price (${agentState.property.currency || "Currency"})`}
                     value={agentState.property.price}
                     onChange={(e) =>
                       _handleChange({

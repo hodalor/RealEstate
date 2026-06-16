@@ -4,7 +4,10 @@ import { AgentsContext } from "../../libs/contexts/agentsContext";
 
 export default function AgentsAside() {
   const { agentState } = useContext(AgentsContext);
-  const agent = agentState.agent;
+  const agent = agentState.agent || {};
+  const agentImage = agent.image || "/assets/image/user.jpg";
+  const agentName = [agent.firstName, agent.lastName].filter(Boolean).join(" ") || "Agent";
+  const agentRole = agent.role || "Agent";
 
   return (
     <div>
@@ -26,20 +29,10 @@ export default function AgentsAside() {
             <div className="menu">
               <ul className="list">
                 <li>
-                  <div className="user-info">
-                    <div className="image">
-                      <Link to="/agents/profile/">
-                        <img
-                          src={agent !== undefined ? agent.image : ""}
-                          alt="User"
-                        />
-                      </Link>
-                    </div>
-                    <div className="detail">
-                      <h4>{agent.firstName + " " + agent.lastName}</h4>
-                      <small>{agent.role}</small>
-                    </div>
-                  </div>
+                  <Link to="/agents/dashboard/">
+                    <i className="fa fa-dashboard" />
+                    <span>Dashboard</span>
+                  </Link>
                 </li>
                 <li>
                   <Link to="/agents/properties">
@@ -155,31 +148,24 @@ export default function AgentsAside() {
                   <div className="user-info m-b-20 p-b-15">
                     <div className="image">
                       <Link to="/agents/profile">
-                        <img
-                          src={agent !== undefined ? agent.image : ""}
-                          alt="User"
-                        />
+                        <img src={agentImage} alt="User" />
                       </Link>
                     </div>
                     <div className="detail">
-                      <h4>
-                        {agent !== undefined
-                          ? agent.firstName + " " + agent.lastName
-                          : "Name"}
-                      </h4>
-                      <small>{agent.role}</small>
+                      <h4>{agentName}</h4>
+                      <small>{agentRole}</small>
                     </div>
                     <p className="text-muted">
-                      {agent !== undefined ? agent.address : "Address"}
+                      {agent.address || "Address"}
                     </p>
                   </div>
                 </li>
                 <li>
                   <small className="text-muted">Email address: </small>
-                  <p>{agent !== undefined ? agent.email : "Email"}</p>
+                  <p>{agent.email || "Email"}</p>
                   <hr />
                   <small className="text-muted">Phone: </small>
-                  <p>{agent !== undefined ? agent.phone : "Phone"}</p>
+                  <p>{agent.phone || "Phone"}</p>
                   <hr />
                 </li>
               </ul>

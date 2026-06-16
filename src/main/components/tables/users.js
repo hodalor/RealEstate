@@ -2,8 +2,8 @@ import { useContext } from "react";
 import { AdminContext } from "../../libs/contexts/adminContext";
 
 export default function UsersTable() {
-  const { _routeToUsers, adminData } = useContext(AdminContext);
-  const customers = adminData.customers;
+  const { adminData } = useContext(AdminContext);
+  const customers = (adminData.customers || []).filter((customer) => customer.role === "Buyer" || !customer.role);
 
   return (
     <div className="table-responsive">
@@ -67,9 +67,9 @@ export default function UsersTable() {
                 </tr>
               </thead>
               <tbody>
-                {customers !== undefined || customers.length !== 0 ? (
+                {customers.length !== 0 ? (
                   customers.map((customer, index) => {
-                    var imgUrl = customer.image;
+                    var imgUrl = customer.image || "/assets/image/user.jpg";
                     return (
                       <tr
                         // onClick={() => _routeToUsers(customer)}
@@ -92,7 +92,11 @@ export default function UsersTable() {
                     );
                   })
                 ) : (
-                  <span>No data found</span>
+                  <tr>
+                    <td colSpan="4" className="text-center">
+                      No registered customers found
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

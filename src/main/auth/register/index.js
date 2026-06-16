@@ -1,12 +1,35 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Loader from "../../components/loader";
 import Notify from "../../components/notification";
 import { AuthContext } from "../../libs/contexts/authContext";
+import { _fetchSiteSettings } from "../../libs/functions/fetches";
+import { detectVisitorCountry, normalizeSiteSettings } from "../../libs/data/siteSettings";
 
 export default function Register() {
   const { loading, authState, _handleChange, _handleRegister } =
     useContext(AuthContext);
+  const [siteSettings, setSiteSettings] = useState(normalizeSiteSettings());
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const result = await _fetchSiteSettings();
+
+      if (result?.success === 1 && result.data) {
+        const normalized = normalizeSiteSettings(result.data);
+        setSiteSettings(normalized);
+
+        if (!authState.country) {
+          _handleChange({
+            field: "country",
+            value: detectVisitorCountry(normalized),
+          });
+        }
+      }
+    };
+
+    loadSettings();
+  }, [_handleChange, authState.country]);
 
   return (
     <div className="auth-page">
@@ -117,6 +140,30 @@ export default function Register() {
                               })
                             }
                           />
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="form-group">
+                          <label htmlFor="country">Country*</label>
+                          <select
+                            id="country"
+                            className="form-control"
+                            value={authState.country}
+                            onChange={(e) =>
+                              _handleChange({
+                                field: "country",
+                                value: e.target.value,
+                              })
+                            }
+                          >
+                            <option value="">Select country</option>
+                            {siteSettings.location.countries.map((country) => (
+                              <option key={country.id} value={country.name}>
+                                {country.name}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
 

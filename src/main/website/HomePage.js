@@ -1,12 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { _fetchProperties } from "../libs/functions/fetches";
+import { formatPriceWithCurrency } from "../libs/data/siteSettings";
 import { resolveImageUrl } from "../libs/functions/images";
-
-const formatPrice = (price) => {
-  const numericPrice = parseFloat(String(price || "0").replace(/[^0-9.]/g, "")) || 0;
-  return numericPrice ? `GHC ${numericPrice.toLocaleString()}` : "Price on request";
-};
 
 export default function HomePage() {
   const [properties, setProperties] = useState([]);
@@ -275,7 +271,9 @@ export default function HomePage() {
                           </div>
 
                           <h4>{property.name}</h4>
-                          <strong className="property-price">{formatPrice(property.price)}</strong>
+                          <strong className="property-price">
+                            {formatPriceWithCurrency(property.price, property.currency)}
+                          </strong>
 
                           <div className="property-card-facts">
                             <span>

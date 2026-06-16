@@ -5,16 +5,31 @@ import ImageUpload from "../../../../components/uploadImage";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 
-export default function AddAgent(params) {
+export default function AddAgent({ isModal = false, onClose }) {
   const { _handleChange, adminData, _cancelAdd, _createAgent } =
     useContext(AdminContext);
   const { loading } = useContext(AuthContext);
+  const handleSubmit = async () => {
+    const created = await _createAgent();
+
+    if (created && onClose) {
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    _cancelAdd();
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="internal-form-page">
-      <div className="container-fluid">
-        <div className="row clearfix">
-          <div className="col-lg-12">
-            <div className="card internal-form-shell">
+    <div className={isModal ? "" : "internal-form-page"}>
+      <div className={isModal ? "" : "container-fluid"}>
+        <div className={isModal ? "" : "row clearfix"}>
+          <div className={isModal ? "" : "col-lg-12"}>
+            <div className={`${isModal ? "" : "card "}internal-form-shell`}>
               <Notify />
               <div className="header internal-form-header">
                 <h2>
@@ -90,10 +105,31 @@ export default function AddAgent(params) {
                   </div>
                   <div className="col-sm-3">
                     <div className="form-group">
+                      <select
+                        className="form-control"
+                        value={adminData.user.country || ""}
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "userCountry",
+                            value: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="">Select country</option>
+                        {adminData.settings?.location?.countries?.map((country) => (
+                          <option key={country.id} value={country.name}>
+                            {country.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="col-sm-3">
+                    <div className="form-group">
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Ghana Card No."
+                        placeholder="National ID / Registration ID"
                         value={adminData.user.ghcard}
                         onChange={(e) =>
                           _handleChange({
@@ -357,14 +393,14 @@ export default function AddAgent(params) {
                         <button
                           type="button"
                           className="btn btn-primary btn-round internal-primary-btn"
-                          onClick={_createAgent}
+                          onClick={handleSubmit}
                         >
                           Submit
                         </button>
                         <button
                           type="button"
                           className="btn btn-default btn-round btn-simple internal-secondary-btn"
-                          onClick={_cancelAdd}
+                          onClick={handleClose}
                         >
                           Cancel
                         </button>

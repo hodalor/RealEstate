@@ -58,6 +58,7 @@ const _validateAgent = async (data) => {
     con_pass,
     image,
     dob,
+    country,
     ghcard,
     gr1Name,
     gr1Contact,
@@ -84,6 +85,7 @@ const _validateAgent = async (data) => {
     image === null ||
     image === undefined ||
     dob === "" ||
+    country === "" ||
     ghcard === "" ||
     gr1Name === "" ||
     gr1Contact === "" ||
@@ -200,12 +202,16 @@ const _validateProp = async (data) => {
     propDesc,
     rentOrSale,
     price,
+    currency,
+    country,
+    province,
+    city,
+    suburb,
     rooms,
     bedRoomNumber,
     bathRoomNumber,
     carPark,
     year,
-    agentID,
     address,
     dRoom,
     kitchen,
@@ -224,6 +230,11 @@ const _validateProp = async (data) => {
     rentOrSale === "" ||
     propType === "" ||
     price === undefined ||
+    currency === "" ||
+    country === "" ||
+    province === "" ||
+    city === "" ||
+    suburb === "" ||
     rooms === undefined ||
     bedRoomNumber === undefined ||
     bathRoomNumber === undefined ||
@@ -282,7 +293,7 @@ const _validateRegister = async (data) => {
     status: false,
     mesg: "",
   };
-  const { email, password, firstName, lastName, phone, con_pass } = data;
+  const { email, password, firstName, lastName, phone, country, con_pass } = data;
 
   if (
     email === "" ||
@@ -290,6 +301,7 @@ const _validateRegister = async (data) => {
     firstName === "" ||
     lastName === "" ||
     phone === "" ||
+    country === "" ||
     con_pass === ""
   )
     return (results = {

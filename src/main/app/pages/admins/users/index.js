@@ -9,7 +9,13 @@ export default function Users() {
     <div>
       <div className="row clearfix">
         <div className="col-lg-12">
-          <div className="card">
+          <div className="card internal-page-card">
+            <div className="internal-page-card-header">
+              <div>
+                <h3 className="internal-page-card-title">Customers</h3>
+                <small className="text-muted">Normal registered user accounts</small>
+              </div>
+            </div>
             <div className="body">{loading ? <Loader /> : <UsersTable />}</div>
           </div>
         </div>

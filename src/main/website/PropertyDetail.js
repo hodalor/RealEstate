@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { _fetchProperties } from "../libs/functions/fetches";
+import { formatPriceWithCurrency } from "../libs/data/siteSettings";
 import { resolveImageUrl } from "../libs/functions/images";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -8,11 +9,6 @@ import BookTourModal from "./components/modals/BookTourModal";
 import BookPropertyModal from "./components/modals/BookPropertyModal";
 import ChatAgentModal from "./components/modals/ChatAgentModal";
 import "./styles/chat-modal.css";
-
-const formatPrice = (price) => {
-  const numericPrice = parseFloat(String(price || "0").replace(/[^0-9.]/g, "")) || 0;
-  return numericPrice ? `GHC ${numericPrice.toLocaleString()}` : "Price on request";
-};
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -135,7 +131,7 @@ export default function PropertyDetail() {
               </p>
             </div>
             <div className="detail-price-block">
-              <strong>{formatPrice(property.price)}</strong>
+              <strong>{formatPriceWithCurrency(property.price, property.currency)}</strong>
               <span>For {property.rentOrSale || "listing"}</span>
             </div>
           </div>

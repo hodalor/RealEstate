@@ -4,9 +4,10 @@ import { _addProperty } from "../../functions/creates";
 import { _calcDays } from "../../functions/dateDiff";
 import { _delNoti, _delProp, _sellProp } from "../../functions/deletes";
 import { _editAgent, _editPass } from "../../functions/edits";
-import { _fetchProperties, _fetchReq } from "../../functions/fetches";
+import { _fetchProperties, _fetchReq, _fetchSiteSettings } from "../../functions/fetches";
 import { _retrieveFromStroage, _saveToStorage } from "../../functions/storage";
 import { _validatePass, _validateProp } from "../../functions/validations";
+import { normalizeSiteSettings } from "../../data/siteSettings";
 import { AuthContext } from "../authContext";
 
 export const AgentsContext = createContext();
@@ -46,6 +47,7 @@ export default function AgentContextProvider(props) {
       propDesc: "",
       rentOrSale: "",
       price: Number,
+      currency: "",
       bedRoomNumber: Number,
       bathRoomNumber: Number,
       sqft: Number,
@@ -53,6 +55,10 @@ export default function AgentContextProvider(props) {
       year: "",
       agentID: "",
       address: "",
+      country: "",
+      province: "",
+      city: "",
+      suburb: "",
       dRoom: Boolean,
       kitchen: Boolean,
       livRoom: Boolean,
@@ -75,6 +81,7 @@ export default function AgentContextProvider(props) {
     agent: {},
     requests: [],
     request: {},
+    settings: normalizeSiteSettings(),
   });
 
   useEffect(() => {
@@ -95,6 +102,7 @@ export default function AgentContextProvider(props) {
     setLoading(true);
     const results = await _fetchProperties();
     const reqs = await _fetchReq();
+    const settingsResult = await _fetchSiteSettings();
 
     var properties = [];
     if (results.success !== 0) {
@@ -125,6 +133,15 @@ export default function AgentContextProvider(props) {
         results !== undefined && results.success === 1 ? properties : [],
       requests: reqs !== undefined && reqs.success === 1 ? agReqs : [],
       agent: userData,
+      property: {
+        ...agentState.property,
+        country: userData.country || "",
+        currency: userData.preferredCurrency || "",
+      },
+      settings:
+        settingsResult !== undefined && settingsResult.success === 1
+          ? normalizeSiteSettings(settingsResult.data)
+          : normalizeSiteSettings(),
     });
   };
 
@@ -288,6 +305,15 @@ export default function AgentContextProvider(props) {
         },
       });
 
+    if (field === "userCountry")
+      return setAgentState({
+        ...agentState,
+        user: {
+          ...agentState.user,
+          country: value,
+        },
+      });
+
     if (field === "gr1Name")
       return setAgentState({
         ...agentState,
@@ -432,6 +458,15 @@ export default function AgentContextProvider(props) {
         },
       });
 
+    if (field === "currency")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          currency: value,
+        },
+      });
+
     if (field === "bedRooms")
       return setAgentState({
         ...agentState,
@@ -492,6 +527,48 @@ export default function AgentContextProvider(props) {
         property: {
           ...agentState.property,
           address: value,
+        },
+      });
+
+    if (field === "country")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          country: value,
+          province: "",
+          city: "",
+          suburb: "",
+        },
+      });
+
+    if (field === "province")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          province: value,
+          city: "",
+          suburb: "",
+        },
+      });
+
+    if (field === "city")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          city: value,
+          suburb: "",
+        },
+      });
+
+    if (field === "suburb")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          suburb: value,
         },
       });
 
@@ -678,6 +755,7 @@ export default function AgentContextProvider(props) {
         propDesc: "",
         rentOrSale: "",
         price: Number,
+        currency: "",
         bedRoomNumber: Number,
         bathRoomNumber: Number,
         sqft: Number,
@@ -685,6 +763,10 @@ export default function AgentContextProvider(props) {
         year: "",
         agentID: "",
         address: "",
+        country: "",
+        province: "",
+        city: "",
+        suburb: "",
         dRoom: Boolean,
         kitchen: Boolean,
         livRoom: Boolean,

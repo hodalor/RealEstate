@@ -32,28 +32,15 @@ export default function AdminAside() {
             <div className="menu">
               <ul className="list">
                 <li>
-                  <div className="user-info">
-                    <div className="image">
-                      <Link to="/admin/profile/">
-                        <img src={adminImage} alt="User" />
-                      </Link>
-                    </div>
-                    <div className="detail">
-                      <h4>{adminName}</h4>
-                      <small>{adminRole}</small>
-                    </div>
-                  </div>
+                  <Link to="/admin/dashboard/">
+                    <i className="fa fa-dashboard" />
+                    <span>Dashboard</span>
+                  </Link>
                 </li>
                 <li>
                   <Link to="/admin/properties/">
                     <i className="fa fa-home" />
                     <span>Properties</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/admin/create-property">
-                    <i className="fa fa-hospital" />
-                    <span>Add Property</span>
                   </Link>
                 </li>
                 <li>
@@ -63,16 +50,23 @@ export default function AdminAside() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/add-agent">
-                    <i className="fa fa-user-plus" />
-                    <span>Add Agent</span>
+                  <Link to="/admin/users/">
+                    <i className="fa fa-users" />
+                    <span>Customers</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="/admin/users/">
-                    <i className="fa fa-users" />
-                    <span>Users</span>
-                  </Link>
+                  <button type="button" className="menu-toggle">
+                    <i className="fa fa-shield" />
+                    <span>Admins</span>
+                  </button>
+                  <ul className="ml-menu">
+                    <li>
+                      <Link to="/admin/admin-users/">
+                        <span>Admin Users</span>
+                      </Link>
+                    </li>
+                  </ul>
                 </li>
                 <li>
                   <Link to="/admin/chats">
@@ -131,23 +125,6 @@ export default function AdminAside() {
                   <small className="text-muted">Phone: </small>
                   <p>{adminPhone}</p>
                   <hr />
-                </li>
-                <li>
-                  <Link
-                    to="/admin/add-admin/"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginLeft: "10px",
-                      marginRight: "10px",
-                      color: "white",
-                      height: "30px",
-                    }}
-                    className="btn-sm btn-primary"
-                  >
-                    Add Admin
-                  </Link>
                 </li>
               </ul>
             </div>

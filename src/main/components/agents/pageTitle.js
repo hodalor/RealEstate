@@ -1,8 +1,16 @@
-import { useContext } from "react";
-import { AgentsContext } from "../../libs/contexts/agentsContext";
+import { useLocation } from "react-router-dom";
 
 export default function AgentsPageTitle() {
-  const { _routeToAdd } = useContext(AgentsContext);
+  const location = useLocation();
+  const activePage = (() => {
+    if (location.pathname.includes("/dashboard")) return "Dashboard";
+    if (location.pathname.includes("/payment-history")) return "Payments";
+    if (location.pathname.includes("/tour-bookings")) return "Tour Bookings";
+    if (location.pathname.includes("/notifications")) return "Notifications";
+    if (location.pathname.includes("/profile")) return "Profile";
+    return "Properties";
+  })();
+
   return (
     <div className="block-header">
       <div className="row">
@@ -13,14 +21,6 @@ export default function AgentsPageTitle() {
           </h2>
         </div>
         <div className="col-lg-5 col-md-6 col-sm-12">
-          <button
-            class="btn btn-white btn-icon btn-round hidden-sm-down float-right ml-3"
-            type="button"
-            onClick={_routeToAdd}
-            title="add property"
-          >
-            <i class="fa fa-plus"></i>
-          </button>
           <ul className="breadcrumb float-md-right">
             <li className="breadcrumb-item">
               <span>
@@ -30,7 +30,7 @@ export default function AgentsPageTitle() {
             <li className="breadcrumb-item">
               <span>Agents Page</span>
             </li>
-            <li className="breadcrumb-item active">Properties</li>
+            <li className="breadcrumb-item active">{activePage}</li>
           </ul>
         </div>
       </div>

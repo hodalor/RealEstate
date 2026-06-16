@@ -1,8 +1,9 @@
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import AgentsStart from "../../../components/agents";
 import AgentsPageTitle from "../../../components/agents/pageTitle";
 import AgentContextProvider from "../../../libs/contexts/agentsContext";
 import AddProp from "./addProperty";
+import AgentDashboard from "./dashboard";
 import NotiDetails from "./notiDetails";
 import Notifications from "./notifications";
 import AgentProfile from "./profile";
@@ -13,12 +14,19 @@ import TourBookings from "./tourBookings";
 import PaymentHistory from "./paymentHistory";
 import { AuthContext } from "../../../libs/contexts/authContext";
 import { useContext } from "react";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function Agents() {
-  const history = useHistory()
   const { authState } = useContext(AuthContext);
-  if (authState.user && authState.user.role !== "Agent") return history.push("/login") 
+  const userRole = authState.user?.role;
+
+  if (!userRole) {
+    return <Redirect to="/login" />;
+  }
+
+  if (userRole !== "Agent") {
+    return <Redirect to="/login" />;
+  }
+
   return (
     <AgentContextProvider>
       <AgentsStart />
@@ -27,6 +35,10 @@ export default function Agents() {
         <div className="container-fluid">
           <div className="row clearfix">
             <Switch>
+              <Route exact path="/agents">
+                <Redirect to="/agents/dashboard/" />
+              </Route>
+              <Route exact path="/agents/dashboard/" component={AgentDashboard} />
               <Route
                 exact
                 path="/agents/properties/"
@@ -62,6 +74,9 @@ export default function Agents() {
                 path="/agents/payment-history"
                 component={PaymentHistory}
               />
+              <Route path="*">
+                <Redirect to="/agents/dashboard/" />
+              </Route>
             </Switch>
           </div>
         </div>

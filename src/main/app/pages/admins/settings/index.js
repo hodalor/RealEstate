@@ -1,158 +1,69 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 import Loader from "../../../../components/loader";
 import WebsiteSettings from "./WebsiteSettings";
 import DeveloperSettings from "./DeveloperSettings";
+import DashboardModal from "../../../../components/admin/DashboardModal";
 import { toast } from "react-toastify";
+import { normalizeSiteSettings } from "../../../../libs/data/siteSettings";
 
 export default function Settings() {
   const { adminData, _saveSettings, _fetchSettings } = useContext(AdminContext);
   const { loading } = useContext(AuthContext);
   
   const [activeTab, setActiveTab] = useState('general');
+  const [locationTab, setLocationTab] = useState("countries");
   const [showContentManagement, setShowContentManagement] = useState(false);
   const [showDeveloperSettings, setShowDeveloperSettings] = useState(false);
+  const [locationModal, setLocationModal] = useState("");
+  const [isDirty, setIsDirty] = useState(false);
+  const [hasHydrated, setHasHydrated] = useState(false);
   
   // Local state for settings
-  const [settings, setSettings] = useState({
-    general: {
-      siteName: "RealEstate",
-      currency: "GHC",
-      currencySymbol: "₵",
-      defaultLanguage: "English",
-    },
-    location: {
-      countries: [
-        { id: 1, name: "Ghana" },
-        { id: 2, name: "Nigeria" },
-        { id: 3, name: "South Africa" },
-        { id: 4, name: "Kenya" },
-        { id: 5, name: "Egypt" },
-      ],
-      provinces: [
-        { id: 1, countryId: 1, name: "Greater Accra" },
-        { id: 2, countryId: 1, name: "Ashanti" },
-        { id: 3, countryId: 1, name: "Western" },
-        { id: 4, countryId: 1, name: "Eastern" },
-        { id: 5, countryId: 1, name: "Central" },
-        { id: 6, countryId: 1, name: "Volta" },
-        { id: 7, countryId: 1, name: "Northern" },
-        { id: 8, countryId: 2, name: "Lagos" },
-        { id: 9, countryId: 2, name: "Abuja" },
-      ],
-    },
-    property: {
-      propertyTypes: [
-        "Single room",
-        "Apartment",
-        "Full house",
-        "Office",
-        "Shop",
-        "Land",
-        "Warehouse",
-      ],
-      amenities: [
-        "Swimming Pool",
-        "Pipe Water",
-        "Air Conditioning",
-        "Electricity",
-        "Near Main Road",
-        "Near Supermarket",
-        "Pets Allowed",
-        "Security",
-        "Internet",
-        "Gym",
-      ],
-    },
-    developer: {
-      apiKeys: {
-        firebase: {
-          apiKey: '',
-          authDomain: '',
-          projectId: '',
-          storageBucket: '',
-          messagingSenderId: '',
-          appId: ''
-        },
-        payment: {
-          paystack: {
-            publicKey: '',
-            secretKey: ''
-          },
-          flutterwave: {
-            publicKey: '',
-            secretKey: ''
-          },
-          momo: {
-            apiKey: '',
-            userId: ''
-          }
-        },
-        maps: {
-          googleMaps: {
-            apiKey: ''
-          }
-        }
-      },
-      generatedApis: [],
-      webhooks: []
-    },
-    content: {
-      hero: {
-        title: "Find Your Dream Home",
-        subtitle: "Discover the perfect property with our extensive listings. Whether you're looking to buy or rent, we've got you covered.",
-        buttonText: "Browse Properties",
-        imageUrl: "../assets/image/hero-image.svg"
-      },
-      footer: {
-        aboutText: "We are dedicated to providing the best real estate services to help you find your dream property.",
-        contactAddress: "123 Real Estate St, Accra",
-        contactPhone: "+233 123 456 789",
-        contactEmail: "info@realestate.com",
-        socialLinks: {
-          facebook: "#",
-          twitter: "#",
-          instagram: "#",
-          linkedin: "#"
-        }
-      },
-      advertisements: [
-        {
-          id: 1,
-          title: "Premium Properties",
-          description: "Exclusive listings for our premium customers",
-          imageUrl: "../assets/image/banner1.jpg",
-          link: "/properties",
-          active: true
-        },
-        {
-          id: 2,
-          title: "New Developments",
-          description: "Check out our newest property developments",
-          imageUrl: "../assets/image/banner2.jpg",
-          link: "/properties",
-          active: true
-        }
-      ]
-    }
-  });
+  const [settings, setSettings] = useState(normalizeSiteSettings());
 
   // New country and province state
-  const [newCountry, setNewCountry] = useState("");
+  const [newCountry, setNewCountry] = useState({
+    name: "",
+    isoCode: "",
+    phoneCode: "",
+    defaultCurrency: "",
+    currencySymbol: "",
+    allowedCurrenciesText: "",
+  });
   const [newProvince, setNewProvince] = useState({ name: "", countryId: "" });
+  const [newCity, setNewCity] = useState({
+    name: "",
+    countryId: "",
+    provinceId: "",
+    suburbsText: "",
+  });
+  const [newSuburb, setNewSuburb] = useState({
+    name: "",
+    countryId: "",
+    provinceId: "",
+    cityId: "",
+  });
   const [newPropertyType, setNewPropertyType] = useState("");
   const [newAmenity, setNewAmenity] = useState("");
-  // Load settings from context or API when component mounts
+  const fetchSettingsRef = useRef(_fetchSettings);
+
+  const updateSettings = (updater) => {
+    setSettings((prev) => (typeof updater === "function" ? updater(prev) : updater));
+    setIsDirty(true);
+  };
+
   useEffect(() => {
-    // If settings exist in adminData, use them
-    if (adminData.settings) {
-      setSettings(adminData.settings);
-    } else {
-      // Fetch settings from backend
-      _fetchSettings();
+    fetchSettingsRef.current();
+  }, []);
+
+  useEffect(() => {
+    if (adminData.settings && (!hasHydrated || !isDirty)) {
+      setSettings(normalizeSiteSettings(adminData.settings));
+      setHasHydrated(true);
     }
-  }, [_fetchSettings, adminData.settings]);
+  }, [adminData.settings, hasHydrated, isDirty]);
 
   const handleTabChange = (tab) => {
     if (tab === 'content') {
@@ -172,151 +83,371 @@ export default function Settings() {
 
   const handleGeneralSettingsChange = (e) => {
     const { name, value } = e.target;
-    setSettings({
-      ...settings,
+    updateSettings((prev) => ({
+      ...prev,
       general: {
-        ...settings.general,
+        ...prev.general,
         [name]: value,
       },
-    });
+    }));
   };
 
   const addCountry = () => {
-    if (!newCountry.trim()) return;
-    
-    const newId = settings.location.countries.length > 0 
-      ? Math.max(...settings.location.countries.map(c => c.id)) + 1 
-      : 1;
-      
-    setSettings({
-      ...settings,
+    if (!newCountry.name.trim() || !newCountry.isoCode.trim() || !newCountry.phoneCode.trim()) return false;
+
+    const countryId = newCountry.name.toLowerCase().replace(/\s+/g, "-");
+    const allowedCurrencies = Array.from(
+      new Set(
+        newCountry.allowedCurrenciesText
+          .split(",")
+          .map((item) => item.trim().toUpperCase())
+          .filter(Boolean)
+          .concat(newCountry.defaultCurrency.trim().toUpperCase())
+          .concat(settings.general.defaultCurrency)
+      )
+    );
+
+    updateSettings((prev) => ({
+      ...prev,
       location: {
-        ...settings.location,
+        ...prev.location,
         countries: [
-          ...settings.location.countries,
-          { id: newId, name: newCountry }
+          ...prev.location.countries,
+          {
+            id: countryId,
+            name: newCountry.name.trim(),
+            isoCode: newCountry.isoCode.trim().toUpperCase(),
+            phoneCode: newCountry.phoneCode.trim(),
+            defaultCurrency: newCountry.defaultCurrency.trim().toUpperCase(),
+            currencySymbol: newCountry.currencySymbol.trim().toUpperCase() || newCountry.defaultCurrency.trim().toUpperCase(),
+            allowedCurrencies,
+            provinces: [],
+            timezones: [],
+          }
         ],
       },
+    }));
+    setNewCountry({
+      name: "",
+      isoCode: "",
+      phoneCode: "",
+      defaultCurrency: "",
+      currencySymbol: "",
+      allowedCurrenciesText: "",
     });
-    setNewCountry("");
+    return true;
   };
 
   const removeCountry = (id) => {
-    setSettings({
-      ...settings,
+    updateSettings((prev) => ({
+      ...prev,
       location: {
-        ...settings.location,
-        countries: settings.location.countries.filter(c => c.id !== id),
-        // Also remove provinces associated with this country
-        provinces: settings.location.provinces.filter(p => p.countryId !== id),
+        ...prev.location,
+        countries: prev.location.countries.filter(c => c.id !== id),
       },
-    });
+    }));
   };
 
   const addProvince = () => {
-    if (!newProvince.name.trim() || !newProvince.countryId) return;
-    
-    const newId = settings.location.provinces.length > 0 
-      ? Math.max(...settings.location.provinces.map(p => p.id)) + 1 
-      : 1;
-      
-    setSettings({
-      ...settings,
+    if (!newProvince.name.trim() || !newProvince.countryId) return false;
+
+    updateSettings((prev) => ({
+      ...prev,
       location: {
-        ...settings.location,
-        provinces: [
-          ...settings.location.provinces,
-          { id: newId, countryId: parseInt(newProvince.countryId), name: newProvince.name }
-        ],
+        ...prev.location,
+        countries: prev.location.countries.map((country) =>
+          country.id !== newProvince.countryId
+            ? country
+            : {
+                ...country,
+                provinces: [
+                  ...(country.provinces || []),
+                  {
+                    id: `${country.id}-${newProvince.name.toLowerCase().replace(/\s+/g, "-")}`,
+                    name: newProvince.name.trim(),
+                    cities: [],
+                  },
+                ],
+              }
+        ),
       },
-    });
+    }));
     setNewProvince({ name: "", countryId: "" });
+    return true;
   };
 
-  const removeProvince = (id) => {
-    setSettings({
-      ...settings,
+  const removeProvince = (countryId, provinceId) => {
+    updateSettings((prev) => ({
+      ...prev,
       location: {
-        ...settings.location,
-        provinces: settings.location.provinces.filter(p => p.id !== id),
+        ...prev.location,
+        countries: prev.location.countries.map((country) =>
+          country.id !== countryId
+            ? country
+            : {
+                ...country,
+                provinces: (country.provinces || []).filter((province) => province.id !== provinceId),
+              }
+        ),
       },
+    }));
+  };
+
+  const addCity = () => {
+    if (!newCity.name.trim() || !newCity.countryId || !newCity.provinceId) return false;
+
+    const suburbs = newCity.suburbsText
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    updateSettings((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        countries: prev.location.countries.map((country) =>
+          country.id !== newCity.countryId
+            ? country
+            : {
+                ...country,
+                provinces: (country.provinces || []).map((province) =>
+                  province.id !== newCity.provinceId
+                    ? province
+                    : {
+                        ...province,
+                        cities: [
+                          ...(province.cities || []),
+                          {
+                            id: `${province.id}-${newCity.name.toLowerCase().replace(/\s+/g, "-")}`,
+                            name: newCity.name.trim(),
+                            suburbs,
+                          },
+                        ],
+                      }
+                ),
+              }
+        ),
+      },
+    }));
+
+    setNewCity({
+      name: "",
+      countryId: "",
+      provinceId: "",
+      suburbsText: "",
     });
+    return true;
+  };
+
+  const removeCity = (countryId, provinceId, cityId) => {
+    updateSettings((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        countries: prev.location.countries.map((country) =>
+          country.id !== countryId
+            ? country
+            : {
+                ...country,
+                provinces: (country.provinces || []).map((province) =>
+                  province.id !== provinceId
+                    ? province
+                    : {
+                        ...province,
+                        cities: (province.cities || []).filter((city) => city.id !== cityId),
+                      }
+                ),
+              }
+        ),
+      },
+    }));
+  };
+
+  const addSuburb = () => {
+    if (!newSuburb.name.trim() || !newSuburb.countryId || !newSuburb.provinceId || !newSuburb.cityId) return false;
+
+    updateSettings((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        countries: prev.location.countries.map((country) =>
+          country.id !== newSuburb.countryId
+            ? country
+            : {
+                ...country,
+                provinces: (country.provinces || []).map((province) =>
+                  province.id !== newSuburb.provinceId
+                    ? province
+                    : {
+                        ...province,
+                        cities: (province.cities || []).map((city) =>
+                          city.id !== newSuburb.cityId
+                            ? city
+                            : {
+                                ...city,
+                                suburbs: Array.from(new Set([...(city.suburbs || []), newSuburb.name.trim()])),
+                              }
+                        ),
+                      }
+                ),
+              }
+        ),
+      },
+    }));
+
+    setNewSuburb({
+      name: "",
+      countryId: "",
+      provinceId: "",
+      cityId: "",
+    });
+    return true;
+  };
+
+  const removeSuburb = (countryId, provinceId, cityId, suburbName) => {
+    updateSettings((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        countries: prev.location.countries.map((country) =>
+          country.id !== countryId
+            ? country
+            : {
+                ...country,
+                provinces: (country.provinces || []).map((province) =>
+                  province.id !== provinceId
+                    ? province
+                    : {
+                        ...province,
+                        cities: (province.cities || []).map((city) =>
+                          city.id !== cityId
+                            ? city
+                            : {
+                                ...city,
+                                suburbs: (city.suburbs || []).filter((suburb) => suburb !== suburbName),
+                              }
+                        ),
+                      }
+                ),
+              }
+        ),
+      },
+    }));
   };
 
   const addPropertyType = () => {
     if (!newPropertyType.trim()) return;
     
-    setSettings({
-      ...settings,
+    updateSettings((prev) => ({
+      ...prev,
       property: {
-        ...settings.property,
-        propertyTypes: [...settings.property.propertyTypes, newPropertyType],
+        ...prev.property,
+        propertyTypes: [...prev.property.propertyTypes, newPropertyType],
       },
-    });
+    }));
     setNewPropertyType("");
   };
 
   const removePropertyType = (type) => {
-    setSettings({
-      ...settings,
+    updateSettings((prev) => ({
+      ...prev,
       property: {
-        ...settings.property,
-        propertyTypes: settings.property.propertyTypes.filter(t => t !== type),
+        ...prev.property,
+        propertyTypes: prev.property.propertyTypes.filter(t => t !== type),
       },
-    });
+    }));
   };
 
   const addAmenity = () => {
     if (!newAmenity.trim()) return;
     
-    setSettings({
-      ...settings,
+    updateSettings((prev) => ({
+      ...prev,
       property: {
-        ...settings.property,
-        amenities: [...settings.property.amenities, newAmenity],
+        ...prev.property,
+        amenities: [...prev.property.amenities, newAmenity],
       },
-    });
+    }));
     setNewAmenity("");
   };
 
   const removeAmenity = (amenity) => {
-    setSettings({
-      ...settings,
+    updateSettings((prev) => ({
+      ...prev,
       property: {
-        ...settings.property,
-        amenities: settings.property.amenities.filter(a => a !== amenity),
+        ...prev.property,
+        amenities: prev.property.amenities.filter(a => a !== amenity),
       },
-    });
+    }));
   };
 
   // Handle content settings changes from WebsiteSettings component
   const handleContentSettingsChange = (contentSettings) => {
-    setSettings({
-      ...settings,
+    updateSettings((prev) => ({
+      ...prev,
       content: contentSettings
-    });
+    }));
   };
 
   // Handle developer settings changes from DeveloperSettings component
   const handleDeveloperSettingsChange = (field, developerSettings) => {
-    setSettings({
-      ...settings,
+    updateSettings((prev) => ({
+      ...prev,
       developer: developerSettings
-    });
+    }));
   };
 
-  const saveSettings = () => {
-    // Call the context function to save settings to backend
+  const saveSettings = async () => {
     if (_saveSettings) {
-      _saveSettings(settings);
+      const saved = await _saveSettings(settings);
+
+      if (saved) {
+        setIsDirty(false);
+      }
     } else {
-      console.log("Settings saved:", settings);
-      // Use toast notification instead of alert
       toast.success("Settings saved successfully!");
+      setIsDirty(false);
     }
   };
 
+  const provinceRows = settings.location.countries.flatMap((country) =>
+    (country.provinces || []).map((province) => ({
+      countryId: country.id,
+      countryName: country.name,
+      province,
+    }))
+  );
+
+  const cityRows = settings.location.countries.flatMap((country) =>
+    (country.provinces || []).flatMap((province) =>
+      (province.cities || []).map((city) => ({
+        countryId: country.id,
+        countryName: country.name,
+        provinceId: province.id,
+        provinceName: province.name,
+        city,
+      }))
+    )
+  );
+
+  const suburbRows = settings.location.countries.flatMap((country) =>
+    (country.provinces || []).flatMap((province) =>
+      (province.cities || []).flatMap((city) =>
+        (city.suburbs || []).map((suburb) => ({
+          countryId: country.id,
+          countryName: country.name,
+          provinceId: province.id,
+          provinceName: province.name,
+          cityId: city.id,
+          cityName: city.name,
+          suburb,
+        }))
+      )
+    )
+  );
+
   return (
+    <>
     <div className="container-fluid">
       <div className="row clearfix">
         <div className="col-lg-12">
@@ -413,26 +544,45 @@ export default function Settings() {
                     <div className="row">
                       <div className="col-md-6">
                         <div className="form-group">
-                          <label>Currency</label>
+                          <label>Default Currency</label>
                           <input 
                             type="text" 
                             className="form-control" 
-                            name="currency"
-                            value={settings.general.currency}
+                            name="defaultCurrency"
+                            value={settings.general.defaultCurrency}
                             onChange={handleGeneralSettingsChange}
                           />
                         </div>
                       </div>
                       <div className="col-md-6">
                         <div className="form-group">
-                          <label>Currency Symbol</label>
+                          <label>Default Currency Symbol</label>
                           <input 
                             type="text" 
                             className="form-control" 
-                            name="currencySymbol"
-                            value={settings.general.currencySymbol}
+                            name="defaultCurrencySymbol"
+                            value={settings.general.defaultCurrencySymbol}
                             onChange={handleGeneralSettingsChange}
                           />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="form-group">
+                          <label>Default Country</label>
+                          <select
+                            className="form-control"
+                            name="defaultCountry"
+                            value={settings.general.defaultCountry}
+                            onChange={handleGeneralSettingsChange}
+                          >
+                            {settings.location.countries.map((country) => (
+                              <option key={country.id} value={country.name}>
+                                {country.name}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -443,133 +593,232 @@ export default function Settings() {
                 {activeTab === 'location' && (
                   <div>
                     <h4 className="mb-4">Location Settings</h4>
-                    
-                    {/* Countries Section */}
-                    <div className="card mb-4">
-                      <div className="card-header bg-primary text-white">
-                        <h5 className="mb-0">Countries</h5>
-                      </div>
-                      <div className="card-body">
-                        <div className="row mb-3">
-                          <div className="col-md-8">
-                            <input 
-                              type="text" 
-                              className="form-control" 
-                              placeholder="Add new country"
-                              value={newCountry}
-                              onChange={(e) => setNewCountry(e.target.value)}
-                            />
-                          </div>
-                          <div className="col-md-4">
-                            <button 
-                              className="btn btn-primary w-100"
-                              onClick={addCountry}
-                            >
-                              Add Country
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="table-responsive">
-                          <table className="table table-bordered">
-                            <thead>
-                              <tr>
-                                <th>Country Name</th>
-                                <th width="100">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {settings.location.countries.map(country => (
-                                <tr key={country.id}>
-                                  <td>{country.name}</td>
-                                  <td>
-                                    <button 
-                                      className="btn btn-sm btn-danger"
-                                      onClick={() => removeCountry(country.id)}
-                                    >
-                                      Remove
-                                    </button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
+                    <div className="location-subtabs">
+                      <button
+                        type="button"
+                        className={`location-subtab ${locationTab === "countries" ? "active" : ""}`}
+                        onClick={() => setLocationTab("countries")}
+                      >
+                        Countries
+                      </button>
+                      <button
+                        type="button"
+                        className={`location-subtab ${locationTab === "provinces" ? "active" : ""}`}
+                        onClick={() => setLocationTab("provinces")}
+                      >
+                        Provinces / Regions
+                      </button>
+                      <button
+                        type="button"
+                        className={`location-subtab ${locationTab === "cities" ? "active" : ""}`}
+                        onClick={() => setLocationTab("cities")}
+                      >
+                        Cities
+                      </button>
+                      <button
+                        type="button"
+                        className={`location-subtab ${locationTab === "suburbs" ? "active" : ""}`}
+                        onClick={() => setLocationTab("suburbs")}
+                      >
+                        Suburbs
+                      </button>
                     </div>
-                    
-                    {/* Provinces/States Section */}
-                    <div className="card">
-                      <div className="card-header bg-primary text-white">
-                        <h5 className="mb-0">Provinces/States</h5>
-                      </div>
-                      <div className="card-body">
-                        <div className="row mb-3">
-                          <div className="col-md-4">
-                            <select 
-                              className="form-control"
-                              value={newProvince.countryId}
-                              onChange={(e) => setNewProvince({...newProvince, countryId: e.target.value})}
+
+                    {locationTab === "countries" && (
+                      <div className="card">
+                        <div className="card-body">
+                          <div className="location-panel-header">
+                            <h5>Countries</h5>
+                            <button
+                              type="button"
+                              className="internal-action-btn"
+                              onClick={() => setLocationModal("country")}
                             >
-                              <option value="">Select Country</option>
-                              {settings.location.countries.map(country => (
-                                <option key={country.id} value={country.id}>
-                                  {country.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="col-md-4">
-                            <input 
-                              type="text" 
-                              className="form-control" 
-                              placeholder="Province/State name"
-                              value={newProvince.name}
-                              onChange={(e) => setNewProvince({...newProvince, name: e.target.value})}
-                            />
-                          </div>
-                          <div className="col-md-4">
-                            <button 
-                              className="btn btn-primary w-100"
-                              onClick={addProvince}
-                            >
-                              Add Province/State
+                              <i className="fa fa-plus m-r-5" /> Add Country
                             </button>
                           </div>
-                        </div>
-                        
-                        <div className="table-responsive">
-                          <table className="table table-bordered">
-                            <thead>
-                              <tr>
-                                <th>Country</th>
-                                <th>Province/State</th>
-                                <th width="100">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {settings.location.provinces.map(province => {
-                                const country = settings.location.countries.find(c => c.id === province.countryId);
-                                return (
-                                  <tr key={province.id}>
-                                    <td>{country ? country.name : 'Unknown'}</td>
-                                    <td>{province.name}</td>
+                          <div className="table-responsive">
+                            <table className="table table-bordered location-panel-table">
+                              <thead>
+                                <tr>
+                                  <th>Country Name</th>
+                                  <th>ISO</th>
+                                  <th>Phone Code</th>
+                                  <th>Default Currency</th>
+                                  <th>Allowed Currencies</th>
+                                  <th width="100">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {settings.location.countries.map((country) => (
+                                  <tr key={country.id}>
+                                    <td>{country.name}</td>
+                                    <td>{country.isoCode}</td>
+                                    <td>{country.phoneCode}</td>
+                                    <td>{country.defaultCurrency}</td>
+                                    <td>{(country.allowedCurrencies || []).join(", ")}</td>
                                     <td>
-                                      <button 
+                                      <button
+                                        type="button"
                                         className="btn btn-sm btn-danger"
-                                        onClick={() => removeProvince(province.id)}
+                                        onClick={() => removeCountry(country.id)}
                                       >
                                         Remove
                                       </button>
                                     </td>
                                   </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
+
+                    {locationTab === "provinces" && (
+                      <div className="card">
+                        <div className="card-body">
+                          <div className="location-panel-header">
+                            <h5>Provinces / Regions</h5>
+                            <button
+                              type="button"
+                              className="internal-action-btn"
+                              onClick={() => setLocationModal("province")}
+                            >
+                              <i className="fa fa-plus m-r-5" /> Add Province / Region
+                            </button>
+                          </div>
+                          <div className="table-responsive">
+                            <table className="table table-bordered location-panel-table">
+                              <thead>
+                                <tr>
+                                  <th>Country</th>
+                                  <th>Province / Region</th>
+                                  <th width="100">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {provinceRows.map((row) => (
+                                  <tr key={row.province.id}>
+                                    <td>{row.countryName}</td>
+                                    <td>{row.province.name}</td>
+                                    <td>
+                                      <button
+                                        type="button"
+                                        className="btn btn-sm btn-danger"
+                                        onClick={() => removeProvince(row.countryId, row.province.id)}
+                                      >
+                                        Remove
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {locationTab === "cities" && (
+                      <div className="card">
+                        <div className="card-body">
+                          <div className="location-panel-header">
+                            <h5>Cities</h5>
+                            <button
+                              type="button"
+                              className="internal-action-btn"
+                              onClick={() => setLocationModal("city")}
+                            >
+                              <i className="fa fa-plus m-r-5" /> Add City
+                            </button>
+                          </div>
+                          <div className="table-responsive">
+                            <table className="table table-bordered location-panel-table">
+                              <thead>
+                                <tr>
+                                  <th>Country</th>
+                                  <th>Province / Region</th>
+                                  <th>City</th>
+                                  <th>Suburbs Count</th>
+                                  <th width="100">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {cityRows.map((row) => (
+                                  <tr key={row.city.id}>
+                                    <td>{row.countryName}</td>
+                                    <td>{row.provinceName}</td>
+                                    <td>{row.city.name}</td>
+                                    <td>{(row.city.suburbs || []).length}</td>
+                                    <td>
+                                      <button
+                                        type="button"
+                                        className="btn btn-sm btn-danger"
+                                        onClick={() => removeCity(row.countryId, row.provinceId, row.city.id)}
+                                      >
+                                        Remove
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {locationTab === "suburbs" && (
+                      <div className="card">
+                        <div className="card-body">
+                          <div className="location-panel-header">
+                            <h5>Suburbs</h5>
+                            <button
+                              type="button"
+                              className="internal-action-btn"
+                              onClick={() => setLocationModal("suburb")}
+                            >
+                              <i className="fa fa-plus m-r-5" /> Add Suburb
+                            </button>
+                          </div>
+                          <div className="table-responsive">
+                            <table className="table table-bordered location-panel-table">
+                              <thead>
+                                <tr>
+                                  <th>Country</th>
+                                  <th>Province / Region</th>
+                                  <th>City</th>
+                                  <th>Suburb</th>
+                                  <th width="100">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {suburbRows.map((row) => (
+                                  <tr key={`${row.cityId}-${row.suburb}`}>
+                                    <td>{row.countryName}</td>
+                                    <td>{row.provinceName}</td>
+                                    <td>{row.cityName}</td>
+                                    <td>{row.suburb}</td>
+                                    <td>
+                                      <button
+                                        type="button"
+                                        className="btn btn-sm btn-danger"
+                                        onClick={() =>
+                                          removeSuburb(row.countryId, row.provinceId, row.cityId, row.suburb)
+                                        }
+                                      >
+                                        Remove
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 
@@ -723,5 +972,250 @@ export default function Settings() {
         </div>
       </div>
     </div>
+
+    {locationModal === "country" && (
+      <DashboardModal title="Add Country" onClose={() => setLocationModal("")} size="medium">
+        <div className="dashboard-modal-form-grid">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Country name"
+            value={newCountry.name}
+            onChange={(e) => setNewCountry({ ...newCountry, name: e.target.value })}
+          />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="ISO code"
+            value={newCountry.isoCode}
+            onChange={(e) => setNewCountry({ ...newCountry, isoCode: e.target.value })}
+          />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Phone code"
+            value={newCountry.phoneCode}
+            onChange={(e) => setNewCountry({ ...newCountry, phoneCode: e.target.value })}
+          />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Default currency"
+            value={newCountry.defaultCurrency}
+            onChange={(e) => setNewCountry({ ...newCountry, defaultCurrency: e.target.value })}
+          />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Currency symbol"
+            value={newCountry.currencySymbol}
+            onChange={(e) => setNewCountry({ ...newCountry, currencySymbol: e.target.value })}
+          />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Allowed currencies, comma separated"
+            value={newCountry.allowedCurrenciesText}
+            onChange={(e) => setNewCountry({ ...newCountry, allowedCurrenciesText: e.target.value })}
+          />
+        </div>
+        <div className="dashboard-modal-footer">
+          <button type="button" className="btn btn-default btn-round" onClick={() => setLocationModal("")}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-round"
+            onClick={() => {
+              if (addCountry()) {
+                setLocationModal("");
+              }
+            }}
+          >
+            Save Country
+          </button>
+        </div>
+      </DashboardModal>
+    )}
+
+    {locationModal === "province" && (
+      <DashboardModal title="Add Province / Region" onClose={() => setLocationModal("")} size="medium">
+        <div className="dashboard-modal-form-grid">
+          <select
+            className="form-control"
+            value={newProvince.countryId}
+            onChange={(e) => setNewProvince({ ...newProvince, countryId: e.target.value })}
+          >
+            <option value="">Select Country</option>
+            {settings.location.countries.map((country) => (
+              <option key={country.id} value={country.id}>
+                {country.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Province / Region name"
+            value={newProvince.name}
+            onChange={(e) => setNewProvince({ ...newProvince, name: e.target.value })}
+          />
+        </div>
+        <div className="dashboard-modal-footer">
+          <button type="button" className="btn btn-default btn-round" onClick={() => setLocationModal("")}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-round"
+            onClick={() => {
+              if (addProvince()) {
+                setLocationModal("");
+              }
+            }}
+          >
+            Save Province
+          </button>
+        </div>
+      </DashboardModal>
+    )}
+
+    {locationModal === "city" && (
+      <DashboardModal title="Add City" onClose={() => setLocationModal("")} size="medium">
+        <div className="dashboard-modal-form-grid">
+          <select
+            className="form-control"
+            value={newCity.countryId}
+            onChange={(e) => setNewCity({ ...newCity, countryId: e.target.value, provinceId: "" })}
+          >
+            <option value="">Select Country</option>
+            {settings.location.countries.map((country) => (
+              <option key={country.id} value={country.id}>
+                {country.name}
+              </option>
+            ))}
+          </select>
+          <select
+            className="form-control"
+            value={newCity.provinceId}
+            onChange={(e) => setNewCity({ ...newCity, provinceId: e.target.value })}
+          >
+            <option value="">Select Province / Region</option>
+            {(settings.location.countries.find((country) => country.id === newCity.countryId)?.provinces || []).map(
+              (province) => (
+                <option key={province.id} value={province.id}>
+                  {province.name}
+                </option>
+              )
+            )}
+          </select>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="City name"
+            value={newCity.name}
+            onChange={(e) => setNewCity({ ...newCity, name: e.target.value })}
+          />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Optional suburbs, comma separated"
+            value={newCity.suburbsText}
+            onChange={(e) => setNewCity({ ...newCity, suburbsText: e.target.value })}
+          />
+        </div>
+        <div className="dashboard-modal-footer">
+          <button type="button" className="btn btn-default btn-round" onClick={() => setLocationModal("")}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-round"
+            onClick={() => {
+              if (addCity()) {
+                setLocationModal("");
+              }
+            }}
+          >
+            Save City
+          </button>
+        </div>
+      </DashboardModal>
+    )}
+
+    {locationModal === "suburb" && (
+      <DashboardModal title="Add Suburb" onClose={() => setLocationModal("")} size="medium">
+        <div className="dashboard-modal-form-grid">
+          <select
+            className="form-control"
+            value={newSuburb.countryId}
+            onChange={(e) =>
+              setNewSuburb({ ...newSuburb, countryId: e.target.value, provinceId: "", cityId: "" })
+            }
+          >
+            <option value="">Select Country</option>
+            {settings.location.countries.map((country) => (
+              <option key={country.id} value={country.id}>
+                {country.name}
+              </option>
+            ))}
+          </select>
+          <select
+            className="form-control"
+            value={newSuburb.provinceId}
+            onChange={(e) => setNewSuburb({ ...newSuburb, provinceId: e.target.value, cityId: "" })}
+          >
+            <option value="">Select Province / Region</option>
+            {(settings.location.countries.find((country) => country.id === newSuburb.countryId)?.provinces || []).map(
+              (province) => (
+                <option key={province.id} value={province.id}>
+                  {province.name}
+                </option>
+              )
+            )}
+          </select>
+          <select
+            className="form-control"
+            value={newSuburb.cityId}
+            onChange={(e) => setNewSuburb({ ...newSuburb, cityId: e.target.value })}
+          >
+            <option value="">Select City</option>
+            {(
+              settings.location.countries
+                .find((country) => country.id === newSuburb.countryId)
+                ?.provinces?.find((province) => province.id === newSuburb.provinceId)?.cities || []
+            ).map((city) => (
+              <option key={city.id} value={city.id}>
+                {city.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Suburb name"
+            value={newSuburb.name}
+            onChange={(e) => setNewSuburb({ ...newSuburb, name: e.target.value })}
+          />
+        </div>
+        <div className="dashboard-modal-footer">
+          <button type="button" className="btn btn-default btn-round" onClick={() => setLocationModal("")}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-round"
+            onClick={() => {
+              if (addSuburb()) {
+                setLocationModal("");
+              }
+            }}
+          >
+            Save Suburb
+          </button>
+        </div>
+      </DashboardModal>
+    )}
+    </>
   );
 }

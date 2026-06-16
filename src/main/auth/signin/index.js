@@ -1,18 +1,11 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import Loader from "../../components/loader";
 import Notify from "../../components/notification";
 import { AuthContext } from "../../libs/contexts/authContext";
-import { _removeFromStorage } from "../../libs/functions/storage";
 
 export default function Login() {
   const { _handleLogin, _handleChange, authState, loading } = useContext(AuthContext);
-
-  useEffect(() => {
-    if (authState.user && Object.keys(authState.user).length) {
-      _removeFromStorage("user");
-    }
-  }, [authState.user]);
 
   return (
     <div className="auth-page">

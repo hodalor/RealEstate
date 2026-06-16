@@ -49,7 +49,7 @@ const _login = async (data) => {
 const _register = async (data) => {
   var results;
 
-  const { email, password, firstName, lastName, phone } = data;
+  const { email, password, firstName, lastName, phone, country } = data;
 
   const url = customerUrl + "create";
 
@@ -65,6 +65,7 @@ const _register = async (data) => {
       firstName,
       lastName,
       phone,
+      country,
       role: "Buyer",
     }),
   })

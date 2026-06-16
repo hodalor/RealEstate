@@ -23,7 +23,7 @@ export default function AgentsTopBar() {
           >
             <i className="fa fa-bars" />
           </button>
-          <Link className="internal-brand" to="/agents/properties/">
+          <Link className="internal-brand" to="/agents/dashboard/">
             <span className="internal-brand-badge">
               <i className="fa fa-building" aria-hidden="true"></i>
             </span>

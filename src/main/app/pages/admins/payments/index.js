@@ -220,6 +220,63 @@ export default function PaymentHistory() {
               <div className="alert alert-danger">{error}</div>
             ) : (
               <>
+                {/* Summary Cards */}
+                <div className="row mb-4">
+                  <div className="col-lg-3 col-md-6">
+                    <div className="card bg-success text-white">
+                      <div className="body">
+                        <h4 className="mt-0 mb-0">
+                          {formatCurrency(
+                            payments
+                              .filter(p => p.status === 'completed')
+                              .reduce((sum, p) => sum + p.amount, 0),
+                            'GHC'
+                          )}
+                        </h4>
+                        <p className="mb-0">Total Completed Payments</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-lg-3 col-md-6">
+                    <div className="card bg-warning text-white">
+                      <div className="body">
+                        <h4 className="mt-0 mb-0">
+                          {formatCurrency(
+                            payments
+                              .filter(p => p.status === 'pending')
+                              .reduce((sum, p) => sum + p.amount, 0),
+                            'GHC'
+                          )}
+                        </h4>
+                        <p className="mb-0">Pending Payments</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-lg-3 col-md-6">
+                    <div className="card bg-info text-white">
+                      <div className="body">
+                        <h4 className="mt-0 mb-0">
+                          {formatCurrency(
+                            payments
+                              .filter(p => p.status === 'refunded')
+                              .reduce((sum, p) => sum + p.amount, 0),
+                            'GHC'
+                          )}
+                        </h4>
+                        <p className="mb-0">Refunded Payments</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-lg-3 col-md-6">
+                    <div className="card bg-primary text-white">
+                      <div className="body">
+                        <h4 className="mt-0 mb-0">{payments.length}</h4>
+                        <p className="mb-0">Total Transactions</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Filters and Search */}
                 <div className="row mb-3">
                   <div className="col-md-4">
@@ -381,63 +438,6 @@ export default function PaymentHistory() {
                       )}
                     </tbody>
                   </table>
-                </div>
-                
-                {/* Summary Cards */}
-                <div className="row mt-4">
-                  <div className="col-lg-3 col-md-6">
-                    <div className="card bg-success text-white">
-                      <div className="body">
-                        <h4 className="mt-0 mb-0">
-                          {formatCurrency(
-                            payments
-                              .filter(p => p.status === 'completed')
-                              .reduce((sum, p) => sum + p.amount, 0),
-                            'GHC'
-                          )}
-                        </h4>
-                        <p className="mb-0">Total Completed Payments</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="card bg-warning text-white">
-                      <div className="body">
-                        <h4 className="mt-0 mb-0">
-                          {formatCurrency(
-                            payments
-                              .filter(p => p.status === 'pending')
-                              .reduce((sum, p) => sum + p.amount, 0),
-                            'GHC'
-                          )}
-                        </h4>
-                        <p className="mb-0">Pending Payments</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="card bg-info text-white">
-                      <div className="body">
-                        <h4 className="mt-0 mb-0">
-                          {formatCurrency(
-                            payments
-                              .filter(p => p.status === 'refunded')
-                              .reduce((sum, p) => sum + p.amount, 0),
-                            'GHC'
-                          )}
-                        </h4>
-                        <p className="mb-0">Refunded Payments</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="card bg-primary text-white">
-                      <div className="body">
-                        <h4 className="mt-0 mb-0">{payments.length}</h4>
-                        <p className="mb-0">Total Transactions</p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </>
             )}

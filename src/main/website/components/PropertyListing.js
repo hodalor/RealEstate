@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { resolveImageUrl } from "../../libs/functions/images";
+import { formatPriceWithCurrency } from "../../libs/data/siteSettings";
 
 const defaultFilter = {
   searchTerm: "",
@@ -18,16 +19,6 @@ const defaultFilter = {
 
 const getPriceValue = (price) =>
   parseFloat(String(price || "0").replace(/[^0-9.]/g, "")) || 0;
-
-const formatPrice = (price) => {
-  const priceValue = getPriceValue(price);
-
-  if (!priceValue) {
-    return "Price on request";
-  }
-
-  return `GHC ${priceValue.toLocaleString()}`;
-};
 
 export default function PropertyListing({
   featured = false,
@@ -370,7 +361,9 @@ export default function PropertyListing({
                       <i className="fa fa-map-marker-alt" aria-hidden="true"></i>
                       {property.city || property.digitalAddress || "Location not specified"}
                     </span>
-                    <strong className="property-price">{formatPrice(property.price)}</strong>
+                    <strong className="property-price">
+                      {formatPriceWithCurrency(property.price, property.currency)}
+                    </strong>
                   </div>
 
                   <h4>{property.name || "Unnamed property"}</h4>

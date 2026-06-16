@@ -1198,6 +1198,30 @@ a {
   .auth-form-panel {
     padding: 1rem;
   }
+
+  .auth-form-card .heading p,
+  .brand-mark small,
+  .section-heading p,
+  .property-card-description,
+  .empty-state-card p {
+    display: none;
+  }
+
+  .auth-form-card .heading {
+    margin-bottom: 1rem;
+  }
+
+  .auth-form-card .heading h2 {
+    margin-bottom: 0;
+  }
+
+  .filter-shell-header h3 {
+    font-size: 1.4rem;
+  }
+
+  .listing-page-section .filter-shell {
+    top: 82px;
+  }
 }
 
 /* Public overrides and homepage/dashboard alignment */

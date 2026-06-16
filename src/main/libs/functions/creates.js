@@ -15,6 +15,7 @@ const _createAdmin = async (data) => {
     password: data.password,
     address: data.address,
     role: "Admin",
+    authorizations: data.authorizations || [],
   });
 
   formData.append("profileImg", data.image);
@@ -53,7 +54,9 @@ const _addAgent = async (data) => {
     password: data.password,
     address: data.address,
     role: "Agent",
+    country: data.country,
     dob: data.dob,
+    identityNumber: data.ghcard,
     ghanaCard: data.ghcard,
     gr1: data.gr1Name,
     gr1Contact: data.gr1Contact,

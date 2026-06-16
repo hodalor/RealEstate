@@ -23,7 +23,7 @@ export default function AdminTopBar() {
           >
             <i className="fa fa-bars" />
           </button>
-          <Link className="internal-brand" to="/admin/properties/">
+          <Link className="internal-brand" to="/admin/dashboard/">
             <span className="internal-brand-badge">
               <i className="fa fa-building" aria-hidden="true"></i>
             </span>

@@ -4,7 +4,9 @@ import { AuthContext } from "../../../libs/contexts/authContext";
 import AdminContextProvider from "../../../libs/contexts/adminContext";
 import AdminStart from "../../../components/admin";
 import AdminPageTitle from "../../../components/admin/pageTitle";
+import AdminDashboard from "./dashboard";
 import AdminProperties from "./properties";
+import AdminUsers from "./adminUsers";
 import AddAdmin from "./addAdmin";
 import AddAgent from "./addAgent";
 import AddProp from "./addProperty";
@@ -41,8 +43,9 @@ export default function Admin() {
           <div className="row clearfix">
             <Switch>
               <Route exact path="/admin">
-                <Redirect to="/admin/properties/" />
+                <Redirect to="/admin/dashboard/" />
               </Route>
+              <Route exact path="/admin/dashboard/" component={AdminDashboard} />
               <Route
                 exact
                 path="/admin/properties/"
@@ -60,6 +63,7 @@ export default function Admin() {
               <Route path="/admin/add-agent/" component={AddAgent} />
               <Route path="/admin/add-admin/" component={AddAdmin} />
               <Route path="/admin/users/" component={Users} />
+              <Route path="/admin/admin-users/" component={AdminUsers} />
               <Route path="/admin/users/user/:ID" component={User} />
               <Route path="/admin/profile/" component={Profile} />
               <Route
@@ -73,7 +77,7 @@ export default function Admin() {
               <Route path="/admin/tour-bookings" component={TourBookings} />
               <Route path="/admin/payments" component={PaymentHistory} />
               <Route path="*">
-                <Redirect to="/admin/properties/" />
+                <Redirect to="/admin/dashboard/" />
               </Route>
             </Switch>
           </div>

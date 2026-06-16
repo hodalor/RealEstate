@@ -15,6 +15,7 @@ const propertyUrl = `${apiBaseUrl}/properties/`;
 const customerUrl = `${apiBaseUrl}/customers/`;
 const signUrl = `${apiBaseUrl}/signin/`;
 const requestsUrl = `${apiBaseUrl}/requests/`;
+const settingsUrl = `${apiBaseUrl}/settings/`;
 const toursUrl = `${apiBaseUrl}/api/tours/`;
 
 export {
@@ -26,5 +27,6 @@ export {
   customerUrl,
   signUrl,
   requestsUrl,
+  settingsUrl,
   toursUrl,
 };

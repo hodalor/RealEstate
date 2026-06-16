@@ -12,8 +12,8 @@ export default function MainApp() {
   }
 
   const routeMap = {
-    Admin: "/admin/properties/",
-    Agent: "/agents/properties/",
+    Admin: "/admin/dashboard/",
+    Agent: "/agents/dashboard/",
     Buyer: "/properties/listings",
   };
 

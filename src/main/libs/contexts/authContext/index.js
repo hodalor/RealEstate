@@ -29,6 +29,7 @@ export default function AuthContextProvider(props) {
     firstName: "",
     lastName: "",
     phone: "",
+    country: "",
     user: getStoredUser(),
   });
 
@@ -82,6 +83,7 @@ export default function AuthContextProvider(props) {
       lastName: "",
       con_pass: "",
       phone: "",
+      country: "",
     });
   };
 
@@ -115,8 +117,8 @@ export default function AuthContextProvider(props) {
     const store = await _saveToStorage({ data: results.user, key: "user" });
     if (store) {
       const roleRoutes = {
-        Admin: "/admin/properties/",
-        Agent: "/agents/properties/",
+        Admin: "/admin/dashboard/",
+        Agent: "/agents/dashboard/",
         Buyer: "/properties/listings",
       };
 
@@ -154,6 +156,12 @@ export default function AuthContextProvider(props) {
       return setAuthState({
         ...authState,
         phone: value,
+      });
+
+    if (field === "country")
+      return setAuthState({
+        ...authState,
+        country: value,
       });
 
     if (field === "firstName")

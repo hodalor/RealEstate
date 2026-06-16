@@ -10,6 +10,7 @@ import {
 } from "../../functions/validations";
 import { _addAgent, _addProperty, _createAdmin } from "../../functions/creates";
 import {
+  _fetchAdmin,
   _fetchAgents,
   _fetchAll,
   _fetchProperties,
@@ -24,9 +25,73 @@ import {
 } from "../../functions/edits";
 import { _delAgent } from "../../functions/deletes";
 import { _retrieveFromStroage, _saveToStorage } from "../../functions/storage";
-import { adminUrl } from "../../data/baseUrls";
+import { settingsUrl } from "../../data/baseUrls";
+import { normalizeSiteSettings } from "../../data/siteSettings";
 
 export const AdminContext = createContext();
+
+const getEmptyUserState = () => ({
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  password: "",
+  address: "",
+  con_pass: "",
+  new_pass: "",
+  image: {},
+  dob: "",
+  country: "",
+  ghcard: "",
+  gr1Name: "",
+  gr1Contact: "",
+  rel1: "",
+  gr2Name: "",
+  gr2Contact: "",
+  rel2: "",
+  gender: "",
+  fb: "",
+  tw: "",
+  ins: "",
+  authorizations: [],
+  isBlocked: false,
+});
+
+const getEmptyPropertyState = () => ({
+  propName: "",
+  propLoca: "",
+  propType: "",
+  propDesc: "",
+  rentOrSale: "",
+  price: Number,
+  currency: "",
+  bedRoomNumber: Number,
+  bathRoomNumber: Number,
+  sqft: Number,
+  carPark: Boolean,
+  year: "",
+  agentID: "",
+  address: "",
+  country: "",
+  province: "",
+  city: "",
+  suburb: "",
+  dRoom: Boolean,
+  kitchen: Boolean,
+  livRoom: Boolean,
+  mBedroom: Boolean,
+  porch: Boolean,
+  stRoom: Boolean,
+  pool: Boolean,
+  ppWater: Boolean,
+  acon: Boolean,
+  elct: Boolean,
+  nmRoad: Boolean,
+  nsMarket: Boolean,
+  pets: Boolean,
+  rooms: Number,
+  propImages: [],
+});
 
 export default function AdminContextProvider(props) {
   const history = useHistory();
@@ -34,115 +99,9 @@ export default function AdminContextProvider(props) {
   const { notiData, setNotiData, setLoading } = useContext(AuthContext);
 
   const [adminData, setAdminData] = useState({
-    user: {
-      firstName: "",
-      lastName: "",
-      phone: "",
-      email: "",
-      password: "",
-      address: "",
-      con_pass: "",
-      new_pass: "",
-      image: {},
-      dob: "",
-      ghcard: "",
-      gr1Name: "",
-      gr1Contact: "",
-      rel1: "",
-      gr2Name: "",
-      gr2Contact: "",
-      rel2: "",
-      gender: "",
-      fb: "",
-      tw: "",
-      ins: "",
-      isBlocked: false,
-    },
-    property: {
-      propName: "",
-      propLoca: "",
-      propType: "",
-      propDesc: "",
-      rentOrSale: "",
-      price: Number,
-      bedRoomNumber: Number,
-      bathRoomNumber: Number,
-      sqft: Number,
-      carPark: Boolean,
-      year: "",
-      agentID: "",
-      address: "",
-      country: "",
-      province: "",
-      city: "",
-      suburb: "",
-      dRoom: Boolean,
-      kitchen: Boolean,
-      livRoom: Boolean,
-      mBedroom: Boolean,
-      porch: Boolean,
-      stRoom: Boolean,
-      pool: Boolean,
-      ppWater: Boolean,
-      acon: Boolean,
-      elct: Boolean,
-      nmRoad: Boolean,
-      nsMarket: Boolean,
-      pets: Boolean,
-      rooms: Number,
-      propImages: [],
-    },
-    settings: {
-      general: {
-        siteName: "RealEstate",
-        currency: "GHC",
-        currencySymbol: "₵",
-        defaultLanguage: "English",
-      },
-      location: {
-        countries: [
-          { id: 1, name: "Ghana" },
-          { id: 2, name: "Nigeria" },
-          { id: 3, name: "South Africa" },
-          { id: 4, name: "Kenya" },
-          { id: 5, name: "Egypt" },
-        ],
-        provinces: [
-          { id: 1, countryId: 1, name: "Greater Accra" },
-          { id: 2, countryId: 1, name: "Ashanti" },
-          { id: 3, countryId: 1, name: "Western" },
-          { id: 4, countryId: 1, name: "Eastern" },
-          { id: 5, countryId: 1, name: "Central" },
-          { id: 6, countryId: 1, name: "Volta" },
-          { id: 7, countryId: 1, name: "Northern" },
-          { id: 8, countryId: 2, name: "Lagos" },
-          { id: 9, countryId: 2, name: "Abuja" },
-        ],
-      },
-      property: {
-        propertyTypes: [
-          "Single room",
-          "Apartment",
-          "Full house",
-          "Office",
-          "Shop",
-          "Land",
-          "Warehouse",
-        ],
-        amenities: [
-          "Swimming Pool",
-          "Pipe Water",
-          "Air Conditioning",
-          "Electricity",
-          "Near Main Road",
-          "Near Supermarket",
-          "Pets Allowed",
-          "Security",
-          "Internet",
-          "Gym",
-        ],
-      },
-    },
+    user: getEmptyUserState(),
+    property: getEmptyPropertyState(),
+    settings: normalizeSiteSettings(),
     categories: {
       all: true,
       singleRooms: false,
@@ -155,6 +114,7 @@ export default function AdminContextProvider(props) {
     properties: [],
     pending: [],
     customers: [],
+    admins: [],
     agent: {},
     propertyDetails: {},
     customer: {},
@@ -224,6 +184,7 @@ export default function AdminContextProvider(props) {
 
   useEffect(() => {
     getAdminData();
+    _fetchSettings();
   }, []);
 
   const getAdminData = async () => {
@@ -234,7 +195,7 @@ export default function AdminContextProvider(props) {
     });
 
     setLoading(true);
-    const results = await _fetchAll();
+    const [results, adminResults] = await Promise.all([_fetchAll(), _fetchAdmin()]);
 
     setLoading(false);
     if (results !== undefined) {
@@ -258,6 +219,7 @@ export default function AdminContextProvider(props) {
           properties: ps,
           pending: pend,
           customers: custData.success === 1 ? custData.data : [],
+          admins: adminResults?.success === 1 ? adminResults.data : [],
           admin: userData,
         });
       }
@@ -275,6 +237,21 @@ export default function AdminContextProvider(props) {
           firstName: value,
         },
       });
+
+    if (field === "authorizations") {
+      const currentAuthorizations = adminData.user.authorizations || [];
+      const nextAuthorizations = currentAuthorizations.includes(value)
+        ? currentAuthorizations.filter((item) => item !== value)
+        : [...currentAuthorizations, value];
+
+      return setAdminData({
+        ...adminData,
+        user: {
+          ...adminData.user,
+          authorizations: nextAuthorizations,
+        },
+      });
+    }
       
     if (field === "country")
       return setAdminData({
@@ -282,6 +259,9 @@ export default function AdminContextProvider(props) {
         property: {
           ...adminData.property,
           country: value,
+          province: "",
+          city: "",
+          suburb: "",
         },
       });
       
@@ -291,6 +271,8 @@ export default function AdminContextProvider(props) {
         property: {
           ...adminData.property,
           province: value,
+          city: "",
+          suburb: "",
         },
       });
       
@@ -300,6 +282,7 @@ export default function AdminContextProvider(props) {
         property: {
           ...adminData.property,
           city: value,
+          suburb: "",
         },
       });
       
@@ -309,6 +292,15 @@ export default function AdminContextProvider(props) {
         property: {
           ...adminData.property,
           suburb: value,
+        },
+      });
+
+    if (field === "currency")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          currency: value,
         },
       });
 
@@ -390,6 +382,15 @@ export default function AdminContextProvider(props) {
         user: {
           ...adminData.user,
           dob: value,
+        },
+      });
+
+    if (field === "userCountry")
+      return setAdminData({
+        ...adminData,
+        user: {
+          ...adminData.user,
+          country: value,
         },
       });
 
@@ -784,29 +785,14 @@ export default function AdminContextProvider(props) {
   const _cancelAdd = () => {
     setAdminData({
       ...adminData,
-      user: {
-        firstName: "",
-        lastName: "",
-        phone: "",
-        email: "",
-        password: "",
-        address: "",
-        con_pass: "",
-        image: {},
-        dob: "",
-        ghcard: "",
-        gr1Name: "",
-        gr1Contact: "",
-        rel1: "",
-        gr2Name: "",
-        gr2Contact: "",
-        rel2: "",
-        gender: "",
-        fb: "",
-        tw: "",
-        ins: "",
-        isBlocked: false,
-      },
+      user: getEmptyUserState(),
+    });
+  };
+
+  const _cancelProperty = () => {
+    setAdminData({
+      ...adminData,
+      property: getEmptyPropertyState(),
     });
   };
 
@@ -815,7 +801,7 @@ export default function AdminContextProvider(props) {
 
     if (validate.status === false) {
       toast.warning(validate.mesg);
-      return;
+      return false;
     }
 
     setLoading(true);
@@ -826,10 +812,20 @@ export default function AdminContextProvider(props) {
     setLoading(false);
     if (results === undefined || results.success === 0) {
       toast.error(results?.message || "Failed to create admin");
-      return;
+      return false;
+    }
+
+    const adminsResult = await _fetchAdmin();
+
+    if (adminsResult?.success === 1) {
+      setAdminData({
+        ...adminData,
+        admins: adminsResult.data,
+      });
     }
 
     toast.success(results.message || "Admin created successfully!");
+    return true;
   };
 
   const _createAgent = async () => {
@@ -837,7 +833,7 @@ export default function AdminContextProvider(props) {
 
     if (validate.status === false) {
       toast.warning(validate.mesg);
-      return;
+      return false;
     }
 
     setLoading(true);
@@ -848,7 +844,7 @@ export default function AdminContextProvider(props) {
     if (results === undefined || results.success === 0) {
       setLoading(false);
       toast.error(results?.message || "Failed to create agent");
-      return;
+      return false;
     }
 
     const getData = await _fetchAgents();
@@ -862,7 +858,7 @@ export default function AdminContextProvider(props) {
         agents: [],
       });
 
-      return;
+      return false;
     }
 
     setAdminData({
@@ -871,6 +867,7 @@ export default function AdminContextProvider(props) {
     });
 
     toast.success("Agent created successfully!");
+    return true;
   };
 
   const _changePass = async (key) => {
@@ -1069,18 +1066,18 @@ export default function AdminContextProvider(props) {
 
     if (validate.status === false) {
       toast.warning(validate.mesg);
-      return;
+      return false;
     }
 
     setLoading(true);
 
     const results = await _addProperty(adminData.property);
 
-    _cancelAdd();
+    _cancelProperty();
     if (results === undefined || results.success === 0) {
       setLoading(false);
       toast.error(results?.message || "Failed to create property");
-      return;
+      return false;
     }
 
     const getData = await _fetchProperties();
@@ -1094,7 +1091,7 @@ export default function AdminContextProvider(props) {
         properties: [],
       });
 
-      return;
+      return false;
     }
 
     var pend = [];
@@ -1111,6 +1108,7 @@ export default function AdminContextProvider(props) {
     });
 
     toast.success("Property added successfully!");
+    return true;
   };
 
   const _findAndRouteToAgent = (_id) => {
@@ -1201,24 +1199,25 @@ export default function AdminContextProvider(props) {
   const _saveSettings = async (settingsData) => {
     try {
       setLoading(true);
-      const response = await fetch(adminUrl + 'settings', {
-        method: 'POST',
+      const response = await fetch(`${settingsUrl}update`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(settingsData)
+        body: JSON.stringify(normalizeSiteSettings(settingsData))
       });
 
       const result = await response.json();
 
       if (result.success === 1) {
-        setAdminData({
-          ...adminData,
-          settings: settingsData
-        });
+        setAdminData((prev) => ({
+          ...prev,
+          settings: normalizeSiteSettings(result.data || settingsData),
+        }));
 
         // Use toast notification instead of Notify component
         toast.success("Settings saved successfully!");
+        return true;
       } else {
         throw new Error(result.message || 'Failed to save settings');
       }
@@ -1226,6 +1225,7 @@ export default function AdminContextProvider(props) {
       console.error("Error saving settings:", error);
       // Use toast notification instead of Notify component
       toast.error(error.message || "Failed to save settings. Please try again.");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -1235,20 +1235,21 @@ export default function AdminContextProvider(props) {
   const _fetchSettings = async () => {
     try {
       setLoading(true);
-      const response = await fetch(adminUrl + 'settings');
+      const response = await fetch(`${settingsUrl}getSettings`);
       const result = await response.json();
 
-      if (result.success === 1 && result.settings) {
-        setAdminData({
-          ...adminData,
-          settings: result.settings
-        });
-        toast.success("Settings loaded successfully");
+      if (result.success === 1 && result.data) {
+        setAdminData((prev) => ({
+          ...prev,
+          settings: normalizeSiteSettings(result.data),
+        }));
+        return true;
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
       // Use toast notification instead of Notify component
       toast.error('Failed to load settings. Please refresh the page.');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -1271,6 +1272,7 @@ export default function AdminContextProvider(props) {
         _unblockAgent,
         _removeAgent,
         _createProperty,
+        _cancelProperty,
         _resetDetails,
         _findAndRouteToAgent,
         _handleCategory,

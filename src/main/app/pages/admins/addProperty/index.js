@@ -4,17 +4,51 @@ import Notify from "../../../../components/notification";
 import ImageUpload from "../../../../components/uploadImage";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
+import {
+  getCityOptions,
+  getCountryConfig,
+  getCurrencyOptions,
+  getProvinceOptions,
+  getSuburbOptions,
+} from "../../../../libs/data/siteSettings";
 
-export default function AddProp() {
-  const { _handleChange, adminData, _createProperty } =
+export default function AddProp({ isModal = false, onClose }) {
+  const { _handleChange, adminData, _createProperty, _cancelProperty } =
     useContext(AdminContext);
   const { loading } = useContext(AuthContext);
+  const selectedCountry = adminData.property.country;
+  const selectedProvince = adminData.property.province;
+  const selectedCity = adminData.property.city;
+  const selectedCountryConfig = getCountryConfig(adminData.settings, selectedCountry);
+  const provinceOptions = getProvinceOptions(adminData.settings, selectedCountry);
+  const cityOptions = getCityOptions(adminData.settings, selectedCountry, selectedProvince);
+  const suburbOptions = getSuburbOptions(
+    adminData.settings,
+    selectedCountry,
+    selectedProvince,
+    selectedCity
+  );
+  const currencyOptions = getCurrencyOptions(adminData.settings, selectedCountry);
+  const handleSubmit = async () => {
+    const created = await _createProperty();
+
+    if (created && onClose) {
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    _cancelProperty();
+    if (onClose) {
+      onClose();
+    }
+  };
 
   return (
-    <div className="container-fluid internal-form-page">
-      <div className="row clearfix">
-        <div className="col-lg-12">
-          <div className="card internal-form-shell">
+    <div className={`${isModal ? "" : "container-fluid "}internal-form-page`}>
+      <div className={isModal ? "" : "row clearfix"}>
+        <div className={isModal ? "" : "col-lg-12"}>
+          <div className={`${isModal ? "" : "card "}internal-form-shell`}>
             <Notify />
             <div className="header internal-form-header">
               <h2>
@@ -76,6 +110,7 @@ export default function AddProp() {
                   <div className="form-group">
                     <select
                       className="form-control"
+                      value={adminData.property.propType || ""}
                       onChange={(e) =>
                         _handleChange({
                           field: "propType",
@@ -86,21 +121,11 @@ export default function AddProp() {
                       <option className="form-control" value="">
                         Select property type
                       </option>
-                      <option className="form-control" value="Single room">
-                        Single room
-                      </option>
-                      <option className="form-control" value="Apartment">
-                        Apartment
-                      </option>
-                      <option className="form-control" value="Full house">
-                        Full house
-                      </option>
-                      <option className="form-control" value="Office">
-                        Office
-                      </option>
-                      <option className="form-control" value="Shop">
-                        Shop
-                      </option>
+                      {(adminData.settings?.property?.propertyTypes || []).map((type) => (
+                        <option className="form-control" value={type} key={type}>
+                          {type}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -129,6 +154,7 @@ export default function AddProp() {
                   <div className="form-group">
                     <select
                       className="form-control"
+                      value={adminData.property.country || ""}
                       onChange={(e) =>
                         _handleChange({
                           field: "country",
@@ -141,11 +167,9 @@ export default function AddProp() {
                       </option>
                       {adminData.settings?.location?.countries?.map((country) => (
                         <option key={country.id} value={country.name}>
-                          {country.name}
+                          {country.name} ({country.phoneCode})
                         </option>
-                      )) || (
-                        <option value="Ghana">Ghana</option>
-                      )}
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -153,6 +177,8 @@ export default function AddProp() {
                   <div className="form-group">
                     <select
                       className="form-control"
+                      value={adminData.property.province || ""}
+                      disabled={!selectedCountry}
                       onChange={(e) =>
                         _handleChange({
                           field: "province",
@@ -163,63 +189,56 @@ export default function AddProp() {
                       <option className="form-control" value="">
                         Select Province/State
                       </option>
-                      {adminData.settings?.location?.provinces
-                        ?.filter(province => {
-                          // If a country is selected, filter provinces by that country
-                          if (adminData.property.country) {
-                            const countryObj = adminData.settings.location.countries.find(
-                              c => c.name === adminData.property.country
-                            );
-                            return countryObj ? province.countryId === countryObj.id : true;
-                          }
-                          return true;
-                        })
-                        .map((province) => (
-                          <option key={province.id} value={province.name}>
-                            {province.name}
-                          </option>
-                        )) || (
-                          <>
-                            <option value="Greater Accra">Greater Accra</option>
-                            <option value="Ashanti">Ashanti</option>
-                            <option value="Western">Western</option>
-                            <option value="Eastern">Eastern</option>
-                            <option value="Central">Central</option>
-                          </>
-                        )}
+                      {provinceOptions.map((province) => (
+                        <option key={province.id} value={province.name}>
+                          {province.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
                 <div className="col-sm-3">
                   <div className="form-group">
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
-                      placeholder="City"
                       value={adminData.property.city || ""}
+                      disabled={!selectedProvince}
                       onChange={(e) =>
                         _handleChange({
                           field: "city",
                           value: e.target.value,
                         })
                       }
-                    />
+                    >
+                      <option value="">Select City</option>
+                      {cityOptions.map((city) => (
+                        <option key={city.id} value={city.name}>
+                          {city.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <div className="col-sm-3">
                   <div className="form-group">
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
-                      placeholder="Suburb/Neighborhood"
                       value={adminData.property.suburb || ""}
+                      disabled={!selectedCity}
                       onChange={(e) =>
                         _handleChange({
                           field: "suburb",
                           value: e.target.value,
                         })
                       }
-                    />
+                    >
+                      <option value="">Select Suburb/Neighborhood</option>
+                      {suburbOptions.map((suburb) => (
+                        <option key={suburb} value={suburb}>
+                          {suburb}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -230,6 +249,7 @@ export default function AddProp() {
                   <div className="form-group">
                     <select
                       className="form-control"
+                      value={adminData.property.rentOrSale || ""}
                       onChange={(e) =>
                         _handleChange({
                           field: "rentOrSale",
@@ -251,10 +271,38 @@ export default function AddProp() {
                 </div>
                 <div className="col-sm-3">
                   <div className="form-group">
+                    <select
+                      className="form-control"
+                      value={adminData.property.currency || ""}
+                      disabled={!selectedCountry}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "currency",
+                          value: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Select Currency</option>
+                      {currencyOptions.map((currency) => (
+                        <option key={currency} value={currency}>
+                          {currency}
+                        </option>
+                      ))}
+                    </select>
+                    {selectedCountryConfig && (
+                      <small style={{ fontSize: "12px", marginLeft: "10px" }}>
+                        {selectedCountryConfig.name} listings can use{" "}
+                        {currencyOptions.join(" or ")}
+                      </small>
+                    )}
+                  </div>
+                </div>
+                <div className="col-sm-3">
+                  <div className="form-group">
                     <input
                       type="number"
                       className="form-control"
-                      placeholder="Price / Rent (GH)"
+                      placeholder={`Price (${adminData.property.currency || "Currency"})`}
                       value={adminData.property.price}
                       onChange={(e) =>
                         _handleChange({
@@ -660,13 +708,22 @@ export default function AddProp() {
                   {loading ? (
                     <Loader />
                   ) : (
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-round internal-primary-btn"
-                      onClick={_createProperty}
-                    >
-                      Submit
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-round internal-primary-btn"
+                        onClick={handleSubmit}
+                      >
+                        Submit
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-default btn-round btn-simple internal-secondary-btn"
+                        onClick={handleClose}
+                      >
+                        Cancel
+                      </button>
+                    </>
                   )}
                 </div>
               </div>

@@ -163,6 +163,13 @@ export default function PaymentHistory() {
     setSearchTerm('');
     setDateRange({ from: '', to: '' });
   };
+
+  const totalCompleted = payments
+    .filter((payment) => payment.status === "completed")
+    .reduce((sum, payment) => sum + payment.amount, 0);
+  const totalPending = payments
+    .filter((payment) => payment.status === "pending")
+    .reduce((sum, payment) => sum + payment.amount, 0);
   
   return (
     <div className="row clearfix">
@@ -172,6 +179,32 @@ export default function PaymentHistory() {
             <h2><strong>Payment</strong> History</h2>
           </div>
           <div className="body">
+            <div className="row mb-4">
+              <div className="col-lg-4 col-md-6">
+                <div className="card bg-success text-white">
+                  <div className="body">
+                    <h4 className="mt-0 mb-0">{formatCurrency(totalCompleted, "GHC")}</h4>
+                    <p className="mb-0">Completed Payments</p>
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6">
+                <div className="card bg-warning text-white">
+                  <div className="body">
+                    <h4 className="mt-0 mb-0">{formatCurrency(totalPending, "GHC")}</h4>
+                    <p className="mb-0">Pending Payments</p>
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-4 col-md-6">
+                <div className="card bg-primary text-white">
+                  <div className="body">
+                    <h4 className="mt-0 mb-0">{agentState.properties?.length || 0}</h4>
+                    <p className="mb-0">Properties Under Account</p>
+                  </div>
+                </div>
+              </div>
+            </div>
             {/* Filters */}
             <div className="row mb-3">
               <div className="col-md-4">
