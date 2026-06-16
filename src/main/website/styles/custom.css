@@ -485,7 +485,7 @@ a {
 
 .page-hero-content {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 1.5rem;
   padding: 2.5rem 2.75rem;
@@ -521,6 +521,14 @@ a {
 .detail-price-block strong {
   display: block;
   font-size: 1.9rem;
+}
+
+.detail-price-block small {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--text-soft);
+  font-size: 0.84rem;
+  font-weight: 600;
 }
 
 .detail-price-block span,
@@ -685,6 +693,11 @@ a {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  gap: 0.18rem;
+}
+
+.property-price-group-start {
+  align-items: flex-start;
 }
 
 .property-price-note {

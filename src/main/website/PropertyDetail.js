@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { _fetchProperties } from "../libs/functions/fetches";
-import { formatPriceWithCurrency } from "../libs/data/siteSettings";
+import { formatPriceWithCurrency, getDisplayCurrency } from "../libs/data/siteSettings";
 import { resolveImageUrl } from "../libs/functions/images";
 import useSiteSettings from "../libs/hooks/useSiteSettings";
 import Header from "./components/Header";
@@ -17,7 +17,6 @@ export default function PropertyDetail() {
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(null);
   const { siteSettings } = useSiteSettings();
-  const defaultDisplayCurrency = siteSettings.general.defaultCurrency || "USD";
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -83,6 +82,10 @@ export default function PropertyDetail() {
     { label: "Master Bedroom", enabled: property?.others?.masterBedroom },
     { label: "Dining Room", enabled: property?.others?.diningRoom },
   ];
+  const localDisplayCurrency = getDisplayCurrency(siteSettings, property?.country);
+  const showOriginalPrice =
+    property?.currency &&
+    String(property.currency).toUpperCase() !== String(localDisplayCurrency).toUpperCase();
 
   if (loading) {
     return (
@@ -134,13 +137,14 @@ export default function PropertyDetail() {
               </p>
             </div>
             <div className="detail-price-block">
-              <strong>{formatPriceWithCurrency(property.price, property.currency, siteSettings)}</strong>
-              {property.currency && property.currency !== defaultDisplayCurrency ? (
+              <strong>
+                {formatPriceWithCurrency(property.price, property.currency, siteSettings, {
+                  displayCurrency: localDisplayCurrency,
+                })}
+              </strong>
+              {showOriginalPrice ? (
                 <small>
-                  Approx.{" "}
-                  {formatPriceWithCurrency(property.price, property.currency, siteSettings, {
-                    displayCurrency: defaultDisplayCurrency,
-                  })}
+                  Original {formatPriceWithCurrency(property.price, property.currency, siteSettings)}
                 </small>
               ) : null}
               <span>For {property.rentOrSale || "listing"}</span>

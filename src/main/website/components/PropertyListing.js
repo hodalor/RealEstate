@@ -3,9 +3,13 @@ import { Link } from "react-router-dom";
 import { resolveImageUrl } from "../../libs/functions/images";
 import {
   convertPrice,
+  detectVisitorCountry,
+  findLocationHierarchyByCity,
   formatPriceWithCurrency,
+  getBudgetOptions,
   getCityOptions,
-  getProvinceOptions,
+  getDisplayCurrency,
+  getEnabledCountries,
 } from "../../libs/data/siteSettings";
 import useSiteSettings from "../../libs/hooks/useSiteSettings";
 
@@ -23,8 +27,7 @@ const defaultFilter = {
   hasCarPark: false,
 };
 
-const getPriceValue = (price) =>
-  parseFloat(String(price || "0").replace(/[^0-9.]/g, "")) || 0;
+const normalizeValue = (value) => String(value || "").trim().toLowerCase();
 
 export default function PropertyListing({
   featured = false,
@@ -35,7 +38,53 @@ export default function PropertyListing({
   const [filter, setFilter] = useState(defaultFilter);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const { siteSettings } = useSiteSettings();
-  const defaultDisplayCurrency = siteSettings.general.defaultCurrency || "USD";
+  const enabledCountries = useMemo(() => getEnabledCountries(siteSettings), [siteSettings]);
+  const visitorCountry = detectVisitorCountry(siteSettings);
+  const selectedCountryConfig = useMemo(
+    () =>
+      filter.country
+        ? enabledCountries.find(
+            (country) => normalizeValue(country.name) === normalizeValue(filter.country)
+          ) || null
+        : null,
+    [enabledCountries, filter.country]
+  );
+  const selectedCountryProperties = useMemo(
+    () =>
+      filter.country
+        ? properties.filter(
+            (property) => normalizeValue(property.country) === normalizeValue(filter.country)
+          )
+        : [],
+    [filter.country, properties]
+  );
+  const inferredCountryCurrency = useMemo(() => {
+    if (!filter.country) {
+      return "";
+    }
+
+    const currencies = selectedCountryProperties
+      .map((property) => String(property.currency || "").trim().toUpperCase())
+      .filter(Boolean);
+
+    return currencies[0] || "";
+  }, [filter.country, selectedCountryProperties]);
+  const budgetCurrency =
+    selectedCountryConfig?.defaultCurrency ||
+    inferredCountryCurrency ||
+    getDisplayCurrency(siteSettings, filter.country || visitorCountry);
+  const selectedProvinceOptions = useMemo(
+    () => selectedCountryConfig?.provinces || [],
+    [selectedCountryConfig]
+  );
+  const selectedCityOptions = useMemo(
+    () => (filter.country ? getCityOptions(siteSettings, filter.country, filter.province) : []),
+    [filter.country, filter.province, siteSettings]
+  );
+  const budgetOptions = useMemo(
+    () => getBudgetOptions(siteSettings, filter.country || visitorCountry),
+    [filter.country, siteSettings, visitorCountry]
+  );
 
   useEffect(() => {
     if (!isMobileFiltersOpen) {
@@ -52,38 +101,34 @@ export default function PropertyListing({
 
   const locationData = useMemo(
     () => {
-      const configuredCountries = siteSettings.location.countries.map((country) => country.name);
-      const propertyCountries = properties.map((item) => item.country).filter(Boolean);
-      const configuredProvinces = filter.country
-        ? getProvinceOptions(siteSettings, filter.country).map((province) => province.name)
-        : siteSettings.location.countries.flatMap((country) =>
-            (country.provinces || []).map((province) => province.name)
-          );
-      const propertyProvinces = properties
-        .filter((item) => !filter.country || item.country === filter.country)
-        .map((item) => item.province)
+      const configuredCountries = enabledCountries.map((country) => country.name);
+      const propertyCountries = properties.map((property) => property.country).filter(Boolean);
+      const propertyProvinces = selectedCountryProperties
+        .map((property) => property.province || property.region)
         .filter(Boolean);
-      const configuredCities =
-        filter.country && filter.province
-          ? getCityOptions(siteSettings, filter.country, filter.province).map((city) => city.name)
-          : siteSettings.location.countries.flatMap((country) =>
-              (country.provinces || []).flatMap((province) =>
-                (province.cities || []).map((city) => city.name)
-              )
-            );
-      const propertyCities = properties
-        .filter((item) => (!filter.country || item.country === filter.country))
-        .filter((item) => (!filter.province || item.province === filter.province))
-        .map((item) => item.city)
+      const propertyCities = selectedCountryProperties
+        .filter(
+          (property) =>
+            !filter.province ||
+            normalizeValue(property.province || property.region) === normalizeValue(filter.province)
+        )
+        .map((property) => property.city)
         .filter(Boolean);
 
       return {
         countries: [...new Set([...configuredCountries, ...propertyCountries])].sort(),
-        provinces: [...new Set([...configuredProvinces, ...propertyProvinces])].sort(),
-        cities: [...new Set([...configuredCities, ...propertyCities])].sort(),
+        provinces: [
+          ...new Set([
+            ...selectedProvinceOptions.map((province) => province.name),
+            ...propertyProvinces,
+          ]),
+        ].sort(),
+        cities: [
+          ...new Set([...selectedCityOptions.map((city) => city.name), ...propertyCities]),
+        ].sort(),
       };
     },
-    [filter.country, filter.province, properties, siteSettings]
+    [enabledCountries, filter.province, properties, selectedCityOptions, selectedCountryProperties, selectedProvinceOptions]
   );
 
   const handleFilterChange = (event) => {
@@ -97,6 +142,7 @@ export default function PropertyListing({
           country: nextValue,
           province: "",
           city: "",
+          priceRange: "",
         };
       }
 
@@ -105,6 +151,23 @@ export default function PropertyListing({
           ...current,
           province: nextValue,
           city: "",
+        };
+      }
+
+      if (name === "city") {
+        if (!nextValue) {
+          return {
+            ...current,
+            city: "",
+          };
+        }
+
+        const hierarchy = findLocationHierarchyByCity(siteSettings, nextValue, current.country);
+        return {
+          ...current,
+          country: current.country || hierarchy?.countryName || current.country,
+          province: hierarchy?.provinceName || current.province,
+          city: nextValue,
         };
       }
 
@@ -125,7 +188,9 @@ export default function PropertyListing({
           property.name,
           property.digitalAddress,
           property.propDescription,
+          property.province,
           property.city,
+          property.suburb,
           property.country,
         ]
           .filter(Boolean)
@@ -149,8 +214,8 @@ export default function PropertyListing({
 
         const price = convertPrice(
           property.price,
-          property.currency || defaultDisplayCurrency,
-          defaultDisplayCurrency,
+          property.currency || budgetCurrency,
+          budgetCurrency,
           siteSettings
         );
 
@@ -167,15 +232,23 @@ export default function PropertyListing({
         return false;
       }
 
-      if (filter.country && property.country !== filter.country) {
+      if (filter.country && normalizeValue(property.country) !== normalizeValue(filter.country)) {
         return false;
       }
 
-      if (filter.province && property.province !== filter.province) {
+      if (
+        filter.country &&
+        selectedCountryConfig &&
+        normalizeValue(property.country) !== normalizeValue(selectedCountryConfig.name)
+      ) {
         return false;
       }
 
-      if (filter.city && property.city !== filter.city) {
+      if (filter.province && normalizeValue(property.province) !== normalizeValue(filter.province)) {
+        return false;
+      }
+
+      if (filter.city && normalizeValue(property.city) !== normalizeValue(filter.city)) {
         return false;
       }
 
@@ -199,10 +272,18 @@ export default function PropertyListing({
         result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
         break;
       case "priceLowToHigh":
-        result.sort((a, b) => getPriceValue(a.price) - getPriceValue(b.price));
+        result.sort(
+          (a, b) =>
+            convertPrice(a.price, a.currency || budgetCurrency, budgetCurrency, siteSettings) -
+            convertPrice(b.price, b.currency || budgetCurrency, budgetCurrency, siteSettings)
+        );
         break;
       case "priceHighToLow":
-        result.sort((a, b) => getPriceValue(b.price) - getPriceValue(a.price));
+        result.sort(
+          (a, b) =>
+            convertPrice(b.price, b.currency || budgetCurrency, budgetCurrency, siteSettings) -
+            convertPrice(a.price, a.currency || budgetCurrency, budgetCurrency, siteSettings)
+        );
         break;
       case "bedroomsHighToLow":
         result.sort((a, b) => (b.others?.noOfBedrooms || 0) - (a.others?.noOfBedrooms || 0));
@@ -216,7 +297,7 @@ export default function PropertyListing({
     }
 
     return featured && limit > 0 ? result.slice(0, limit) : result;
-  }, [defaultDisplayCurrency, featured, filter, limit, properties, siteSettings]);
+  }, [budgetCurrency, featured, filter, limit, properties, selectedCountryConfig, siteSettings]);
 
   const visibleProperties = filteredProperties;
   const filterContent = (
@@ -253,13 +334,12 @@ export default function PropertyListing({
             value={filter.priceRange}
             onChange={handleFilterChange}
           >
-            <option value="">Budget ({defaultDisplayCurrency})</option>
-            <option value="0-50000">Under 50,000</option>
-            <option value="50000-100000">50,000 - 100,000</option>
-            <option value="100000-250000">100,000 - 250,000</option>
-            <option value="250000-500000">250,000 - 500,000</option>
-            <option value="500000-1000000">500,000 - 1,000,000</option>
-            <option value="1000000-">Above 1,000,000</option>
+            <option value="">Budget ({budgetCurrency})</option>
+            {budgetOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -322,7 +402,7 @@ export default function PropertyListing({
             value={filter.province}
             onChange={handleFilterChange}
           >
-            <option value="">Province</option>
+            <option value="">Province / Region</option>
             {locationData.provinces.map((province) => (
               <option key={province} value={province}>
                 {province}
@@ -413,7 +493,7 @@ export default function PropertyListing({
             <div>
               <h3>Filter properties faster</h3>
               <p className="filter-currency-note">
-                Budget compares all prices in {defaultDisplayCurrency}
+                Budget compares all prices in {budgetCurrency}
               </p>
             </div>
             <div className="filter-shell-actions">
@@ -474,18 +554,31 @@ export default function PropertyListing({
                       {property.city || property.digitalAddress || "Location not specified"}
                     </span>
                     <div className="property-price-group">
-                      <strong className="property-price">
-                        {formatPriceWithCurrency(property.price, property.currency, siteSettings)}
-                      </strong>
-                      {property.currency &&
-                      property.currency !== defaultDisplayCurrency ? (
-                        <small className="property-price-note">
-                          Approx.{" "}
-                          {formatPriceWithCurrency(property.price, property.currency, siteSettings, {
-                            displayCurrency: defaultDisplayCurrency,
-                          })}
-                        </small>
-                      ) : null}
+                      {(() => {
+                        const localCurrency = getDisplayCurrency(
+                          siteSettings,
+                          filter.country || property.country || visitorCountry
+                        );
+                        const showOriginalPrice =
+                          property.currency &&
+                          String(property.currency).toUpperCase() !== String(localCurrency).toUpperCase();
+
+                        return (
+                          <>
+                            <strong className="property-price">
+                              {formatPriceWithCurrency(property.price, property.currency, siteSettings, {
+                                displayCurrency: localCurrency,
+                              })}
+                            </strong>
+                            {showOriginalPrice ? (
+                              <small className="property-price-note">
+                                Original{" "}
+                                {formatPriceWithCurrency(property.price, property.currency, siteSettings)}
+                              </small>
+                            ) : null}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
 

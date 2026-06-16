@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { _fetchProperties } from "../libs/functions/fetches";
-import { formatPriceWithCurrency } from "../libs/data/siteSettings";
+import { formatPriceWithCurrency, getDisplayCurrency } from "../libs/data/siteSettings";
 import { resolveImageUrl } from "../libs/functions/images";
 import useSiteSettings from "../libs/hooks/useSiteSettings";
 
@@ -279,9 +279,21 @@ export default function HomePage() {
                           </div>
 
                           <h4>{property.name}</h4>
-                          <strong className="property-price">
-                            {formatPriceWithCurrency(property.price, property.currency)}
-                          </strong>
+                          <div className="property-price-group property-price-group-start">
+                            <strong className="property-price">
+                              {formatPriceWithCurrency(property.price, property.currency, siteSettings, {
+                                displayCurrency: getDisplayCurrency(siteSettings, property.country),
+                              })}
+                            </strong>
+                            {property.currency &&
+                            String(property.currency).toUpperCase() !==
+                              String(getDisplayCurrency(siteSettings, property.country)).toUpperCase() ? (
+                              <small className="property-price-note">
+                                Original{" "}
+                                {formatPriceWithCurrency(property.price, property.currency, siteSettings)}
+                              </small>
+                            ) : null}
+                          </div>
 
                           <div className="property-card-facts">
                             <span>

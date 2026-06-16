@@ -116,6 +116,7 @@ export default function Settings() {
           {
             id: countryId,
             name: newCountry.name.trim(),
+            enabled: true,
             isoCode: newCountry.isoCode.trim().toUpperCase(),
             phoneCode: newCountry.phoneCode.trim(),
             defaultCurrency: newCountry.defaultCurrency.trim().toUpperCase(),
@@ -144,6 +145,23 @@ export default function Settings() {
       location: {
         ...prev.location,
         countries: prev.location.countries.filter(c => c.id !== id),
+      },
+    }));
+  };
+
+  const toggleCountryEnabled = (id) => {
+    updateSettings((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        countries: prev.location.countries.map((country) =>
+          country.id !== id
+            ? country
+            : {
+                ...country,
+                enabled: country.enabled === false,
+              }
+        ),
       },
     }));
   };
@@ -445,6 +463,8 @@ export default function Settings() {
       )
     )
   );
+  const availableCountries = settings.location.countries.filter((country) => country.enabled !== false);
+  const defaultCountryOptions = availableCountries.length > 0 ? availableCountries : settings.location.countries;
 
   return (
     <>
@@ -577,7 +597,7 @@ export default function Settings() {
                             value={settings.general.defaultCountry}
                             onChange={handleGeneralSettingsChange}
                           >
-                            {settings.location.countries.map((country) => (
+                            {defaultCountryOptions.map((country) => (
                               <option key={country.id} value={country.name}>
                                 {country.name}
                               </option>
@@ -642,22 +662,41 @@ export default function Settings() {
                               <thead>
                                 <tr>
                                   <th>Country Name</th>
+                                  <th>Status</th>
                                   <th>ISO</th>
                                   <th>Phone Code</th>
                                   <th>Default Currency</th>
                                   <th>Allowed Currencies</th>
-                                  <th width="100">Action</th>
+                                  <th width="220">Action</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {settings.location.countries.map((country) => (
                                   <tr key={country.id}>
                                     <td>{country.name}</td>
+                                    <td>
+                                      <span
+                                        className={`badge ${
+                                          country.enabled === false ? "badge-secondary" : "badge-success"
+                                        }`}
+                                      >
+                                        {country.enabled === false ? "Disabled" : "Enabled"}
+                                      </span>
+                                    </td>
                                     <td>{country.isoCode}</td>
                                     <td>{country.phoneCode}</td>
                                     <td>{country.defaultCurrency}</td>
                                     <td>{(country.allowedCurrencies || []).join(", ")}</td>
                                     <td>
+                                      <button
+                                        type="button"
+                                        className={`btn btn-sm m-r-5 ${
+                                          country.enabled === false ? "btn-success" : "btn-warning"
+                                        }`}
+                                        onClick={() => toggleCountryEnabled(country.id)}
+                                      >
+                                        {country.enabled === false ? "Enable" : "Disable"}
+                                      </button>
                                       <button
                                         type="button"
                                         className="btn btn-sm btn-danger"

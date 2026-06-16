@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Loader from "../../components/loader";
 import Notify from "../../components/notification";
 import { AuthContext } from "../../libs/contexts/authContext";
-import { detectVisitorCountry } from "../../libs/data/siteSettings";
+import { detectVisitorCountry, getEnabledCountries } from "../../libs/data/siteSettings";
 import useSiteSettings from "../../libs/hooks/useSiteSettings";
 
 export default function Register() {
@@ -11,6 +11,7 @@ export default function Register() {
     useContext(AuthContext);
   const { siteSettings } = useSiteSettings();
   const siteName = siteSettings.general.siteName || "LEDS PROPERTIES";
+  const availableCountries = getEnabledCountries(siteSettings);
 
   useEffect(() => {
     if (!authState.country) {
@@ -148,7 +149,7 @@ export default function Register() {
                             }
                           >
                             <option value="">Select country</option>
-                            {siteSettings.location.countries.map((country) => (
+                            {availableCountries.map((country) => (
                               <option key={country.id} value={country.name}>
                                 {country.name}
                               </option>

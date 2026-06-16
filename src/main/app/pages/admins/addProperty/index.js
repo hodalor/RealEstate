@@ -7,6 +7,7 @@ import { AuthContext } from "../../../../libs/contexts/authContext";
 import {
   getCityOptions,
   getCountryConfig,
+  getEnabledCountries,
   getCurrencyOptions,
   getProvinceOptions,
   getSuburbOptions,
@@ -20,6 +21,7 @@ export default function AddProp({ isModal = false, onClose }) {
   const selectedProvince = adminData.property.province;
   const selectedCity = adminData.property.city;
   const selectedCountryConfig = getCountryConfig(adminData.settings, selectedCountry);
+  const availableCountries = getEnabledCountries(adminData.settings);
   const provinceOptions = getProvinceOptions(adminData.settings, selectedCountry);
   const cityOptions = getCityOptions(adminData.settings, selectedCountry, selectedProvince);
   const suburbOptions = getSuburbOptions(
@@ -165,7 +167,7 @@ export default function AddProp({ isModal = false, onClose }) {
                       <option className="form-control" value="">
                         Select Country
                       </option>
-                      {adminData.settings?.location?.countries?.map((country) => (
+                      {availableCountries.map((country) => (
                         <option key={country.id} value={country.name}>
                           {country.name} ({country.phoneCode})
                         </option>

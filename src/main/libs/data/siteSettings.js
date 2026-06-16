@@ -16,6 +16,7 @@ const defaultSiteSettings = {
       {
         id: "ghana",
         name: "Ghana",
+        enabled: true,
         isoCode: "GH",
         phoneCode: "+233",
         defaultCurrency: "GHS",
@@ -55,6 +56,7 @@ const defaultSiteSettings = {
       {
         id: "zambia",
         name: "Zambia",
+        enabled: true,
         isoCode: "ZM",
         phoneCode: "+260",
         defaultCurrency: "ZMW",
@@ -142,53 +144,105 @@ const defaultSiteSettings = {
 };
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
+const ensureArray = (value, fallback = []) => (Array.isArray(value) ? value : clone(fallback));
 
-const normalizeSiteSettings = (settings = {}) => ({
-  general: {
+const normalizeCity = (city, provinceId = "province") => ({
+  id: city?.id || `${provinceId}-${String(city?.name || "city").toLowerCase().replace(/\s+/g, "-")}`,
+  name: city?.name || "",
+  suburbs: ensureArray(city?.suburbs).filter(Boolean),
+});
+
+const normalizeProvince = (province, countryId = "country") => ({
+  id:
+    province?.id ||
+    `${countryId}-${String(province?.name || "province").toLowerCase().replace(/\s+/g, "-")}`,
+  name: province?.name || "",
+  cities: ensureArray(province?.cities).map((city) => normalizeCity(city, province?.id || countryId)),
+});
+
+const normalizeCountry = (country, generalDefaults) => ({
+  id: country?.id || String(country?.name || "country").toLowerCase().replace(/\s+/g, "-"),
+  name: country?.name || "",
+  enabled: country?.enabled !== false,
+  isoCode: country?.isoCode || "",
+  phoneCode: country?.phoneCode || "",
+  defaultCurrency: String(
+    country?.defaultCurrency || generalDefaults.defaultCurrency || "USD"
+  ).toUpperCase(),
+  currencySymbol:
+    country?.currencySymbol ||
+    country?.defaultCurrency ||
+    generalDefaults.defaultCurrencySymbol ||
+    "$",
+  allowedCurrencies: Array.from(
+    new Set(
+      ensureArray(country?.allowedCurrencies, [
+        country?.defaultCurrency,
+        generalDefaults.defaultCurrency,
+      ])
+        .filter(Boolean)
+        .map((currency) => String(currency).toUpperCase())
+    )
+  ),
+  timezones: ensureArray(country?.timezones),
+  provinces: ensureArray(country?.provinces).map((province) =>
+    normalizeProvince(province, country?.id || country?.name || "country")
+  ),
+});
+
+const normalizeSiteSettings = (settings = {}) => {
+  const general = {
     ...clone(defaultSiteSettings.general),
     ...(settings.general || {}),
     currencyRates: {
       ...clone(defaultSiteSettings.general.currencyRates),
       ...(settings.general?.currencyRates || {}),
     },
-  },
-  location: {
-    countries: Array.isArray(settings.location?.countries)
-      ? settings.location.countries
-      : clone(defaultSiteSettings.location.countries),
-  },
-  property: {
-    ...clone(defaultSiteSettings.property),
-    ...(settings.property || {}),
-    propertyTypes: Array.isArray(settings.property?.propertyTypes)
-      ? settings.property.propertyTypes
-      : clone(defaultSiteSettings.property.propertyTypes),
-    amenities: Array.isArray(settings.property?.amenities)
-      ? settings.property.amenities
-      : clone(defaultSiteSettings.property.amenities),
-  },
-  content: {
-    ...clone(defaultSiteSettings.content),
-    ...(settings.content || {}),
-    hero: {
-      ...clone(defaultSiteSettings.content.hero),
-      ...(settings.content?.hero || {}),
+  };
+
+  return {
+    general,
+    location: {
+      countries: ensureArray(
+        settings.location?.countries,
+        defaultSiteSettings.location.countries
+      ).map((country) => normalizeCountry(country, general)),
     },
-    footer: {
-      ...clone(defaultSiteSettings.content.footer),
-      ...(settings.content?.footer || {}),
-      socialLinks: {
-        ...clone(defaultSiteSettings.content.footer.socialLinks),
-        ...(settings.content?.footer?.socialLinks || {}),
+    property: {
+      ...clone(defaultSiteSettings.property),
+      ...(settings.property || {}),
+      propertyTypes: Array.isArray(settings.property?.propertyTypes)
+        ? settings.property.propertyTypes
+        : clone(defaultSiteSettings.property.propertyTypes),
+      amenities: Array.isArray(settings.property?.amenities)
+        ? settings.property.amenities
+        : clone(defaultSiteSettings.property.amenities),
+    },
+    content: {
+      ...clone(defaultSiteSettings.content),
+      ...(settings.content || {}),
+      hero: {
+        ...clone(defaultSiteSettings.content.hero),
+        ...(settings.content?.hero || {}),
       },
+      footer: {
+        ...clone(defaultSiteSettings.content.footer),
+        ...(settings.content?.footer || {}),
+        socialLinks: {
+          ...clone(defaultSiteSettings.content.footer.socialLinks),
+          ...(settings.content?.footer?.socialLinks || {}),
+        },
+      },
+      advertisements: Array.isArray(settings.content?.advertisements)
+        ? settings.content.advertisements
+        : [],
     },
-    advertisements: Array.isArray(settings.content?.advertisements) ? settings.content.advertisements : [],
-  },
-  developer: {
-    ...clone(defaultSiteSettings.developer),
-    ...(settings.developer || {}),
-  },
-});
+    developer: {
+      ...clone(defaultSiteSettings.developer),
+      ...(settings.developer || {}),
+    },
+  };
+};
 
 const normalizeLegacyBranding = (settings = {}) => {
   const normalized = normalizeSiteSettings(settings);
@@ -208,18 +262,67 @@ const getCountryConfig = (settings, countryName) => {
   );
 };
 
+const getEnabledCountries = (settings) => {
+  const normalized = normalizeLegacyBranding(settings);
+  const enabledCountries = normalized.location.countries.filter((country) => country.enabled !== false);
+
+  return enabledCountries.length > 0 ? enabledCountries : normalized.location.countries;
+};
+
 const getProvinceOptions = (settings, countryName) =>
   getCountryConfig(settings, countryName)?.provinces || [];
 
-const getCityOptions = (settings, countryName, provinceName) =>
-  getProvinceOptions(settings, countryName).find(
-    (province) => province.name.toLowerCase() === String(provinceName || "").trim().toLowerCase()
-  )?.cities || [];
+const getCityOptions = (settings, countryName, provinceName) => {
+  const provinces = getProvinceOptions(settings, countryName);
+
+  if (provinceName) {
+    return (
+      provinces.find(
+        (province) =>
+          province.name.toLowerCase() === String(provinceName || "").trim().toLowerCase()
+      )?.cities || []
+    );
+  }
+
+  return provinces.flatMap((province) => province.cities || []);
+};
 
 const getSuburbOptions = (settings, countryName, provinceName, cityName) =>
   getCityOptions(settings, countryName, provinceName).find(
     (city) => city.name.toLowerCase() === String(cityName || "").trim().toLowerCase()
   )?.suburbs || [];
+
+const findLocationHierarchyByCity = (settings, cityName, countryName = "") => {
+  const targetCityName = String(cityName || "").trim().toLowerCase();
+  if (!targetCityName) {
+    return null;
+  }
+
+  const countries = countryName
+    ? [getCountryConfig(settings, countryName)].filter(Boolean)
+    : getEnabledCountries(settings);
+
+  for (const country of countries) {
+    for (const province of country.provinces || []) {
+      const matchedCity = (province.cities || []).find(
+        (city) => city.name.toLowerCase() === targetCityName
+      );
+
+      if (matchedCity) {
+        return {
+          countryId: country.id,
+          countryName: country.name,
+          provinceId: province.id,
+          provinceName: province.name,
+          cityId: matchedCity.id,
+          cityName: matchedCity.name,
+        };
+      }
+    }
+  }
+
+  return null;
+};
 
 const getCurrencyOptions = (settings, countryName) => {
   const normalized = normalizeLegacyBranding(settings);
@@ -234,12 +337,67 @@ const getCurrencyOptions = (settings, countryName) => {
   );
 };
 
+const getDisplayCurrency = (settings, countryName = "") => {
+  const normalized = normalizeLegacyBranding(settings);
+  const selectedCountry = countryName ? getCountryConfig(normalized, countryName) : null;
+  const detectedCountry = getCountryConfig(normalized, detectVisitorCountry(normalized));
+  const defaultCountry = getCountryConfig(normalized, normalized.general.defaultCountry);
+
+  return (
+    selectedCountry?.defaultCurrency ||
+    detectedCountry?.defaultCurrency ||
+    defaultCountry?.defaultCurrency ||
+    normalized.general.defaultCurrency ||
+    "USD"
+  );
+};
+
+const getBudgetOptions = (settings, countryName = "") => {
+  const displayCurrency = getDisplayCurrency(settings, countryName);
+  const baseRanges = [
+    { min: 0, max: 50000 },
+    { min: 50000, max: 100000 },
+    { min: 100000, max: 250000 },
+    { min: 250000, max: 500000 },
+    { min: 500000, max: 1000000 },
+    { min: 1000000, max: null },
+  ];
+
+  return baseRanges.map((range) => {
+    const convertedMin = Math.round(convertPrice(range.min, "USD", displayCurrency, settings));
+    const convertedMax =
+      range.max === null
+        ? null
+        : Math.round(convertPrice(range.max, "USD", displayCurrency, settings));
+
+    if (range.min === 0 && convertedMax !== null) {
+      return {
+        value: `0-${convertedMax}`,
+        label: `Under ${convertedMax.toLocaleString()}`,
+      };
+    }
+
+    if (convertedMax === null) {
+      return {
+        value: `${convertedMin}-`,
+        label: `Above ${convertedMin.toLocaleString()}`,
+      };
+    }
+
+    return {
+      value: `${convertedMin}-${convertedMax}`,
+      label: `${convertedMin.toLocaleString()} - ${convertedMax.toLocaleString()}`,
+    };
+  });
+};
+
 const detectVisitorCountry = (settings) => {
   const normalized = normalizeLegacyBranding(settings);
+  const enabledCountries = getEnabledCountries(normalized);
 
   if (typeof Intl !== "undefined") {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const matchedCountry = normalized.location.countries.find((country) =>
+    const matchedCountry = enabledCountries.find((country) =>
       (country.timezones || []).includes(timeZone)
     );
 
@@ -260,7 +418,12 @@ const detectVisitorCountry = (settings) => {
     }
   }
 
-  return normalized.general.defaultCountry;
+  const defaultCountryName = normalized.general.defaultCountry;
+  const enabledDefaultCountry = enabledCountries.find(
+    (country) => country.name.toLowerCase() === String(defaultCountryName || "").trim().toLowerCase()
+  );
+
+  return enabledDefaultCountry?.name || enabledCountries[0]?.name || defaultCountryName;
 };
 
 const getCurrencyRate = (settings, currency) => {
@@ -309,10 +472,14 @@ export {
   normalizeSiteSettings,
   normalizeLegacyBranding,
   getCountryConfig,
+  getEnabledCountries,
   getProvinceOptions,
   getCityOptions,
   getSuburbOptions,
+  findLocationHierarchyByCity,
   getCurrencyOptions,
+  getDisplayCurrency,
+  getBudgetOptions,
   detectVisitorCountry,
   getCurrencyRate,
   convertPrice,

@@ -4,11 +4,13 @@ import Notify from "../../../../components/notification";
 import ImageUpload from "../../../../components/uploadImage";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
+import { getEnabledCountries } from "../../../../libs/data/siteSettings";
 
 export default function AddAgent({ isModal = false, onClose }) {
   const { _handleChange, adminData, _cancelAdd, _createAgent } =
     useContext(AdminContext);
   const { loading } = useContext(AuthContext);
+  const availableCountries = getEnabledCountries(adminData.settings);
   const handleSubmit = async () => {
     const created = await _createAgent();
 
@@ -116,7 +118,7 @@ export default function AddAgent({ isModal = false, onClose }) {
                         }
                       >
                         <option value="">Select country</option>
-                        {adminData.settings?.location?.countries?.map((country) => (
+                        {availableCountries.map((country) => (
                           <option key={country.id} value={country.name}>
                             {country.name}
                           </option>
