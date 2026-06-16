@@ -1,10 +1,15 @@
 const defaultSiteSettings = {
   general: {
-    siteName: "BrightEstate",
+    siteName: "LEDS PROPERTIES",
     defaultLanguage: "English",
     defaultCurrency: "USD",
     defaultCurrencySymbol: "$",
     defaultCountry: "Ghana",
+    currencyRates: {
+      USD: 1,
+      GHS: 15.5,
+      ZMW: 26.8,
+    },
   },
   location: {
     countries: [
@@ -142,6 +147,10 @@ const normalizeSiteSettings = (settings = {}) => ({
   general: {
     ...clone(defaultSiteSettings.general),
     ...(settings.general || {}),
+    currencyRates: {
+      ...clone(defaultSiteSettings.general.currencyRates),
+      ...(settings.general?.currencyRates || {}),
+    },
   },
   location: {
     countries: Array.isArray(settings.location?.countries)
@@ -181,8 +190,19 @@ const normalizeSiteSettings = (settings = {}) => ({
   },
 });
 
-const getCountryConfig = (settings, countryName) => {
+const normalizeLegacyBranding = (settings = {}) => {
   const normalized = normalizeSiteSettings(settings);
+  const currentName = String(normalized.general.siteName || "").trim().toLowerCase();
+
+  if (currentName === "brightestate" || currentName === "hodalorestate") {
+    normalized.general.siteName = "LEDS PROPERTIES";
+  }
+
+  return normalized;
+};
+
+const getCountryConfig = (settings, countryName) => {
+  const normalized = normalizeLegacyBranding(settings);
   return normalized.location.countries.find(
     (country) => country.name.toLowerCase() === String(countryName || "").trim().toLowerCase()
   );
@@ -202,7 +222,7 @@ const getSuburbOptions = (settings, countryName, provinceName, cityName) =>
   )?.suburbs || [];
 
 const getCurrencyOptions = (settings, countryName) => {
-  const normalized = normalizeSiteSettings(settings);
+  const normalized = normalizeLegacyBranding(settings);
   const country = getCountryConfig(normalized, countryName);
 
   if (!country) {
@@ -215,7 +235,7 @@ const getCurrencyOptions = (settings, countryName) => {
 };
 
 const detectVisitorCountry = (settings) => {
-  const normalized = normalizeSiteSettings(settings);
+  const normalized = normalizeLegacyBranding(settings);
 
   if (typeof Intl !== "undefined") {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -243,19 +263,58 @@ const detectVisitorCountry = (settings) => {
   return normalized.general.defaultCountry;
 };
 
-const formatPriceWithCurrency = (price, currency = "USD") => {
+const getCurrencyRate = (settings, currency) => {
+  const normalized = normalizeLegacyBranding(settings);
+  const code = String(currency || normalized.general.defaultCurrency || "USD").toUpperCase();
+  const rate = Number(normalized.general.currencyRates?.[code]);
+
+  return rate > 0 ? rate : 1;
+};
+
+const convertPrice = (price, fromCurrency = "USD", toCurrency = "USD", settings = {}) => {
   const numericPrice = parseFloat(String(price || "0").replace(/[^0-9.]/g, "")) || 0;
-  return numericPrice ? `${currency} ${numericPrice.toLocaleString()}` : "Price on request";
+
+  if (!numericPrice) {
+    return 0;
+  }
+
+  const sourceRate = getCurrencyRate(settings, fromCurrency);
+  const targetRate = getCurrencyRate(settings, toCurrency);
+  const amountInUsd = numericPrice / sourceRate;
+
+  return amountInUsd * targetRate;
+};
+
+const formatPriceWithCurrency = (
+  price,
+  currency = "USD",
+  settings = {},
+  options = {}
+) => {
+  const normalized = normalizeLegacyBranding(settings);
+  const sourceCurrency = String(currency || normalized.general.defaultCurrency || "USD").toUpperCase();
+  const displayCurrency = String(
+    options.displayCurrency || sourceCurrency || normalized.general.defaultCurrency || "USD"
+  ).toUpperCase();
+  const numericPrice =
+    displayCurrency === sourceCurrency
+      ? parseFloat(String(price || "0").replace(/[^0-9.]/g, "")) || 0
+      : convertPrice(price, sourceCurrency, displayCurrency, normalized);
+
+  return numericPrice ? `${displayCurrency} ${numericPrice.toLocaleString()}` : "Price on request";
 };
 
 export {
   defaultSiteSettings,
   normalizeSiteSettings,
+  normalizeLegacyBranding,
   getCountryConfig,
   getProvinceOptions,
   getCityOptions,
   getSuburbOptions,
   getCurrencyOptions,
   detectVisitorCountry,
+  getCurrencyRate,
+  convertPrice,
   formatPriceWithCurrency,
 };

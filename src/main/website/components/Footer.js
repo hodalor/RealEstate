@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import useSiteSettings from "../../libs/hooks/useSiteSettings";
 
 const quickLinks = [
   { label: "Home", to: "/" },
@@ -16,6 +17,15 @@ const socialLinks = [
 ];
 
 export default function Footer() {
+  const { siteSettings } = useSiteSettings();
+  const siteName = siteSettings.general.siteName || "LEDS PROPERTIES";
+  const footerSettings = siteSettings.content.footer || {};
+  const footerSocialLinks = footerSettings.socialLinks || {};
+  const socialItems = socialLinks.map((social) => ({
+    ...social,
+    href: footerSocialLinks[social.label.toLowerCase()] || social.href,
+  }));
+
   return (
     <footer className="site-footer">
       <div className="container">
@@ -27,16 +37,13 @@ export default function Footer() {
                   <i className="fa fa-building" aria-hidden="true"></i>
                 </span>
                 <div>
-                  <h5>BrightEstate</h5>
-                  <p>
-                    A brighter, easier property experience for buyers, renters,
-                    and owners across every stage of the journey.
-                  </p>
+                  <h5>{siteName}</h5>
+                  <p>{footerSettings.aboutText}</p>
                 </div>
               </div>
 
               <div className="footer-socials">
-                {socialLinks.map((social) => (
+                {socialItems.map((social) => (
                   <a
                     key={social.label}
                     href={social.href}
@@ -66,17 +73,15 @@ export default function Footer() {
               <ul className="footer-links footer-contact">
                 <li>
                   <i className="fa fa-map-marker-alt" aria-hidden="true"></i>
-                  <span>East Legon, Accra</span>
+                  <span>{footerSettings.contactAddress}</span>
                 </li>
                 <li>
                   <i className="fa fa-phone" aria-hidden="true"></i>
-                  <a href="tel:+233123456789">+233 123 456 789</a>
+                  <a href={`tel:${footerSettings.contactPhone}`}>{footerSettings.contactPhone}</a>
                 </li>
                 <li>
                   <i className="fa fa-envelope" aria-hidden="true"></i>
-                  <a href="mailto:hello@brightestate.com">
-                    hello@brightestate.com
-                  </a>
+                  <a href={`mailto:${footerSettings.contactEmail}`}>{footerSettings.contactEmail}</a>
                 </li>
               </ul>
             </div>
@@ -101,7 +106,7 @@ export default function Footer() {
 
           <div className="footer-bottom">
             <small>
-              © {new Date().getFullYear()} BrightEstate. All rights reserved.
+              © {new Date().getFullYear()} {siteName}. All rights reserved.
             </small>
             <small>Built for a cleaner property discovery experience.</small>
           </div>

@@ -27,7 +27,7 @@ export default function TopBar() {
               <i className="fa fa-building" aria-hidden="true"></i>
             </span>
             <span>
-              <strong>HodalorEstate</strong>
+              <strong>LEDS PROPERTIES</strong>
               <small>Buyer portal</small>
             </span>
           </Link>

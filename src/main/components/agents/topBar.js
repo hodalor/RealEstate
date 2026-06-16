@@ -28,7 +28,7 @@ export default function AgentsTopBar() {
               <i className="fa fa-building" aria-hidden="true"></i>
             </span>
             <span>
-              <strong>HodalorEstate</strong>
+              <strong>LEDS PROPERTIES</strong>
               <small>Agent workspace</small>
             </span>
           </Link>

@@ -562,6 +562,23 @@ a {
   color: var(--text-soft);
 }
 
+.filter-shell-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.filter-currency-note {
+  margin: 0;
+}
+
+.mobile-filter-launcher,
+.mobile-filter-backdrop,
+.mobile-filter-close-btn {
+  display: none;
+}
+
 .amenity-toggles {
   display: flex;
   flex-wrap: wrap;
@@ -662,6 +679,18 @@ a {
 .property-price {
   color: #0f766e;
   font-size: 1.05rem;
+}
+
+.property-price-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.property-price-note {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
 .property-card-body h4 {
@@ -1612,6 +1641,59 @@ a {
 }
 
 @media (max-width: 767.98px) {
+  .mobile-filter-launcher {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .mobile-filter-open-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+  }
+
+  .mobile-filter-reset-btn {
+    min-width: 112px;
+  }
+
+  .mobile-filter-backdrop.is-visible {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1045;
+    background: rgba(15, 23, 42, 0.48);
+  }
+
+  .property-listing .filter-shell {
+    display: none;
+  }
+
+  .property-listing .filter-shell.mobile-open {
+    display: block;
+    position: fixed;
+    left: 0.85rem;
+    right: 0.85rem;
+    top: 94px;
+    bottom: 0.85rem;
+    z-index: 1050;
+    overflow-y: auto;
+    border-radius: 22px;
+    padding: 1.1rem;
+    box-shadow: 0 20px 44px rgba(15, 23, 42, 0.22);
+  }
+
+  .filter-shell-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .mobile-filter-close-btn {
+    display: inline-flex;
+  }
+
   .site-header-actions {
     margin-top: 0.75rem;
   }
@@ -1625,5 +1707,9 @@ a {
   .home-carousel-frame img {
     min-height: 260px;
     height: 260px;
+  }
+
+  .property-price-group {
+    align-items: flex-start;
   }
 }

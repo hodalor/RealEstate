@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { _fetchProperties } from "../libs/functions/fetches";
 import { formatPriceWithCurrency } from "../libs/data/siteSettings";
 import { resolveImageUrl } from "../libs/functions/images";
+import useSiteSettings from "../libs/hooks/useSiteSettings";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import BookTourModal from "./components/modals/BookTourModal";
@@ -15,6 +16,8 @@ export default function PropertyDetail() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(null);
+  const { siteSettings } = useSiteSettings();
+  const defaultDisplayCurrency = siteSettings.general.defaultCurrency || "USD";
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -131,7 +134,15 @@ export default function PropertyDetail() {
               </p>
             </div>
             <div className="detail-price-block">
-              <strong>{formatPriceWithCurrency(property.price, property.currency)}</strong>
+              <strong>{formatPriceWithCurrency(property.price, property.currency, siteSettings)}</strong>
+              {property.currency && property.currency !== defaultDisplayCurrency ? (
+                <small>
+                  Approx.{" "}
+                  {formatPriceWithCurrency(property.price, property.currency, siteSettings, {
+                    displayCurrency: defaultDisplayCurrency,
+                  })}
+                </small>
+              ) : null}
               <span>For {property.rentOrSale || "listing"}</span>
             </div>
           </div>

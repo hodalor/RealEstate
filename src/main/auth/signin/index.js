@@ -3,9 +3,12 @@ import { Link } from "react-router-dom";
 import Loader from "../../components/loader";
 import Notify from "../../components/notification";
 import { AuthContext } from "../../libs/contexts/authContext";
+import useSiteSettings from "../../libs/hooks/useSiteSettings";
 
 export default function Login() {
   const { _handleLogin, _handleChange, authState, loading } = useContext(AuthContext);
+  const { siteSettings } = useSiteSettings();
+  const siteName = siteSettings.general.siteName || "LEDS PROPERTIES";
 
   return (
     <div className="auth-page">
@@ -48,7 +51,7 @@ export default function Login() {
                         <i className="fa fa-building" aria-hidden="true"></i>
                       </span>
                       <span>
-                        <strong>BrightEstate</strong>
+                        <strong>{siteName}</strong>
                         <small>Public portal</small>
                       </span>
                     </Link>

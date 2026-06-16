@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import { _fetchProperties } from "../libs/functions/fetches";
 import { formatPriceWithCurrency } from "../libs/data/siteSettings";
 import { resolveImageUrl } from "../libs/functions/images";
+import useSiteSettings from "../libs/hooks/useSiteSettings";
 
 export default function HomePage() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeSlide, setActiveSlide] = useState(0);
   const [recentPage, setRecentPage] = useState(1);
+  const { siteSettings } = useSiteSettings();
 
   useEffect(() => {
     const fetchApprovedProperties = async () => {
@@ -65,8 +67,8 @@ export default function HomePage() {
 
   const propertyTypes = useMemo(() => {
     const types = [...new Set(properties.map((property) => property.propType).filter(Boolean))];
-    return types.slice(0, 5);
-  }, [properties]);
+    return (types.length > 0 ? types : siteSettings.property.propertyTypes || []).slice(0, 5);
+  }, [properties, siteSettings.property.propertyTypes]);
 
   const cities = useMemo(() => {
     const cityMap = properties.reduce((acc, property) => {
@@ -97,6 +99,9 @@ export default function HomePage() {
   }, [recentPage, recentProperties]);
 
   const activeProperty = heroSlides[activeSlide] || properties[0];
+  const primaryAdvert = (siteSettings.content.advertisements || []).find(
+    (advertisement) => advertisement?.active !== false
+  );
 
   return (
     <div className="site-wrapper overflow-hidden position-relative">
@@ -165,7 +170,7 @@ export default function HomePage() {
                           View Property
                         </Link>
                         <Link to="/property-listing" className="btn btn-soft-primary">
-                          Browse Listings
+                          {siteSettings.content.hero.buttonText || "Browse Listings"}
                         </Link>
                       </div>
                     </div>
@@ -196,10 +201,13 @@ export default function HomePage() {
             <aside className="home-side-panel">
               <div className="home-side-card advert-card">
                 <span className="eyebrow-pill">Advert</span>
-                <h4>List your property with faster visibility.</h4>
-                <p>Agents and admins can publish and manage stock from the dashboard.</p>
-                <Link to="/login" className="btn btn-primary btn-sm">
-                  Go to Dashboard
+                <h4>{primaryAdvert?.title || "List your property with faster visibility."}</h4>
+                <p>
+                  {primaryAdvert?.description ||
+                    "Agents and admins can publish and manage stock from the dashboard."}
+                </p>
+                <Link to={primaryAdvert?.link || "/login"} className="btn btn-primary btn-sm">
+                  {siteSettings.content.hero.buttonText || "Go to Dashboard"}
                 </Link>
               </div>
 

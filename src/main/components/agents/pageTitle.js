@@ -17,14 +17,14 @@ export default function AgentsPageTitle() {
         <div className="col-lg-7 col-md-6 col-sm-12">
           <h2>
             Agents
-            <small>Welcome to HodalorEstate</small>
+            <small>Welcome to LEDS PROPERTIES</small>
           </h2>
         </div>
         <div className="col-lg-5 col-md-6 col-sm-12">
           <ul className="breadcrumb float-md-right">
             <li className="breadcrumb-item">
               <span>
-                <i className="fa fa-home" /> HodalorEstate
+                <i className="fa fa-home" /> LEDS PROPERTIES
               </span>
             </li>
             <li className="breadcrumb-item">

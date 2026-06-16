@@ -28,7 +28,7 @@ export default function AdminTopBar() {
               <i className="fa fa-building" aria-hidden="true"></i>
             </span>
             <span>
-              <strong>HodalorEstate</strong>
+              <strong>LEDS PROPERTIES</strong>
               <small>Admin dashboard</small>
             </span>
           </Link>

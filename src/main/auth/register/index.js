@@ -1,35 +1,25 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Loader from "../../components/loader";
 import Notify from "../../components/notification";
 import { AuthContext } from "../../libs/contexts/authContext";
-import { _fetchSiteSettings } from "../../libs/functions/fetches";
-import { detectVisitorCountry, normalizeSiteSettings } from "../../libs/data/siteSettings";
+import { detectVisitorCountry } from "../../libs/data/siteSettings";
+import useSiteSettings from "../../libs/hooks/useSiteSettings";
 
 export default function Register() {
   const { loading, authState, _handleChange, _handleRegister } =
     useContext(AuthContext);
-  const [siteSettings, setSiteSettings] = useState(normalizeSiteSettings());
+  const { siteSettings } = useSiteSettings();
+  const siteName = siteSettings.general.siteName || "LEDS PROPERTIES";
 
   useEffect(() => {
-    const loadSettings = async () => {
-      const result = await _fetchSiteSettings();
-
-      if (result?.success === 1 && result.data) {
-        const normalized = normalizeSiteSettings(result.data);
-        setSiteSettings(normalized);
-
-        if (!authState.country) {
-          _handleChange({
-            field: "country",
-            value: detectVisitorCountry(normalized),
-          });
-        }
-      }
-    };
-
-    loadSettings();
-  }, [_handleChange, authState.country]);
+    if (!authState.country) {
+      _handleChange({
+        field: "country",
+        value: detectVisitorCountry(siteSettings),
+      });
+    }
+  }, [_handleChange, authState.country, siteSettings]);
 
   return (
     <div className="auth-page">
@@ -71,7 +61,7 @@ export default function Register() {
                         <i className="fa fa-building" aria-hidden="true"></i>
                       </span>
                       <span>
-                        <strong>BrightEstate</strong>
+                        <strong>{siteName}</strong>
                         <small>Public portal</small>
                       </span>
                     </Link>

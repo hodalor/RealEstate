@@ -1,7 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { resolveImageUrl } from "../../libs/functions/images";
-import { formatPriceWithCurrency } from "../../libs/data/siteSettings";
+import {
+  convertPrice,
+  formatPriceWithCurrency,
+  getCityOptions,
+  getProvinceOptions,
+} from "../../libs/data/siteSettings";
+import useSiteSettings from "../../libs/hooks/useSiteSettings";
 
 const defaultFilter = {
   searchTerm: "",
@@ -27,22 +33,86 @@ export default function PropertyListing({
   loading = false,
 }) {
   const [filter, setFilter] = useState(defaultFilter);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const { siteSettings } = useSiteSettings();
+  const defaultDisplayCurrency = siteSettings.general.defaultCurrency || "USD";
+
+  useEffect(() => {
+    if (!isMobileFiltersOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMobileFiltersOpen]);
 
   const locationData = useMemo(
-    () => ({
-      countries: [...new Set(properties.map((item) => item.country).filter(Boolean))].sort(),
-      provinces: [...new Set(properties.map((item) => item.province).filter(Boolean))].sort(),
-      cities: [...new Set(properties.map((item) => item.city).filter(Boolean))].sort(),
-    }),
-    [properties]
+    () => {
+      const configuredCountries = siteSettings.location.countries.map((country) => country.name);
+      const propertyCountries = properties.map((item) => item.country).filter(Boolean);
+      const configuredProvinces = filter.country
+        ? getProvinceOptions(siteSettings, filter.country).map((province) => province.name)
+        : siteSettings.location.countries.flatMap((country) =>
+            (country.provinces || []).map((province) => province.name)
+          );
+      const propertyProvinces = properties
+        .filter((item) => !filter.country || item.country === filter.country)
+        .map((item) => item.province)
+        .filter(Boolean);
+      const configuredCities =
+        filter.country && filter.province
+          ? getCityOptions(siteSettings, filter.country, filter.province).map((city) => city.name)
+          : siteSettings.location.countries.flatMap((country) =>
+              (country.provinces || []).flatMap((province) =>
+                (province.cities || []).map((city) => city.name)
+              )
+            );
+      const propertyCities = properties
+        .filter((item) => (!filter.country || item.country === filter.country))
+        .filter((item) => (!filter.province || item.province === filter.province))
+        .map((item) => item.city)
+        .filter(Boolean);
+
+      return {
+        countries: [...new Set([...configuredCountries, ...propertyCountries])].sort(),
+        provinces: [...new Set([...configuredProvinces, ...propertyProvinces])].sort(),
+        cities: [...new Set([...configuredCities, ...propertyCities])].sort(),
+      };
+    },
+    [filter.country, filter.province, properties, siteSettings]
   );
 
   const handleFilterChange = (event) => {
     const { name, value, type, checked } = event.target;
-    setFilter((current) => ({
-      ...current,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFilter((current) => {
+      const nextValue = type === "checkbox" ? checked : value;
+
+      if (name === "country") {
+        return {
+          ...current,
+          country: nextValue,
+          province: "",
+          city: "",
+        };
+      }
+
+      if (name === "province") {
+        return {
+          ...current,
+          province: nextValue,
+          city: "",
+        };
+      }
+
+      return {
+        ...current,
+        [name]: nextValue,
+      };
+    });
   };
 
   const filteredProperties = useMemo(() => {
@@ -77,7 +147,12 @@ export default function PropertyListing({
           return parseFloat(value);
         });
 
-        const price = getPriceValue(property.price);
+        const price = convertPrice(
+          property.price,
+          property.currency || defaultDisplayCurrency,
+          defaultDisplayCurrency,
+          siteSettings
+        );
 
         if (minValue !== null && price < minValue) {
           return false;
@@ -141,189 +216,226 @@ export default function PropertyListing({
     }
 
     return featured && limit > 0 ? result.slice(0, limit) : result;
-  }, [featured, filter, limit, properties]);
+  }, [defaultDisplayCurrency, featured, filter, limit, properties, siteSettings]);
 
   const visibleProperties = filteredProperties;
+  const filterContent = (
+    <div className="row g-3">
+      <div className="col-lg-4">
+        <input
+          type="text"
+          className="website-field"
+          placeholder="Search by name, city, address, or description"
+          name="searchTerm"
+          value={filter.searchTerm}
+          onChange={handleFilterChange}
+        />
+      </div>
+      <div className="col-lg-2 col-md-4">
+        <div className="website-select-wrap">
+          <select
+            className="website-field website-select"
+            name="propertyType"
+            value={filter.propertyType}
+            onChange={handleFilterChange}
+          >
+            <option value="">Type</option>
+            <option value="Sale">For Sale</option>
+            <option value="Rent">For Rent</option>
+          </select>
+        </div>
+      </div>
+      <div className="col-lg-2 col-md-4">
+        <div className="website-select-wrap">
+          <select
+            className="website-field website-select"
+            name="priceRange"
+            value={filter.priceRange}
+            onChange={handleFilterChange}
+          >
+            <option value="">Budget ({defaultDisplayCurrency})</option>
+            <option value="0-50000">Under 50,000</option>
+            <option value="50000-100000">50,000 - 100,000</option>
+            <option value="100000-250000">100,000 - 250,000</option>
+            <option value="250000-500000">250,000 - 500,000</option>
+            <option value="500000-1000000">500,000 - 1,000,000</option>
+            <option value="1000000-">Above 1,000,000</option>
+          </select>
+        </div>
+      </div>
+      <div className="col-lg-2 col-md-4">
+        <div className="website-select-wrap">
+          <select
+            className="website-field website-select"
+            name="bedrooms"
+            value={filter.bedrooms}
+            onChange={handleFilterChange}
+          >
+            <option value="">Bedrooms</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+            <option value="5">5+</option>
+          </select>
+        </div>
+      </div>
+      <div className="col-lg-2 col-md-6">
+        <div className="website-select-wrap">
+          <select
+            className="website-field website-select"
+            name="sortBy"
+            value={filter.sortBy}
+            onChange={handleFilterChange}
+          >
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="priceLowToHigh">Price Low to High</option>
+            <option value="priceHighToLow">Price High to Low</option>
+            <option value="bedroomsLowToHigh">Bedrooms Low to High</option>
+            <option value="bedroomsHighToLow">Bedrooms High to Low</option>
+          </select>
+        </div>
+      </div>
+      <div className="col-lg-2 col-md-6">
+        <div className="website-select-wrap">
+          <select
+            className="website-field website-select"
+            name="country"
+            value={filter.country}
+            onChange={handleFilterChange}
+          >
+            <option value="">Country</option>
+            {locationData.countries.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="col-lg-2 col-md-6">
+        <div className="website-select-wrap">
+          <select
+            className="website-field website-select"
+            name="province"
+            value={filter.province}
+            onChange={handleFilterChange}
+          >
+            <option value="">Province</option>
+            {locationData.provinces.map((province) => (
+              <option key={province} value={province}>
+                {province}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="col-lg-2 col-md-6">
+        <div className="website-select-wrap">
+          <select
+            className="website-field website-select"
+            name="city"
+            value={filter.city}
+            onChange={handleFilterChange}
+          >
+            <option value="">City</option>
+            {locationData.cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="col-lg-6">
+        <div className="amenity-toggles">
+          <label className="toggle-chip">
+            <input
+              type="checkbox"
+              name="hasSwimmingPool"
+              checked={filter.hasSwimmingPool}
+              onChange={handleFilterChange}
+            />
+            <span>Swimming pool</span>
+          </label>
+          <label className="toggle-chip">
+            <input
+              type="checkbox"
+              name="hasAirCondition"
+              checked={filter.hasAirCondition}
+              onChange={handleFilterChange}
+            />
+            <span>Air conditioning</span>
+          </label>
+          <label className="toggle-chip">
+            <input
+              type="checkbox"
+              name="hasCarPark"
+              checked={filter.hasCarPark}
+              onChange={handleFilterChange}
+            />
+            <span>Parking</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="property-listing">
       {!featured && (
-        <div className="filter-shell mb-4">
-          <div className="filter-shell-header">
-            <div>
-              <h3>Filter properties faster</h3>
-            </div>
-
+        <>
+          <div className="mobile-filter-launcher mb-3">
             <button
               type="button"
-              className="btn btn-soft-primary"
+              className="btn btn-primary mobile-filter-open-btn"
+              onClick={() => setIsMobileFiltersOpen(true)}
+            >
+              <i className="fa fa-search" aria-hidden="true"></i>
+              <span>Search Filters</span>
+            </button>
+            <button
+              type="button"
+              className="btn btn-soft-primary mobile-filter-reset-btn"
               onClick={() => setFilter(defaultFilter)}
             >
-              Reset Filters
+              Reset
             </button>
           </div>
 
-          <div className="row g-3">
-            <div className="col-lg-4">
-              <input
-                type="text"
-                className="website-field"
-                placeholder="Search by name, city, address, or description"
-                name="searchTerm"
-                value={filter.searchTerm}
-                onChange={handleFilterChange}
-              />
+          <div
+            className={`mobile-filter-backdrop ${isMobileFiltersOpen ? "is-visible" : ""}`}
+            onClick={() => setIsMobileFiltersOpen(false)}
+          />
+        <div className={`filter-shell mb-4 ${isMobileFiltersOpen ? "mobile-open" : ""}`}>
+          <div className="filter-shell-header">
+            <div>
+              <h3>Filter properties faster</h3>
+              <p className="filter-currency-note">
+                Budget compares all prices in {defaultDisplayCurrency}
+              </p>
             </div>
-            <div className="col-lg-2 col-md-4">
-              <div className="website-select-wrap">
-                <select
-                  className="website-field website-select"
-                  name="propertyType"
-                  value={filter.propertyType}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">Type</option>
-                  <option value="Sale">For Sale</option>
-                  <option value="Rent">For Rent</option>
-                </select>
-              </div>
-            </div>
-            <div className="col-lg-2 col-md-4">
-              <div className="website-select-wrap">
-                <select
-                  className="website-field website-select"
-                  name="priceRange"
-                  value={filter.priceRange}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">Budget</option>
-                  <option value="0-50000">Under 50,000</option>
-                  <option value="50000-100000">50,000 - 100,000</option>
-                  <option value="100000-250000">100,000 - 250,000</option>
-                  <option value="250000-500000">250,000 - 500,000</option>
-                  <option value="500000-1000000">500,000 - 1,000,000</option>
-                  <option value="1000000-">Above 1,000,000</option>
-                </select>
-              </div>
-            </div>
-            <div className="col-lg-2 col-md-4">
-              <div className="website-select-wrap">
-                <select
-                  className="website-field website-select"
-                  name="bedrooms"
-                  value={filter.bedrooms}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">Bedrooms</option>
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                  <option value="4">4+</option>
-                  <option value="5">5+</option>
-                </select>
-              </div>
-            </div>
-            <div className="col-lg-2 col-md-6">
-              <div className="website-select-wrap">
-                <select
-                  className="website-field website-select"
-                  name="sortBy"
-                  value={filter.sortBy}
-                  onChange={handleFilterChange}
-                >
-                  <option value="newest">Newest</option>
-                  <option value="oldest">Oldest</option>
-                  <option value="priceLowToHigh">Price Low to High</option>
-                  <option value="priceHighToLow">Price High to Low</option>
-                  <option value="bedroomsLowToHigh">Bedrooms Low to High</option>
-                  <option value="bedroomsHighToLow">Bedrooms High to Low</option>
-                </select>
-              </div>
-            </div>
-            <div className="col-lg-2 col-md-6">
-              <div className="website-select-wrap">
-                <select
-                  className="website-field website-select"
-                  name="country"
-                  value={filter.country}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">Country</option>
-                  {locationData.countries.map((country) => (
-                    <option key={country} value={country}>
-                      {country}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="col-lg-2 col-md-6">
-              <div className="website-select-wrap">
-                <select
-                  className="website-field website-select"
-                  name="province"
-                  value={filter.province}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">Province</option>
-                  {locationData.provinces.map((province) => (
-                    <option key={province} value={province}>
-                      {province}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="col-lg-2 col-md-6">
-              <div className="website-select-wrap">
-                <select
-                  className="website-field website-select"
-                  name="city"
-                  value={filter.city}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">City</option>
-                  {locationData.cities.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="col-lg-6">
-              <div className="amenity-toggles">
-                <label className="toggle-chip">
-                  <input
-                    type="checkbox"
-                    name="hasSwimmingPool"
-                    checked={filter.hasSwimmingPool}
-                    onChange={handleFilterChange}
-                  />
-                  <span>Swimming pool</span>
-                </label>
-                <label className="toggle-chip">
-                  <input
-                    type="checkbox"
-                    name="hasAirCondition"
-                    checked={filter.hasAirCondition}
-                    onChange={handleFilterChange}
-                  />
-                  <span>Air conditioning</span>
-                </label>
-                <label className="toggle-chip">
-                  <input
-                    type="checkbox"
-                    name="hasCarPark"
-                    checked={filter.hasCarPark}
-                    onChange={handleFilterChange}
-                  />
-                  <span>Parking</span>
-                </label>
-              </div>
+            <div className="filter-shell-actions">
+              <button
+                type="button"
+                className="btn btn-soft-primary"
+                onClick={() => setFilter(defaultFilter)}
+              >
+                Reset Filters
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary mobile-filter-close-btn"
+                onClick={() => setIsMobileFiltersOpen(false)}
+              >
+                Apply
+              </button>
             </div>
           </div>
+          {filterContent}
         </div>
+        </>
       )}
 
       {!featured && !loading && (
@@ -361,9 +473,20 @@ export default function PropertyListing({
                       <i className="fa fa-map-marker-alt" aria-hidden="true"></i>
                       {property.city || property.digitalAddress || "Location not specified"}
                     </span>
-                    <strong className="property-price">
-                      {formatPriceWithCurrency(property.price, property.currency)}
-                    </strong>
+                    <div className="property-price-group">
+                      <strong className="property-price">
+                        {formatPriceWithCurrency(property.price, property.currency, siteSettings)}
+                      </strong>
+                      {property.currency &&
+                      property.currency !== defaultDisplayCurrency ? (
+                        <small className="property-price-note">
+                          Approx.{" "}
+                          {formatPriceWithCurrency(property.price, property.currency, siteSettings, {
+                            displayCurrency: defaultDisplayCurrency,
+                          })}
+                        </small>
+                      ) : null}
+                    </div>
                   </div>
 
                   <h4>{property.name || "Unnamed property"}</h4>

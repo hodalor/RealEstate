@@ -3,6 +3,7 @@ import { AdminContext } from '../../../../libs/contexts/adminContext';
 import { AuthContext } from '../../../../libs/contexts/authContext';
 import Loader from '../../../../components/loader';
 import { toast } from 'react-toastify';
+import { formatPriceWithCurrency } from '../../../../libs/data/siteSettings';
 
 export default function PaymentHistory() {
   const { loading } = useContext(AuthContext);
@@ -184,7 +185,7 @@ export default function PaymentHistory() {
   
   // Format currency
   const formatCurrency = (amount, currency) => {
-    return `${currency} ${amount.toLocaleString()}`;
+    return formatPriceWithCurrency(amount, currency);
   };
   
   // Get status badge class

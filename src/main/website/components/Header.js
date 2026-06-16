@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import useSiteSettings from "../../libs/hooks/useSiteSettings";
 import "../styles/header-fix.css";
 
 const navItems = [
@@ -11,6 +12,8 @@ const navItems = [
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const { siteSettings } = useSiteSettings();
+  const siteName = siteSettings.general.siteName || "LEDS PROPERTIES";
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,8 +35,8 @@ export default function Header() {
               <i className="fa fa-building" aria-hidden="true"></i>
             </span>
             <span>
-              <strong>BrightEstate</strong>
-              <small>Property management, made welcoming.</small>
+              <strong>{siteName}</strong>
+              <small>Property management across multiple locations.</small>
             </span>
           </Link>
 
