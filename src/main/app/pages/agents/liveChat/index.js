@@ -34,7 +34,7 @@ export default function LiveChat() {
     if (agentState && agentState.agent && agentState.agent._id) {
       try {
         // Initialize socket with agent ID
-        initializeSocket(agentState.agent._id);
+        initializeSocket(agentState.agent._id, 'Agent');
         
         // Subscribe to new chats
         const newChatCleanup = subscribeToNewChats((newChat) => {
@@ -68,7 +68,10 @@ export default function LiveChat() {
     const loadChats = async () => {
       try {
         setIsLoading(true);
-        const response = await fetchChats();
+        const response = await fetchChats({
+          viewerId: agentState?.agent?._id,
+          viewerRole: 'Agent',
+        });
         if (response.success) {
           setChats(response.data);
         } else {
@@ -84,7 +87,7 @@ export default function LiveChat() {
     };
     
     loadChats();
-  }, []);
+  }, [agentState]);
 
   // Fetch messages when active chat changes
   useEffect(() => {
@@ -166,7 +169,8 @@ export default function LiveChat() {
   // Filter chats based on search term
   const filteredChats = chats.filter(chat => 
     chat.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (chat.lastMessage && chat.lastMessage.toLowerCase().includes(searchTerm.toLowerCase()))
+    (chat.lastMessage?.text &&
+      chat.lastMessage.text.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Format timestamp
@@ -234,8 +238,11 @@ export default function LiveChat() {
                             <div className="about">
                               <div className="name">{chat.user.name}</div>
                               <div className="status">
-                                {chat.lastMessage && (
-                                  <span>{chat.lastMessage.substring(0, 20)}{chat.lastMessage.length > 20 ? '...' : ''}</span>
+                                {chat.lastMessage?.text && (
+                                  <span>
+                                    {chat.lastMessage.text.substring(0, 20)}
+                                    {chat.lastMessage.text.length > 20 ? '...' : ''}
+                                  </span>
                                 )}
                                 {chat.lastMessageTime && (
                                   <small className="float-right">{formatTime(chat.lastMessageTime)}</small>

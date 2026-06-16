@@ -35,7 +35,7 @@ export default function AdminChats() {
     if (adminData && adminData.user && adminData.user._id) {
       try {
         // Initialize socket with admin ID
-        initializeSocket(adminData.user._id);
+        initializeSocket(adminData.user._id, 'Admin');
         
         // Subscribe to new chats
         const newChatCleanup = subscribeToNewChats((newChat) => {
@@ -70,7 +70,10 @@ export default function AdminChats() {
     const loadChats = async () => {
       try {
         setIsLoading(true);
-        const response = await fetchChats();
+        const response = await fetchChats({
+          viewerId: adminData?.user?._id,
+          viewerRole: 'Admin',
+        });
         if (response.success) {
           setChats(response.data);
         } else {
@@ -87,7 +90,7 @@ export default function AdminChats() {
     };
     
     loadChats();
-  }, []);
+  }, [adminData]);
 
   // Fetch messages when active chat changes
   useEffect(() => {

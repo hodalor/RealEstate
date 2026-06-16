@@ -16,7 +16,7 @@ const customerUrl = `${apiBaseUrl}/customers/`;
 const signUrl = `${apiBaseUrl}/signin/`;
 const requestsUrl = `${apiBaseUrl}/requests/`;
 const settingsUrl = `${apiBaseUrl}/settings/`;
-const toursUrl = `${apiBaseUrl}/api/tours/`;
+const toursUrl = `${apiBaseUrl}/tours/`;
 
 export {
   apiBaseUrl,

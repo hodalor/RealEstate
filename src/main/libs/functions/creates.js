@@ -167,7 +167,27 @@ const _bookTour = async (tourData) => {
     },
     body: JSON.stringify(tourData),
   })
-    .then((response) => response.json())
+    .then(async (response) => {
+      const responseText = await response.clone().text();
+      let parsedResponse;
+
+      try {
+        parsedResponse = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        parsedResponse = null;
+      }
+
+      if (parsedResponse !== null) {
+        return parsedResponse;
+      }
+
+      return {
+        success: 0,
+        message: response.ok
+          ? "Unexpected response received while booking the tour."
+          : "Tour booking request failed.",
+      };
+    })
     .then((res) => {
       return (results = res);
     })

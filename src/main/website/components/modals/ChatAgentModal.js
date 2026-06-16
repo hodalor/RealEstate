@@ -1,7 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { initializeClientSocket, createLiveChatRequest, emitLiveChatRequest, subscribeToAgentResponse } from '../../../libs/services/chatService';
+import { AuthContext } from '../../../libs/contexts/authContext';
 
 export default function ChatAgentModal({ property }) {
+  const history = useHistory();
+  const { authState } = useContext(AuthContext);
   const [messages, setMessages] = useState([
     { sender: 'agent', text: 'Hello! I\'m the agent for this property. How can I help you today?', time: new Date() }
   ]);
@@ -33,6 +37,19 @@ export default function ChatAgentModal({ property }) {
 
   // Handle live chat request button click
   const handleLiveChatRequest = async () => {
+    if (!authState?.user?._id) {
+      setMessages(prev => [
+        ...prev,
+        {
+          sender: 'agent',
+          text: 'Please log in first before requesting a live chat with an agent.',
+          time: new Date(),
+        },
+      ]);
+      history.push('/login');
+      return;
+    }
+
     try {
       setWaitingForAgent(true);
       
@@ -44,13 +61,17 @@ export default function ChatAgentModal({ property }) {
       };
       setMessages(prev => [...prev, systemMessage]);
       
-      // Initialize socket connection
-      const socket = initializeClientSocket();
+      // Initialize the client chat session.
+      initializeClientSocket();
       
       // Create client info object
       const clientInfo = {
         propertyId: property?._id,
         propertyName: property?.name,
+        name: `${authState.user.firstName || ''} ${authState.user.lastName || ''}`.trim(),
+        email: authState.user.email || '',
+        phone: authState.user.phone || '',
+        userId: authState.user._id,
         timestamp: new Date().toISOString()
       };
       
@@ -58,39 +79,23 @@ export default function ChatAgentModal({ property }) {
       const response = await createLiveChatRequest(property?._id, clientInfo);
       
       if (response.success) {
-        // Emit live chat request event to notify agents
         emitLiveChatRequest({
           requestId: response.data.requestId,
           propertyId: property?._id,
           propertyName: property?.name,
           timestamp: new Date().toISOString()
         });
-        
-        // Subscribe to agent response
-        socketCleanupRef.current = subscribeToAgentResponse((response) => {
-          if (response.status === 'accepted') {
-            // Add system message that agent has accepted the chat
-            const acceptedMessage = { 
-              sender: 'agent', 
-              text: `${response.agentName || 'An agent'} has accepted your chat request and will be with you shortly.`, 
-              time: new Date() 
-            };
-            setMessages(prev => [...prev, acceptedMessage]);
-            setWaitingForAgent(false);
-            setLiveChatRequested(true);
-          } else if (response.status === 'rejected') {
-            // Add system message that no agents are available
-            const rejectedMessage = { 
-              sender: 'agent', 
-              text: 'We apologize, but all agents are currently busy. Please try again later or leave a message.', 
-              time: new Date() 
-            };
-            setMessages(prev => [...prev, rejectedMessage]);
-            setWaitingForAgent(false);
-          }
-        });
-        
-        // Set live chat requested flag
+
+        socketCleanupRef.current = subscribeToAgentResponse(() => {});
+        setMessages(prev => [
+          ...prev,
+          {
+            sender: 'agent',
+            text: 'Your live chat request has been sent successfully. An agent can now pick it up from the dashboard.',
+            time: new Date(),
+          },
+        ]);
+        setWaitingForAgent(false);
         setLiveChatRequested(true);
       } else {
         throw new Error(response.message || 'Failed to create live chat request');
