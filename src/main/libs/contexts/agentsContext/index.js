@@ -12,6 +12,14 @@ import { AuthContext } from "../authContext";
 
 export const AgentsContext = createContext();
 
+const reorderByIndex = (items = [], index = 0) => {
+  if (!Array.isArray(items) || items.length <= 1) return Array.isArray(items) ? items : [];
+  const safeIndex = Math.max(0, Math.min(index, items.length - 1));
+  const nextItems = [...items];
+  const [selectedItem] = nextItems.splice(safeIndex, 1);
+  return [selectedItem, ...nextItems];
+};
+
 export default function AgentContextProvider(props) {
   const { notiData, setNotiData, setLoading } = useContext(AuthContext);
 
@@ -76,6 +84,8 @@ export default function AgentContextProvider(props) {
       pets: Boolean,
       rooms: Number,
       propImages: [],
+      existingImages: [],
+      coverImageIndex: 0,
       shortStayMinimumNights: 1,
       shortStayCheckInTime: "14:00",
       shortStayCheckOutTime: "11:00",
@@ -781,6 +791,25 @@ export default function AgentContextProvider(props) {
         property: {
           ...agentState.property,
           propImages: Array.isArray(value) ? value : [],
+          coverImageIndex: 0,
+        },
+      });
+
+    if (field === "coverImageIndex")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          coverImageIndex: Number(value) || 0,
+        },
+      });
+
+    if (field === "existingImages")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          existingImages: Array.isArray(value) ? value : [],
         },
       });
 
@@ -879,6 +908,8 @@ export default function AgentContextProvider(props) {
         pets: Boolean,
         rooms: Number,
         propImages: [],
+        existingImages: [],
+        coverImageIndex: 0,
         shortStayMinimumNights: 1,
         shortStayCheckInTime: "14:00",
         shortStayCheckOutTime: "11:00",
@@ -1017,6 +1048,10 @@ export default function AgentContextProvider(props) {
 
     const propertyPayload = {
       ...agentState.property,
+      propImages: reorderByIndex(
+        agentState.property.propImages,
+        agentState.property.coverImageIndex || 0
+      ),
       agentID: agentState.agent._id,
       country: agentState.property.country || agentState.agent.country || "",
       currency: agentState.property.currency || agentState.agent.preferredCurrency || "",

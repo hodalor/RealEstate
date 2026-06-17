@@ -52,6 +52,10 @@ export default function Admin() {
                 component={AdminProperties}
               />
               <Route
+                path="/admin/properties/edit/:ID"
+                component={AddProp}
+              />
+              <Route
                 path="/admin/properties/details/:ID"
                 component={PropertyDetails}
               />

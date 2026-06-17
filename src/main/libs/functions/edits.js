@@ -275,24 +275,51 @@ const _updateProperty = async (_id, payload) => {
 
   const url = propertyUrl + "update/" + _id;
 
-  await fetch(url, {
-    method: "PATCH",
-    headers: {
-      Accept: "application/json",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  })
-    .then((response) => response.json())
-    .then((res) => {
-      results = res;
-    })
-    .catch(() => {
-      results = {
-        success: 0,
-        message: "Please check your internet connection!",
-      };
+  const hasFiles =
+    Array.isArray(payload?.propImages) &&
+    payload.propImages.some((image) => typeof File !== "undefined" && image instanceof File);
+
+  if (hasFiles) {
+    const formData = new FormData();
+    payload.propImages.forEach((image) => {
+      formData.append("propImage", image);
     });
+    formData.append("data", JSON.stringify(payload));
+
+    await fetch(url, {
+      method: "PATCH",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        results = res;
+      })
+      .catch(() => {
+        results = {
+          success: 0,
+          message: "Please check your internet connection!",
+        };
+      });
+  } else {
+    await fetch(url, {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        results = res;
+      })
+      .catch(() => {
+        results = {
+          success: 0,
+          message: "Please check your internet connection!",
+        };
+      });
+  }
 
   return results;
 };

@@ -1,6 +1,8 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import Loader from "../../../../components/loader";
 import Notify from "../../../../components/notification";
+import PropertyImagePicker from "../../../../components/propertyImages/Picker";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 import {
@@ -13,10 +15,28 @@ import {
 } from "../../../../libs/data/siteSettings";
 
 export default function AddProp({ isModal = false, onClose }) {
-  const { _handleChange, adminData, _createProperty, _cancelProperty } =
+  const {
+    _handleChange,
+    adminData,
+    _createProperty,
+    _cancelProperty,
+    _preparePropertyForEdit,
+    _savePropertyEdits,
+  } =
     useContext(AdminContext);
   const { loading } = useContext(AuthContext);
-  const areaUnits = ["Meters", "CM", "SQM", "SQFEET"];
+  const history = useHistory();
+  const { ID } = useParams();
+  const isEditMode = Boolean(ID);
+  const areaUnits = [
+    "Meters",
+    "CM",
+    "SQM",
+    "SQFEET",
+    "Hectares",
+    "Acres",
+    "Ares",
+  ];
   const selectedCountry = adminData.property.country;
   const selectedProvince = adminData.property.province;
   const selectedCity = adminData.property.city;
@@ -33,8 +53,19 @@ export default function AddProp({ isModal = false, onClose }) {
   const currencyOptions = getCurrencyOptions(adminData.settings, selectedCountry);
   const isShortStay =
     String(adminData.property.rentOrSale || "").trim().toLowerCase() === "short stay";
+
+  // The context helpers are intentionally invoked on route changes only here.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (isEditMode) {
+      _preparePropertyForEdit(ID);
+    } else if (!isModal) {
+      _cancelProperty();
+    }
+  }, [ID]);
+
   const handleSubmit = async () => {
-    const created = await _createProperty();
+    const created = isEditMode ? await _savePropertyEdits(ID) : await _createProperty();
 
     if (created && onClose) {
       onClose();
@@ -45,6 +76,8 @@ export default function AddProp({ isModal = false, onClose }) {
     _cancelProperty();
     if (onClose) {
       onClose();
+    } else if (isEditMode) {
+      history.push(`/admin/properties/details/${ID}`);
     }
   };
 
@@ -56,8 +89,12 @@ export default function AddProp({ isModal = false, onClose }) {
             <Notify />
             <div className="header internal-form-header">
               <h2>
-                <strong>Create</strong> Property
-                <small>Add the core details, location, rooms, amenities, and images.</small>
+                <strong>{isEditMode ? "Edit" : "Create"}</strong> Property
+                <small>
+                  {isEditMode
+                    ? "Update the property details, images, and cover thumbnail."
+                    : "Add the core details, location, rooms, amenities, and images."}
+                </small>
               </h2>
             </div>
             <div className="body internal-form-body">
@@ -471,7 +508,7 @@ export default function AddProp({ isModal = false, onClose }) {
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Property size e.g. 100 x 40"
+                      placeholder="Property size e.g. 100 x 40 or 2.435"
                       value={adminData.property.areaValue || ""}
                       onChange={(e) =>
                         _handleChange({
@@ -542,6 +579,7 @@ export default function AddProp({ isModal = false, onClose }) {
                   <div className="form-group">
                     <select
                       className="form-control"
+                      value={adminData.property.agentID || ""}
                       onChange={(e) =>
                         _handleChange({
                           field: "agentID",
@@ -801,28 +839,23 @@ export default function AddProp({ isModal = false, onClose }) {
               <div className="row clearfix">
                 <div className="col-sm-12">
                   <form className="form-group m-b-15 m-t-15 row internal-upload-block">
-                    <div className="col-sm-12">
-                      <input
-                        type="file"
-                        className="form-control"
-                        accept="image/*"
-                        multiple
-                        onChange={(e) =>
-                          _handleChange({
-                            field: "propImages",
-                            value: Array.from(e.target.files || []),
-                          })
-                        }
-                      />
-                      <small style={{ fontSize: "12px", marginLeft: "10px" }}>
-                        Upload one or more images. At least one image is required.
-                      </small>
-                      {adminData.property.propImages?.length ? (
-                        <div className="mt-2 text-muted">
-                          {adminData.property.propImages.length} image(s) selected
-                        </div>
-                      ) : null}
-                    </div>
+                    <PropertyImagePicker
+                      files={adminData.property.propImages}
+                      existingImages={adminData.property.existingImages}
+                      coverImageIndex={adminData.property.coverImageIndex || 0}
+                      onFilesChange={(files) =>
+                        _handleChange({
+                          field: "propImages",
+                          value: files,
+                        })
+                      }
+                      onCoverChange={(index) =>
+                        _handleChange({
+                          field: "coverImageIndex",
+                          value: index,
+                        })
+                      }
+                    />
                   </form>
                 </div>
                 <div className="col-sm-12">

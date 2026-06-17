@@ -31,6 +31,26 @@ import { normalizeSiteSettings } from "../../data/siteSettings";
 
 export const AdminContext = createContext();
 
+const reorderByIndex = (items = [], index = 0) => {
+  if (!Array.isArray(items) || items.length <= 1) return Array.isArray(items) ? items : [];
+  const safeIndex = Math.max(0, Math.min(index, items.length - 1));
+  const nextItems = [...items];
+  const [selectedItem] = nextItems.splice(safeIndex, 1);
+  return [selectedItem, ...nextItems];
+};
+
+const extractPropertyImages = (property = {}) => {
+  const images = property.images || {};
+  return [
+    images.image1,
+    images.image2,
+    images.image3,
+    images.image4,
+    images.image5,
+    ...(Array.isArray(images.gallery) ? images.gallery : []),
+  ].filter(Boolean);
+};
+
 const getEmptyUserState = () => ({
   firstName: "",
   lastName: "",
@@ -94,6 +114,9 @@ const getEmptyPropertyState = () => ({
   pets: Boolean,
   rooms: Number,
   propImages: [],
+  existingImages: [],
+  coverImageIndex: 0,
+  editId: "",
   shortStayMinimumNights: 1,
   shortStayCheckInTime: "14:00",
   shortStayCheckOutTime: "11:00",
@@ -806,6 +829,25 @@ export default function AdminContextProvider(props) {
         property: {
           ...adminData.property,
           propImages: Array.isArray(value) ? value : [],
+          coverImageIndex: 0,
+        },
+      });
+
+    if (field === "coverImageIndex")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          coverImageIndex: Number(value) || 0,
+        },
+      });
+
+    if (field === "existingImages")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          existingImages: Array.isArray(value) ? value : [],
         },
       });
 
@@ -876,6 +918,165 @@ export default function AdminContextProvider(props) {
       ...adminData,
       property: getEmptyPropertyState(),
     });
+  };
+
+  const buildPropertyFormState = (property = {}) => ({
+    ...getEmptyPropertyState(),
+    propName: property.name || "",
+    propLoca: property.location || "",
+    propType: property.propType || "",
+    propDesc: property.propDescription || "",
+    rentOrSale: property.rentOrSale || "",
+    price: property.price ?? "",
+    currency: property.currency || "",
+    bedRoomNumber: property.others?.noOfBedrooms ?? "",
+    bathRoomNumber: property.others?.bathrooms ?? "",
+    areaValue: property.areaValue || property.squareFt || "",
+    areaUnit: property.areaUnit || "SQM",
+    sqft: property.areaValue || property.squareFt || "",
+    carPark: property.others?.carPark ?? false,
+    year: property.yearBuilt || "",
+    agentID: property.agentID || "",
+    address: property.digitalAddress || "",
+    country: property.country || "",
+    province: property.province || "",
+    city: property.city || "",
+    suburb: property.suburb || "",
+    dRoom: property.others?.diningRoom ?? false,
+    kitchen: property.others?.kitchen ?? false,
+    livRoom: property.others?.livingRoom ?? false,
+    mBedroom: property.others?.masterBedroom ?? false,
+    porch: property.others?.porch ?? false,
+    stRoom: property.others?.storeRoom ?? false,
+    pool: property.amenities?.swimmingPool ?? false,
+    ppWater: property.amenities?.pipeWater ?? false,
+    acon: property.amenities?.airCondition ?? false,
+    elct: property.amenities?.electricity ?? false,
+    nmRoad: property.amenities?.nearMainRoad ?? false,
+    nsMarket: property.amenities?.nearSuperMarket ?? false,
+    pets: property.amenities?.petsAllowed ?? false,
+    rooms: property.numberOfRooms ?? "",
+    propImages: [],
+    existingImages: extractPropertyImages(property),
+    coverImageIndex: 0,
+    editId: property._id || "",
+    shortStayMinimumNights: property.shortStay?.minimumNights || 1,
+    shortStayCheckInTime: property.shortStay?.checkInTime || "14:00",
+    shortStayCheckOutTime: property.shortStay?.checkOutTime || "11:00",
+    shortStayAvailabilityStart: property.shortStay?.openDates?.[0] || "",
+    shortStayAvailabilityEnd:
+      property.shortStay?.openDates?.[property.shortStay?.openDates?.length - 1] || "",
+    shortStayBlockedDates: Array.isArray(property.shortStay?.blockedDates)
+      ? property.shortStay.blockedDates.join(", ")
+      : "",
+  });
+
+  const _preparePropertyForEdit = async (_id) => {
+    let property =
+      adminData.properties.find((item) => item._id === _id) ||
+      adminData.pending.find((item) => item._id === _id) ||
+      (adminData.propertyDetails?._id === _id ? adminData.propertyDetails : null);
+
+    if (!property) {
+      const storedProperty = await _retrieveFromStroage("property");
+      if (storedProperty?._id === _id) {
+        property = storedProperty;
+      }
+    }
+
+    if (!property) {
+      const results = await _fetchProperties();
+      if (results?.success === 1) {
+        property = results.data.find((item) => item._id === _id);
+      }
+    }
+
+    if (!property) {
+      toast.error("Property not found");
+      history.push("/admin/properties/");
+      return null;
+    }
+
+    await _saveToStorage({ data: property, key: "property" });
+
+    setAdminData({
+      ...adminData,
+      property: buildPropertyFormState(property),
+      propertyDetails: property,
+    });
+
+    return property;
+  };
+
+  const _savePropertyEdits = async (_id) => {
+    const payload = {
+      ...adminData.property,
+      propImages: reorderByIndex(
+        adminData.property.propImages,
+        adminData.property.coverImageIndex || 0
+      ),
+      existingImages:
+        adminData.property.propImages.length > 0
+          ? []
+          : reorderByIndex(
+              adminData.property.existingImages,
+              adminData.property.coverImageIndex || 0
+            ),
+    };
+
+    const validate = await _validateProp({
+      ...payload,
+      propImages:
+        payload.propImages.length > 0 ? payload.propImages : payload.existingImages,
+    });
+
+    if (validate.status === false) {
+      toast.warning(validate.mesg);
+      return false;
+    }
+
+    setLoading(true);
+
+    const results = await _updateProperty(_id, payload);
+
+    if (results === undefined || results.success === 0) {
+      setLoading(false);
+      toast.error(results?.message || "Failed to update property");
+      return false;
+    }
+
+    const getData = await _fetchProperties();
+
+    if (getData === undefined || getData.success === 0) {
+      setLoading(false);
+      toast.warning(getData?.message || "Failed to refresh properties");
+      return false;
+    }
+
+    const pending = [];
+    const approved = [];
+    getData.data.forEach((pro) => {
+      if (pro.isApproved) approved.push(pro);
+      if (!pro.isApproved) pending.push(pro);
+    });
+
+    const refreshedProperty =
+      getData.data.find((property) => property._id === _id) || adminData.propertyDetails;
+
+    setAdminData({
+      ...adminData,
+      properties: approved,
+      pending,
+      property: buildPropertyFormState(refreshedProperty),
+      propertyDetails: refreshedProperty,
+    });
+
+    await _saveToStorage({ data: refreshedProperty, key: "property" });
+
+    setLoading(false);
+    toast.success("Property updated successfully!");
+    history.push(`/admin/properties/details/${_id}`);
+    return true;
   };
 
   const _submit = async () => {
@@ -1144,7 +1345,15 @@ export default function AdminContextProvider(props) {
   };
 
   const _createProperty = async () => {
-    const validate = await _validateProp(adminData.property);
+    const propertyPayload = {
+      ...adminData.property,
+      propImages: reorderByIndex(
+        adminData.property.propImages,
+        adminData.property.coverImageIndex || 0
+      ),
+    };
+
+    const validate = await _validateProp(propertyPayload);
 
     if (validate.status === false) {
       toast.warning(validate.mesg);
@@ -1153,7 +1362,7 @@ export default function AdminContextProvider(props) {
 
     setLoading(true);
 
-    const results = await _addProperty(adminData.property);
+    const results = await _addProperty(propertyPayload);
 
     _cancelProperty();
     if (results === undefined || results.success === 0) {
@@ -1400,6 +1609,8 @@ export default function AdminContextProvider(props) {
         _unblockAgent,
         _removeAgent,
         _createProperty,
+        _preparePropertyForEdit,
+        _savePropertyEdits,
         _cancelProperty,
         _resetDetails,
         _findAndRouteToAgent,

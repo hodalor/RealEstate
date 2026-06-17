@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import Loader from "../../../../components/loader";
 import Notify from "../../../../components/notification";
+import PropertyImagePicker from "../../../../components/propertyImages/Picker";
 import { AgentsContext } from "../../../../libs/contexts/agentsContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 import {
@@ -14,7 +15,15 @@ export default function AddProp() {
   const { _handleChange, agentState, _createProperty } =
     useContext(AgentsContext);
   const { loading } = useContext(AuthContext);
-  const areaUnits = ["Meters", "CM", "SQM", "SQFEET"];
+  const areaUnits = [
+    "Meters",
+    "CM",
+    "SQM",
+    "SQFEET",
+    "Hectares",
+    "Acres",
+    "Ares",
+  ];
   const selectedCountry = agentState.property.country || agentState.agent.country || "";
   const selectedProvince = agentState.property.province;
   const selectedCity = agentState.property.city;
@@ -430,7 +439,7 @@ export default function AddProp() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Property size e.g. 100 x 40"
+                    placeholder="Property size e.g. 100 x 40 or 2.435"
                     value={agentState.property.areaValue || ""}
                     onChange={(e) =>
                       _handleChange({
@@ -726,28 +735,23 @@ export default function AddProp() {
             <div className="row clearfix">
               <div className="col-sm-12">
                 <form className="form-group m-b-15 m-t-15 row internal-upload-block">
-                  <div className="col-sm-12">
-                    <input
-                      type="file"
-                      className="form-control"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) =>
-                        _handleChange({
-                          field: "propImages",
-                          value: Array.from(e.target.files || []),
-                        })
-                      }
-                    />
-                    <small style={{ fontSize: "12px", marginLeft: "10px" }}>
-                      Upload one or more images. At least one image is required.
-                    </small>
-                    {agentState.property.propImages?.length ? (
-                      <div className="mt-2 text-muted">
-                        {agentState.property.propImages.length} image(s) selected
-                      </div>
-                    ) : null}
-                  </div>
+                  <PropertyImagePicker
+                    files={agentState.property.propImages}
+                    existingImages={agentState.property.existingImages}
+                    coverImageIndex={agentState.property.coverImageIndex || 0}
+                    onFilesChange={(files) =>
+                      _handleChange({
+                        field: "propImages",
+                        value: files,
+                      })
+                    }
+                    onCoverChange={(index) =>
+                      _handleChange({
+                        field: "coverImageIndex",
+                        value: index,
+                      })
+                    }
+                  />
                 </form>
               </div>
               <div className="col-sm-12">

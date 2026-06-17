@@ -25,9 +25,11 @@ export default function PropertyDetails() {
     ...(Array.isArray(property?.images?.gallery) ? property.images.gallery : []),
   ].filter(Boolean);
 
+  // Load the stored property once when the details page mounts.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     _resetDetails("property");
-  }, [_resetDetails]);
+  }, []);
   
   const handleEditProperty = () => {
     // Store the property in context/storage for editing
