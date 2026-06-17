@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Footer from "./components/Footer";
 
 export default function Web(props) {
   return (
@@ -537,100 +538,7 @@ export default function Web(props) {
         </div>
       </div>
       {/* CTA Area */}
-      {/* Footer Area */}
-      <footer className="footer-area-l7  position-relative">
-        <div className="container">
-          <div className="row justify-content-center justify-content-md-between align-items-center cta-area-l7">
-            <div className="col-xxl-5 col-xl-6 col-lg-7 col-md-7">
-              <div className="cta-l7-content text-center text-md-start">
-                <h2>Get your dream house</h2>
-                <p>
-                  Family is number one, and comfortable is number two. That two
-                  things is must be together. Let’s start it!{" "}
-                </p>
-              </div>
-            </div>
-            <div className="col-xl-3 col-lg-5 col-md-5">
-              <div className="cta-l7-btn text-center text-md-end">
-                <a href="#" className="btn focus-reset btn-style-05">
-                  Request Free Consultation
-                </a>
-              </div>
-            </div>
-            <div className="col-lg-12">
-              <div className="cta-border-l7" />
-            </div>
-          </div>
-          <div className="row justify-content-center footer-l7-area-items">
-            <div className="col-xl-4 col-lg-4 col-md-9 col-sm-11">
-              <div className="footer-content-l7 text-sm-center text-lg-start">
-                <a href="#">
-                  <img src="../assets/image/logo/logo-black.png" alt="image" />
-                </a>
-                <p>
-                  we are real estate development Company that provide
-                  affordable yet quality properties for ghanaian including those section of society whose
-                   income is below the median household income.
-                </p>
-              </div>
-            </div>
-            <div className="offset-xl-2 col-xl-2 col-lg-3 col-sm-4">
-              <h3>Company</h3>
-              <ul className="list-unstyled">
-                {/* <li>
-                  <a href="#">Global location</a>
-                </li>
-                <li>
-                  <a href="#">Missions</a>
-                </li>
-                <li>
-                  <a href="#">Careers </a>
-                </li>
-                <li>
-                  <a href="#">Investors </a> */}
-                {/* </li> */}
-                <li>
-                  <a href="#">News rooms </a>
-                </li>
-              </ul>
-            </div>
-            <div className="col-xl-2 col-lg-3 col-sm-4">
-              <h3>Impact</h3>
-              <ul className="list-unstyled">
-                <li>
-                  <a href="#">princehodalor@mail.com</a>
-                </li>
-                <li>
-                  <a href="#">+233 24 398 4046</a>
-                </li>
-                <li>
-                  <a href="#">Refuge initiatives </a>
-                </li>
-                <li>
-                  <a href="#">Residents </a>
-                </li>
-              </ul>
-            </div>
-            {/* <div className="col-xl-2 col-lg-2 col-sm-4">
-              <h3>Partnership</h3>
-              <ul className="list-unstyled">
-                <li>
-                  <a href="#">Brookers</a>
-                </li>
-                <li>
-                  <a href="#">Impact coffee</a>
-                </li>
-                <li>
-                  <a href="#">Table talk</a>
-                </li>
-                <li>
-                  <a href="#">Push door </a>
-                </li>
-              </ul>
-            </div> */}
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

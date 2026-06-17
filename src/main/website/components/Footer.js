@@ -20,6 +20,9 @@ export default function Footer() {
   const { siteSettings } = useSiteSettings();
   const siteName = siteSettings.general.siteName || "LEDS PROPERTIES";
   const footerSettings = siteSettings.content.footer || {};
+  const contactAddress = footerSettings.contactAddress || footerSettings.address || "";
+  const contactPhone = footerSettings.contactPhone || footerSettings.phone || "";
+  const contactEmail = footerSettings.contactEmail || footerSettings.email || "";
   const footerSocialLinks = footerSettings.socialLinks || {};
   const socialItems = socialLinks.map((social) => ({
     ...social,
@@ -73,15 +76,15 @@ export default function Footer() {
               <ul className="footer-links footer-contact">
                 <li>
                   <i className="fa fa-map-marker-alt" aria-hidden="true"></i>
-                  <span>{footerSettings.contactAddress}</span>
+                  <span>{contactAddress}</span>
                 </li>
                 <li>
                   <i className="fa fa-phone" aria-hidden="true"></i>
-                  <a href={`tel:${footerSettings.contactPhone}`}>{footerSettings.contactPhone}</a>
+                  <a href={`tel:${contactPhone}`}>{contactPhone}</a>
                 </li>
                 <li>
                   <i className="fa fa-envelope" aria-hidden="true"></i>
-                  <a href={`mailto:${footerSettings.contactEmail}`}>{footerSettings.contactEmail}</a>
+                  <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
                 </li>
               </ul>
             </div>

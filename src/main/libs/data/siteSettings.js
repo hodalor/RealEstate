@@ -134,6 +134,9 @@ const defaultSiteSettings = {
         linkedin: "#",
       },
     },
+    agentControl: {
+      showPropertyAgentCard: true,
+    },
     advertisements: [],
   },
   developer: {
@@ -200,6 +203,8 @@ const normalizeSiteSettings = (settings = {}) => {
     },
   };
 
+  const rawFooter = settings.content?.footer || {};
+
   return {
     general,
     location: {
@@ -227,11 +232,27 @@ const normalizeSiteSettings = (settings = {}) => {
       },
       footer: {
         ...clone(defaultSiteSettings.content.footer),
-        ...(settings.content?.footer || {}),
+        ...rawFooter,
+        contactAddress:
+          rawFooter.contactAddress ||
+          rawFooter.address ||
+          defaultSiteSettings.content.footer.contactAddress,
+        contactPhone:
+          rawFooter.contactPhone ||
+          rawFooter.phone ||
+          defaultSiteSettings.content.footer.contactPhone,
+        contactEmail:
+          rawFooter.contactEmail ||
+          rawFooter.email ||
+          defaultSiteSettings.content.footer.contactEmail,
         socialLinks: {
           ...clone(defaultSiteSettings.content.footer.socialLinks),
-          ...(settings.content?.footer?.socialLinks || {}),
+          ...(rawFooter.socialLinks || {}),
         },
+      },
+      agentControl: {
+        ...clone(defaultSiteSettings.content.agentControl),
+        ...(settings.content?.agentControl || {}),
       },
       advertisements: Array.isArray(settings.content?.advertisements)
         ? settings.content.advertisements

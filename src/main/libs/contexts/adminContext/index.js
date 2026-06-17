@@ -68,7 +68,9 @@ const getEmptyPropertyState = () => ({
   currency: "",
   bedRoomNumber: Number,
   bathRoomNumber: Number,
-  sqft: Number,
+  areaValue: "",
+  areaUnit: "SQM",
+  sqft: "",
   carPark: Boolean,
   year: "",
   agentID: "",
@@ -626,12 +628,22 @@ export default function AdminContextProvider(props) {
         },
       });
 
-    if (field === "sqft")
+    if (field === "sqft" || field === "areaValue")
       return setAdminData({
         ...adminData,
         property: {
           ...adminData.property,
+          areaValue: value,
           sqft: value,
+        },
+      });
+
+    if (field === "areaUnit")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          areaUnit: value,
         },
       });
 
@@ -785,6 +797,15 @@ export default function AdminContextProvider(props) {
         property: {
           ...adminData.property,
           pets: value,
+        },
+      });
+
+    if (field === "propImages")
+      return setAdminData({
+        ...adminData,
+        property: {
+          ...adminData.property,
+          propImages: Array.isArray(value) ? value : [],
         },
       });
 
@@ -1188,7 +1209,6 @@ export default function AdminContextProvider(props) {
   };
 
   const _handleCategory = (data) => {
-    const properties = adminData.properties;
     if (data.field === "all") {
       setAdminData({
         ...adminData,
@@ -1237,10 +1257,14 @@ export default function AdminContextProvider(props) {
       if (!pro.isApproved) pend.push(pro);
     });
 
+    const refreshedProperty =
+      getData.data.find((property) => property._id === data._id) || adminData.propertyDetails;
+
     setAdminData({
       ...adminData,
       properties: ps,
       pending: pend,
+      propertyDetails: refreshedProperty,
     });
 
     setLoading(false);

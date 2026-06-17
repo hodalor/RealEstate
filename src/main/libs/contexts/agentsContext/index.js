@@ -4,7 +4,7 @@ import { _addProperty } from "../../functions/creates";
 import { _calcDays } from "../../functions/dateDiff";
 import { _delNoti, _delProp, _sellProp } from "../../functions/deletes";
 import { _editAgent, _editPass, _updateProperty } from "../../functions/edits";
-import { _fetchProperties, _fetchReq, _fetchSiteSettings } from "../../functions/fetches";
+import { _fetchAgents, _fetchProperties, _fetchReq, _fetchSiteSettings } from "../../functions/fetches";
 import { _retrieveFromStroage, _saveToStorage } from "../../functions/storage";
 import { _validatePass, _validateProp } from "../../functions/validations";
 import { normalizeSiteSettings } from "../../data/siteSettings";
@@ -50,7 +50,9 @@ export default function AgentContextProvider(props) {
       currency: "",
       bedRoomNumber: Number,
       bathRoomNumber: Number,
-      sqft: Number,
+      areaValue: "",
+      areaUnit: "SQM",
+      sqft: "",
       carPark: Boolean,
       year: "",
       agentID: "",
@@ -95,6 +97,10 @@ export default function AgentContextProvider(props) {
   }, []);
 
   const history = useHistory();
+  const getOwnProperties = (properties = [], agentID = "") =>
+    Array.isArray(properties)
+      ? properties.filter((property) => property.agentID === agentID)
+      : [];
 
   const _getData = async () => {
     var userData = await _retrieveFromStroage("user");
@@ -110,14 +116,8 @@ export default function AgentContextProvider(props) {
     const reqs = await _fetchReq();
     const settingsResult = await _fetchSiteSettings();
 
-    var properties = [];
-    if (results.success !== 0) {
-      await results.data.forEach((property) => {
-        if (property.agentID === userData._id) {
-          properties.push(property);
-        }
-      });
-    }
+    const properties =
+      results.success !== 0 ? getOwnProperties(results.data, userData._id) : [];
 
     var agReqs = [];
     if (reqs.success !== 0) {
@@ -138,9 +138,25 @@ export default function AgentContextProvider(props) {
       properties:
         results !== undefined && results.success === 1 ? properties : [],
       requests: reqs !== undefined && reqs.success === 1 ? agReqs : [],
+      user: {
+        ...agentState.user,
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
+        phone: userData.phone || "",
+        email: userData.email || "",
+        address: userData.address || "",
+        image: userData.image,
+        dob: userData.dob || "",
+        ghcard: userData.ghanaCard || userData.identityNumber || "",
+        fb: userData.fbAct || "",
+        tw: userData.twAct || "",
+        ins: userData.insAct || "",
+        isBlocked: userData.isBlocked || false,
+      },
       agent: userData,
       property: {
         ...agentState.property,
+        agentID: userData._id || "",
         country: userData.country || "",
         currency: userData.preferredCurrency || "",
       },
@@ -545,12 +561,22 @@ export default function AgentContextProvider(props) {
         },
       });
 
-    if (field === "sqft")
+    if (field === "sqft" || field === "areaValue")
       return setAgentState({
         ...agentState,
         property: {
           ...agentState.property,
+          areaValue: value,
           sqft: value,
+        },
+      });
+
+    if (field === "areaUnit")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          areaUnit: value,
         },
       });
 
@@ -749,6 +775,15 @@ export default function AgentContextProvider(props) {
         },
       });
 
+    if (field === "propImages")
+      return setAgentState({
+        ...agentState,
+        property: {
+          ...agentState.property,
+          propImages: Array.isArray(value) ? value : [],
+        },
+      });
+
     if (field === "image_1")
       return setAgentState({
         ...agentState,
@@ -815,15 +850,17 @@ export default function AgentContextProvider(props) {
         propDesc: "",
         rentOrSale: "",
         price: Number,
-        currency: "",
+        currency: agentState.agent.preferredCurrency || "",
         bedRoomNumber: Number,
         bathRoomNumber: Number,
-        sqft: Number,
+        areaValue: "",
+        areaUnit: "SQM",
+        sqft: "",
         carPark: Boolean,
         year: "",
-        agentID: "",
+        agentID: agentState.agent._id || "",
         address: "",
-        country: "",
+        country: agentState.agent.country || "",
         province: "",
         city: "",
         suburb: "",
@@ -917,6 +954,49 @@ export default function AgentContextProvider(props) {
       return;
     }
 
+    const refreshedAgents = await _fetchAgents();
+    const refreshedAgent =
+      refreshedAgents?.success === 1
+        ? refreshedAgents.data.find((agent) => agent._id === agentState.agent._id)
+        : null;
+
+    const updatedAgent = refreshedAgent || {
+      ...agentState.agent,
+      firstName: agentState.user.firstName || agentState.agent.firstName,
+      lastName: agentState.user.lastName || agentState.agent.lastName,
+      phone: agentState.user.phone || agentState.agent.phone,
+      email: agentState.user.email || agentState.agent.email,
+      address: agentState.user.address || agentState.agent.address,
+      fbAct: agentState.user.fb || agentState.agent.fbAct,
+      twAct: agentState.user.tw || agentState.agent.twAct,
+      insAct: agentState.user.ins || agentState.agent.insAct,
+      image:
+        typeof agentState.user.image === "string" && agentState.user.image
+          ? agentState.user.image
+          : agentState.agent.image,
+    };
+
+    await _saveToStorage({ data: updatedAgent, key: "user" });
+
+    setAgentState({
+      ...agentState,
+      user: {
+        ...agentState.user,
+        firstName: updatedAgent.firstName || "",
+        lastName: updatedAgent.lastName || "",
+        phone: updatedAgent.phone || "",
+        email: updatedAgent.email || "",
+        address: updatedAgent.address || "",
+        image: updatedAgent.image,
+        fb: updatedAgent.fbAct || "",
+        tw: updatedAgent.twAct || "",
+        ins: updatedAgent.insAct || "",
+      },
+      agent: updatedAgent,
+    });
+
+    setLoading(false);
+
     setNotiData({
       ...notiData,
       type: "info",
@@ -926,15 +1006,27 @@ export default function AgentContextProvider(props) {
   };
 
   const _createProperty = async () => {
-    setAgentState({
-      ...agentState,
-      property: {
-        ...agentState.property,
-        agentID: agentState.agent._id,
-      },
-    });
+    if (!agentState.agent._id) {
+      return setNotiData({
+        ...notiData,
+        type: "error",
+        msg: "Agent account details are still loading. Please try again.",
+        show: true,
+      });
+    }
 
-    const validate = await _validateProp(agentState.property);
+    const propertyPayload = {
+      ...agentState.property,
+      agentID: agentState.agent._id,
+      country: agentState.property.country || agentState.agent.country || "",
+      currency: agentState.property.currency || agentState.agent.preferredCurrency || "",
+      propType: String(agentState.property.propType || "").trim(),
+      areaValue: String(agentState.property.areaValue || agentState.property.sqft || "").trim(),
+      areaUnit: String(agentState.property.areaUnit || "").trim(),
+      suburb: String(agentState.property.suburb || "").trim(),
+    };
+
+    const validate = await _validateProp(propertyPayload);
 
     if (!validate.status)
       return setNotiData({
@@ -945,10 +1037,7 @@ export default function AgentContextProvider(props) {
       });
 
     setLoading(true);
-    const data = agentState.property;
-    data.agentID = agentState.agent._id;
-
-    const results = await _addProperty(data);
+    const results = await _addProperty(propertyPayload);
 
     _cancelAdd();
     if (results === undefined || results.success === 0) {
@@ -984,7 +1073,13 @@ export default function AgentContextProvider(props) {
 
     setAgentState({
       ...agentState,
-      properties: getData.data,
+      properties: getOwnProperties(getData.data, agentState.agent._id),
+      property: {
+        ...agentState.property,
+        agentID: agentState.agent._id || "",
+        country: agentState.agent.country || "",
+        currency: agentState.agent.preferredCurrency || "",
+      },
     });
 
     setNotiData({
@@ -1039,7 +1134,7 @@ export default function AgentContextProvider(props) {
 
     setAgentState({
       ...agentState,
-      properties: getData.data,
+      properties: getOwnProperties(getData.data, agentState.agent._id),
     });
 
     setNotiData({
@@ -1094,7 +1189,7 @@ export default function AgentContextProvider(props) {
 
     setAgentState({
       ...agentState,
-      properties: getData.data,
+      properties: getOwnProperties(getData.data, agentState.agent._id),
     });
 
     setNotiData({

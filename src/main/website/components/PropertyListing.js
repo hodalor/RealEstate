@@ -601,7 +601,7 @@ export default function PropertyListing({
                     </span>
                     <span>
                       <i className="fa fa-home" aria-hidden="true"></i>
-                      {property.squareFt || "N/A"} sqft
+                      {property.squareFt || "N/A"}
                     </span>
                   </div>
 

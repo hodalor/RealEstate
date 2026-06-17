@@ -105,6 +105,41 @@ const _editAgent = async (data) => {
   }
 
   if (fields.image === undefined) {
+    let objData = "";
+
+    if (key === "agent") {
+      objData = JSON.stringify({
+        firstName: fields.firstName === "" ? agent.firstName : fields.firstName,
+        lastName: fields.lastName === "" ? agent.lastName : fields.lastName,
+        phone: fields.phone === "" ? agent.phone : fields.phone,
+        email: fields.email === "" ? agent.email : fields.email,
+        address: fields.address === "" ? agent.address : fields.address,
+        fbAct: fields.fb === "" ? agent.fbAct : fields.fb,
+        twAct: fields.tw === "" ? agent.twAct : fields.tw,
+        insAct: fields.ins === "" ? agent.insAct : fields.ins,
+        isBlocked: fields.isBlocked ? fields.isBlocked : agent.isBlocked,
+      });
+    }
+
+    if (key === "admin") {
+      objData = JSON.stringify({
+        firstName: fields.firstName === "" ? admin.firstName : fields.firstName,
+        lastName: fields.lastName === "" ? admin.lastName : fields.lastName,
+        phone: fields.phone === "" ? admin.phone : fields.phone,
+        email: fields.email === "" ? admin.email : fields.email,
+        address: fields.address === "" ? admin.address : fields.address,
+      });
+    }
+
+    if (key === "buyer") {
+      objData = JSON.stringify({
+        firstName: fields.firstName === "" ? buyer.firstName : fields.firstName,
+        lastName: fields.lastName === "" ? buyer.lastName : fields.lastName,
+        phone: fields.phone === "" ? buyer.phone : fields.phone,
+        email: fields.email === "" ? buyer.email : fields.email,
+      });
+    }
+
     await fetch(url, {
       method: "PATCH",
       headers: {

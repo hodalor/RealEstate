@@ -211,7 +211,6 @@ const _validateProp = async (data) => {
     bedRoomNumber,
     bathRoomNumber,
     carPark,
-    year,
     address,
     dRoom,
     kitchen,
@@ -242,7 +241,6 @@ const _validateProp = async (data) => {
     bedRoomNumber === undefined ||
     bathRoomNumber === undefined ||
     carPark === undefined ||
-    year === "" ||
     address === "" ||
     dRoom === undefined ||
     kitchen === undefined ||
@@ -256,10 +254,10 @@ const _validateProp = async (data) => {
       mesg: "Please provide all fields!",
     });
 
-  if (propImages.length < 3)
+  if (!Array.isArray(propImages) || propImages.length < 1)
     return (results = {
       status: false,
-      mesg: "Please provide 3 or more images!",
+      mesg: "Please upload at least one image!",
     });
 
   if (String(rentOrSale || "").trim().toLowerCase() === "short stay") {

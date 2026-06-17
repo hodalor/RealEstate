@@ -5,7 +5,7 @@ import { resolveImageUrl } from "../../libs/functions/images";
 export default function AgentsTable() {
   const { _routeToDetails, agentState } = useContext(AgentsContext);
 
-  const properties = agentState.properties;
+  const properties = Array.isArray(agentState.properties) ? agentState.properties : [];
 
   return (
     <div className="table-responsive">
@@ -80,7 +80,7 @@ export default function AgentsTable() {
                 </tr>
               </thead>
               <tbody>
-                {properties !== undefined || properties.length !== 0 ? (
+                {properties.length > 0 ? (
                   properties.map((property, index) => {
                     const image = resolveImageUrl(property.images.image1, "");
                     return (
@@ -106,7 +106,11 @@ export default function AgentsTable() {
                     );
                   })
                 ) : (
-                  <span>No data found</span>
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      No properties found
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

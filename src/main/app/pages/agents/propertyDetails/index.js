@@ -16,6 +16,7 @@ export default function PropertyDetails() {
     property?.images?.image3,
     property?.images?.image4,
     property?.images?.image5,
+    ...(Array.isArray(property?.images?.gallery) ? property.images.gallery : []),
   ].filter(Boolean);
 
   return (
@@ -26,54 +27,24 @@ export default function PropertyDetails() {
             <div className="body">
               <div id="demo2" className="carousel slide" data-ride="carousel">
                 <ul className="carousel-indicators">
-                  <li
-                    data-target="#demo2"
-                    data-slide-to={0}
-                    className="active"
-                  />
-                  <li data-target="#demo2" data-slide-to={1} className />
-                  <li data-target="#demo2" data-slide-to={2} className />
+                  {propertyImages.map((image, index) => (
+                    <li
+                      key={`indicator-${index}`}
+                      data-target="#demo2"
+                      data-slide-to={index}
+                      className={index === 0 ? "active" : ""}
+                    />
+                  ))}
                 </ul>
                 <div className="carousel-inner">
-                  <div className="carousel-item active">
-                    <img
-                      src={property.images.image1}
-                      className="img-fluid"
-                      alt={property.name}
-                    />
-                  </div>
-                  <div className="carousel-item">
-                    <img
-                      src={property.images.image2}
-                      className="img-fluid"
-                      alt={property.name}
-                    />
-                  </div>
-                  <div className="carousel-item">
-                    <img
-                      src={property.images.image3}
-                      className="img-fluid"
-                      alt={property.name}
-                    />
-                  </div>
-                  {property.images.image4 !== undefined ? (
-                    <div className="carousel-item">
-                      <img
-                        src={property.images.image4}
-                        className="img-fluid"
-                        alt={property.name}
-                      />
+                  {propertyImages.map((image, index) => (
+                    <div
+                      key={`${image}-${index}`}
+                      className={`carousel-item ${index === 0 ? "active" : ""}`}
+                    >
+                      <img src={image} className="img-fluid" alt={property.name} />
                     </div>
-                  ) : null}
-                  {property.images.image5 !== undefined ? (
-                    <div className="carousel-item">
-                      <img
-                        src={property.images.image5}
-                        className="img-fluid"
-                        alt={property.name}
-                      />
-                    </div>
-                  ) : null}
+                  ))}
                 </div>
                 {/* Left and right controls */}
                 <a
@@ -103,9 +74,9 @@ export default function PropertyDetails() {
                 {property.digitalAddress}
               </small>
               <div className="d-flex flex-wrap justify-content-start mt-3 p-3 bg-light">
-                <span className="w100" title="Square Feet">
+                <span className="w100" title="Area">
                   <i className="fa fa-home mr-2" />
-                  <span>{property.squareFt}</span>
+                  <span>{property.squareFt || "N/A"}</span>
                 </span>
                 <span className="w100" title="Bedrooms">
                   <i className="fa fa-bed mr-2" />
@@ -265,7 +236,7 @@ export default function PropertyDetails() {
                     </tr>
                     <tr>
                       <th scope="row">Built In:</th>
-                      <td>{property.yearBuilt}</td>
+                      <td>{property.yearBuilt || "Not provided"}</td>
                     </tr>
                     <tr>
                       <th scope="row">Contract type: </th>
@@ -280,8 +251,8 @@ export default function PropertyDetails() {
                       <td>{property.others.bathrooms}</td>
                     </tr>
                     <tr>
-                      <th scope="row">Square ft:</th>
-                      <td>{property.squareFt}</td>
+                      <th scope="row">Area:</th>
+                      <td>{property.squareFt || "N/A"}</td>
                     </tr>
                     <tr>
                       <th scope="row">Garage Space:</th>

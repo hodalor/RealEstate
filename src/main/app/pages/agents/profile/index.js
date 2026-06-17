@@ -10,6 +10,7 @@ export default function AgentProfile() {
     useContext(AgentsContext);
   const { loading } = useContext(AuthContext);
   const agent = agentState.agent;
+  const user = agentState.user;
 
   return (
     <div>
@@ -238,7 +239,8 @@ export default function AgentProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={agent.firstName}
+                            value={user.firstName || ""}
+                            placeholder="First name"
                             onChange={(e) =>
                               _handleChange({
                                 field: "firstName",
@@ -253,7 +255,8 @@ export default function AgentProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={agent.lastName}
+                            value={user.lastName || ""}
+                            placeholder="Last name"
                             onChange={(e) =>
                               _handleChange({
                                 field: "lastName",
@@ -268,7 +271,8 @@ export default function AgentProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={agent.phone}
+                            value={user.phone || ""}
+                            placeholder="Phone number"
                             onChange={(e) =>
                               _handleChange({
                                 field: "phone",
@@ -283,11 +287,12 @@ export default function AgentProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={agent.email}
+                            value={user.email || ""}
+                            placeholder="Email address"
                             onChange={(e) =>
                               _handleChange({
                                 field: "email",
-                                value: e.target.value.toUpperCase(),
+                                value: e.target.value,
                               })
                             }
                           />
@@ -298,7 +303,8 @@ export default function AgentProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={agent.address}
+                            value={user.address || ""}
+                            placeholder="Address"
                             onChange={(e) =>
                               _handleChange({
                                 field: "address",
@@ -313,9 +319,8 @@ export default function AgentProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={
-                              agent.fbAct === "" ? "Fb account" : agent.fbAct
-                            }
+                            value={user.fb || ""}
+                            placeholder="Facebook account"
                             onChange={(e) =>
                               _handleChange({
                                 field: "fb",
@@ -330,9 +335,8 @@ export default function AgentProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={
-                              agent.twAct === "" ? "Tw account" : agent.twAct
-                            }
+                            value={user.tw || ""}
+                            placeholder="Twitter account"
                             onChange={(e) =>
                               _handleChange({
                                 field: "tw",
@@ -347,9 +351,8 @@ export default function AgentProfile() {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={
-                              agent.insAct === "" ? "Ins account" : agent.insAct
-                            }
+                            value={user.ins || ""}
+                            placeholder="Instagram account"
                             onChange={(e) =>
                               _handleChange({
                                 field: "ins",

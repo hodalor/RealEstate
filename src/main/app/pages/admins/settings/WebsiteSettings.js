@@ -13,15 +13,18 @@ export default function WebsiteSettings({ contentSettings, onSettingsChange, par
     },
     footer: {
       aboutText: 'We are dedicated to providing the best real estate services to help you find your dream property.',
-      address: '123 Real Estate St, Accra',
-      phone: '+233 123 456 789',
-      email: 'info@realestate.com',
+      contactAddress: '123 Real Estate St, Accra',
+      contactPhone: '+233 123 456 789',
+      contactEmail: 'info@realestate.com',
       socialLinks: {
         facebook: '#',
         twitter: '#',
         instagram: '#',
         linkedin: '#'
       }
+    },
+    agentControl: {
+      showPropertyAgentCard: true
     },
     advertisements: [
       {
@@ -184,6 +187,15 @@ export default function WebsiteSettings({ contentSettings, onSettingsChange, par
                     Advertisement Banners
                   </button>
                 </li>
+                <li className="nav-item">
+                  <button
+                    type="button"
+                    className={`nav-link ${activeTab === 'agent-control' ? 'active' : ''}`}
+                    onClick={() => handleTabChange('agent-control')}
+                  >
+                    Agent Control
+                  </button>
+                </li>
               </ul>
 
               <div className="tab-content p-4">
@@ -275,8 +287,8 @@ export default function WebsiteSettings({ contentSettings, onSettingsChange, par
                           <input 
                             type="text" 
                             className="form-control" 
-                            name="address" 
-                            value={settings.footer.address} 
+                            name="contactAddress" 
+                            value={settings.footer.contactAddress || ''} 
                             onChange={handleFooterChange} 
                           />
                         </div>
@@ -285,8 +297,8 @@ export default function WebsiteSettings({ contentSettings, onSettingsChange, par
                           <input 
                             type="text" 
                             className="form-control" 
-                            name="phone" 
-                            value={settings.footer.phone} 
+                            name="contactPhone" 
+                            value={settings.footer.contactPhone || ''} 
                             onChange={handleFooterChange} 
                           />
                         </div>
@@ -295,8 +307,8 @@ export default function WebsiteSettings({ contentSettings, onSettingsChange, par
                           <input 
                             type="email" 
                             className="form-control" 
-                            name="email" 
-                            value={settings.footer.email} 
+                            name="contactEmail" 
+                            value={settings.footer.contactEmail || ''} 
                             onChange={handleFooterChange} 
                           />
                         </div>
@@ -419,6 +431,42 @@ export default function WebsiteSettings({ contentSettings, onSettingsChange, par
                         <button className="btn btn-outline-primary">
                           <i className="fa fa-plus"></i> Add New Banner
                         </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'agent-control' && (
+                  <div className="tab-pane active">
+                    <h4 className="mb-4">Agent Control</h4>
+                    <div className="card border-0 bg-light">
+                      <div className="card-body">
+                        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                          <div>
+                            <h5 className="mb-1">Show agent profile card on property details</h5>
+                            <p className="mb-0 text-muted">
+                              Display a frontend agent card when visitors open a property posted by an agent.
+                            </p>
+                          </div>
+                          <div className="form-check form-switch m-0">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              checked={!!settings.agentControl?.showPropertyAgentCard}
+                              onChange={(e) => {
+                                const updatedSettings = {
+                                  ...settings,
+                                  agentControl: {
+                                    ...settings.agentControl,
+                                    showPropertyAgentCard: e.target.checked,
+                                  },
+                                };
+                                setSettings(updatedSettings);
+                                onSettingsChange && onSettingsChange(updatedSettings);
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

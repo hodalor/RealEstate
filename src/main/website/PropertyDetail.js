@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { _fetchProperties } from "../libs/functions/fetches";
+import { _fetchAgents, _fetchProperties } from "../libs/functions/fetches";
 import { formatPriceWithCurrency, getDisplayCurrency } from "../libs/data/siteSettings";
 import { resolveImageUrl } from "../libs/functions/images";
 import useSiteSettings from "../libs/hooks/useSiteSettings";
@@ -14,9 +14,23 @@ import "./styles/chat-modal.css";
 export default function PropertyDetail() {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
+  const [agent, setAgent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(null);
   const { siteSettings } = useSiteSettings();
+
+  const getPropertyImages = (images = {}) => {
+    const baseImages = [
+      images.image1,
+      images.image2,
+      images.image3,
+      images.image4,
+      images.image5,
+      ...(Array.isArray(images.gallery) ? images.gallery : []),
+    ];
+
+    return [...new Set(baseImages.map((image) => resolveImageUrl(image, "")).filter(Boolean))];
+  };
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -30,7 +44,7 @@ export default function PropertyDetail() {
 
           if (foundProperty) {
             setProperty(foundProperty);
-            setActiveImage(resolveImageUrl(foundProperty.images?.image1, null));
+            setActiveImage(getPropertyImages(foundProperty.images)[0] || null);
           } else {
             setProperty(null);
             setActiveImage(null);
@@ -49,21 +63,37 @@ export default function PropertyDetail() {
     fetchPropertyDetails();
   }, [id]);
 
-  const imageGallery = useMemo(() => {
-    if (!property?.images) {
-      return [];
-    }
+  useEffect(() => {
+    const fetchAgentDetails = async () => {
+      if (!property?.agentID) {
+        setAgent(null);
+        return;
+      }
 
-    return Object.entries(property.images)
-      .map(([key, value]) => ({ key, value: resolveImageUrl(value, "") }))
-      .filter((item) => Boolean(item.value));
+      const results = await _fetchAgents();
+
+      if (results?.success === 1) {
+        setAgent(results.data.find((item) => item._id === property.agentID) || null);
+      } else {
+        setAgent(null);
+      }
+    };
+
+    fetchAgentDetails();
+  }, [property?.agentID]);
+
+  const imageGallery = useMemo(() => {
+    return getPropertyImages(property?.images).map((value, index) => ({
+      key: `property-image-${index}`,
+      value,
+    }));
   }, [property]);
 
   const detailItems = [
     { label: "Listing type", value: property?.rentOrSale ? `For ${property.rentOrSale}` : "N/A" },
     { label: "Bedrooms", value: property?.others?.noOfBedrooms || "N/A" },
     { label: "Bathrooms", value: property?.others?.bathrooms || "N/A" },
-    { label: "Square feet", value: property?.squareFt || "N/A" },
+    { label: "Area", value: property?.squareFt || "N/A" },
     { label: "Parking", value: property?.others?.carPark ? "Available" : "Not included" },
     { label: "Region", value: property?.province || "Not specified" },
   ];
@@ -88,6 +118,7 @@ export default function PropertyDetail() {
   const showOriginalPrice =
     property?.currency &&
     String(property.currency).toUpperCase() !== String(localDisplayCurrency).toUpperCase();
+  const showAgentCard = !!siteSettings.content?.agentControl?.showPropertyAgentCard && !!agent;
 
   if (loading) {
     return (
@@ -296,6 +327,40 @@ export default function PropertyDetail() {
                     <strong>{property.digitalAddress || "Not specified"}</strong>
                   </div>
                 </div>
+
+                {showAgentCard ? (
+                  <div className="detail-side-divider"></div>
+                ) : null}
+
+                {showAgentCard ? (
+                  <div className="agent-profile-card">
+                    <span className="eyebrow-pill">Listed by agent</span>
+                    <div className="d-flex align-items-center mt-3">
+                      <img
+                        src={resolveImageUrl(agent.image, "../assets/images/user.png")}
+                        alt={`${agent.firstName || ""} ${agent.lastName || ""}`.trim() || "Agent"}
+                        className="rounded-circle me-3"
+                        style={{ width: "64px", height: "64px", objectFit: "cover" }}
+                      />
+                      <div>
+                        <h5 className="mb-1">
+                          {[agent.firstName, agent.lastName].filter(Boolean).join(" ") || "Assigned Agent"}
+                        </h5>
+                        <p className="mb-0 text-muted">{agent.role || "Agent"}</p>
+                      </div>
+                    </div>
+                    <div className="quick-facts mt-3">
+                      <div>
+                        <span>Phone</span>
+                        <strong>{agent.phone || "Not available"}</strong>
+                      </div>
+                      <div>
+                        <span>Email</span>
+                        <strong>{agent.email || "Not available"}</strong>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
 
                 <Link to="/property-listing" className="btn btn-soft-primary w-100 mt-4">
                   View More Listings

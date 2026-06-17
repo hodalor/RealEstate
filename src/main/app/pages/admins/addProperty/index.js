@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import Loader from "../../../../components/loader";
 import Notify from "../../../../components/notification";
-import ImageUpload from "../../../../components/uploadImage";
 import { AdminContext } from "../../../../libs/contexts/adminContext";
 import { AuthContext } from "../../../../libs/contexts/authContext";
 import {
@@ -17,6 +16,7 @@ export default function AddProp({ isModal = false, onClose }) {
   const { _handleChange, adminData, _createProperty, _cancelProperty } =
     useContext(AdminContext);
   const { loading } = useContext(AuthContext);
+  const areaUnits = ["Meters", "CM", "SQM", "SQFEET"];
   const selectedCountry = adminData.property.country;
   const selectedProvince = adminData.property.province;
   const selectedCity = adminData.property.city;
@@ -118,7 +118,7 @@ export default function AddProp({ isModal = false, onClose }) {
                       onChange={(e) =>
                         _handleChange({
                           field: "propType",
-                          value: e.target.value.toUpperCase(),
+                          value: e.target.value,
                         })
                       }
                     >
@@ -225,24 +225,24 @@ export default function AddProp({ isModal = false, onClose }) {
                 </div>
                 <div className="col-sm-3">
                   <div className="form-group">
-                    <select
+                    <input
+                      list="admin-suburb-options"
                       className="form-control"
                       value={adminData.property.suburb || ""}
                       disabled={!selectedCity}
+                      placeholder="Select or type suburb"
                       onChange={(e) =>
                         _handleChange({
                           field: "suburb",
                           value: e.target.value,
                         })
                       }
-                    >
-                      <option value="">Select Suburb/Neighborhood</option>
+                    />
+                    <datalist id="admin-suburb-options">
                       {suburbOptions.map((suburb) => (
-                        <option key={suburb} value={suburb}>
-                          {suburb}
-                        </option>
+                        <option key={suburb} value={suburb} />
                       ))}
-                    </select>
+                    </datalist>
                   </div>
                 </div>
               </div>
@@ -469,17 +469,37 @@ export default function AddProp({ isModal = false, onClose }) {
                 <div className="col-lg-3 col-md-3 col-sm-6">
                   <div className="form-group">
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
-                      placeholder="Square ft"
-                      value={adminData.property.sqft}
+                      placeholder="Property size e.g. 100 x 40"
+                      value={adminData.property.areaValue || ""}
                       onChange={(e) =>
                         _handleChange({
-                          field: "sqft",
+                          field: "areaValue",
                           value: e.target.value,
                         })
                       }
                     />
+                  </div>
+                </div>
+                <div className="col-lg-3 col-md-3 col-sm-6">
+                  <div className="form-group">
+                    <select
+                      className="form-control"
+                      value={adminData.property.areaUnit || "SQM"}
+                      onChange={(e) =>
+                        _handleChange({
+                          field: "areaUnit",
+                          value: e.target.value,
+                        })
+                      }
+                    >
+                      {areaUnits.map((unit) => (
+                        <option key={unit} value={unit}>
+                          {unit}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <div className="col-lg-3 col-md-3 col-sm-6">
@@ -502,21 +522,19 @@ export default function AddProp({ isModal = false, onClose }) {
                 <div className="col-lg-3 col-md-3 col-sm-6">
                   <div className="form-group">
                     <input
-                      type="date"
+                      type="text"
                       className="form-control"
-                      placeholder="Year Built"
-                      // value={adminData.property.year}
+                      placeholder="Year built (optional)"
+                      value={adminData.property.year || ""}
                       onChange={(e) =>
                         _handleChange({
                           field: "year",
-                          value: new Date(e.target.value)
-                            .getFullYear()
-                            .toString(),
+                          value: e.target.value,
                         })
                       }
                     />
                     <small style={{ fontSize: "12px", marginLeft: "10px" }}>
-                      Year built
+                      Optional
                     </small>
                   </div>
                 </div>
@@ -783,46 +801,28 @@ export default function AddProp({ isModal = false, onClose }) {
               <div className="row clearfix">
                 <div className="col-sm-12">
                   <form className="form-group m-b-15 m-t-15 row internal-upload-block">
-                    <ImageUpload
-                      onUpload={(v) =>
-                        _handleChange({
-                          field: "image_1",
-                          value: v,
-                        })
-                      }
-                    />
-                    <ImageUpload
-                      onUpload={(v) =>
-                        _handleChange({
-                          field: "image_2",
-                          value: v,
-                        })
-                      }
-                    />
-                    <ImageUpload
-                      onUpload={(v) =>
-                        _handleChange({
-                          field: "image_3",
-                          value: v,
-                        })
-                      }
-                    />
-                    <ImageUpload
-                      onUpload={(v) =>
-                        _handleChange({
-                          field: "image_4",
-                          value: v,
-                        })
-                      }
-                    />
-                    <ImageUpload
-                      onUpload={(v) =>
-                        _handleChange({
-                          field: "image_5",
-                          value: v,
-                        })
-                      }
-                    />
+                    <div className="col-sm-12">
+                      <input
+                        type="file"
+                        className="form-control"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) =>
+                          _handleChange({
+                            field: "propImages",
+                            value: Array.from(e.target.files || []),
+                          })
+                        }
+                      />
+                      <small style={{ fontSize: "12px", marginLeft: "10px" }}>
+                        Upload one or more images. At least one image is required.
+                      </small>
+                      {adminData.property.propImages?.length ? (
+                        <div className="mt-2 text-muted">
+                          {adminData.property.propImages.length} image(s) selected
+                        </div>
+                      ) : null}
+                    </div>
                   </form>
                 </div>
                 <div className="col-sm-12">

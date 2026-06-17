@@ -23,76 +23,8 @@ export default function PaymentHistory() {
     const fetchPayments = async () => {
       try {
         setIsLoading(true);
-        // This would be replaced with an actual API call
-        // const response = await fetch(`${agentUrl}payments/${agentState.agent._id}`);
-        // const data = await response.json();
-        
-        // Mock data for demonstration
-        const mockData = [
-          {
-            id: 'PAY-1001',
-            propertyId: 'prop123',
-            propertyName: 'Luxury Apartment in East Legon',
-            clientName: 'John Doe',
-            clientEmail: 'john.doe@example.com',
-            amount: 2500,
-            currency: 'GHC',
-            paymentDate: new Date().toISOString(),
-            paymentMethod: 'Credit Card',
-            status: 'completed',
-            transactionId: 'TXN-123456',
-            paymentType: 'Booking Fee',
-            notes: 'Initial booking payment'
-          },
-          {
-            id: 'PAY-1002',
-            propertyId: 'prop456',
-            propertyName: 'Family House in Tema',
-            clientName: 'Jane Smith',
-            clientEmail: 'jane.smith@example.com',
-            amount: 5000,
-            currency: 'GHC',
-            paymentDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            paymentMethod: 'Bank Transfer',
-            status: 'completed',
-            transactionId: 'TXN-789012',
-            paymentType: 'Rent',
-            notes: 'First month rent payment'
-          },
-          {
-            id: 'PAY-1003',
-            propertyId: 'prop789',
-            propertyName: 'Office Space in Airport Residential',
-            clientName: 'Robert Johnson',
-            clientEmail: 'robert.johnson@example.com',
-            amount: 10000,
-            currency: 'GHC',
-            paymentDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-            paymentMethod: 'Mobile Money',
-            status: 'completed',
-            transactionId: 'TXN-345678',
-            paymentType: 'Deposit',
-            notes: 'Security deposit for office space'
-          },
-          {
-            id: 'PAY-1004',
-            propertyId: 'prop101',
-            propertyName: 'Beachfront Villa in Labadi',
-            clientName: 'Emma Thompson',
-            clientEmail: 'emma.thompson@example.com',
-            amount: 3500,
-            currency: 'GHC',
-            paymentDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-            paymentMethod: 'Credit Card',
-            status: 'pending',
-            transactionId: 'TXN-901234',
-            paymentType: 'Booking Fee',
-            notes: 'Awaiting payment confirmation'
-          }
-        ];
-        
-        setPayments(mockData);
-        setFilteredPayments(mockData);
+        setPayments([]);
+        setFilteredPayments([]);
       } catch (error) {
         console.error('Error fetching payments:', error);
         setError('Failed to load payment history. Please try again later.');
@@ -103,7 +35,7 @@ export default function PaymentHistory() {
     };
     
     fetchPayments();
-  }, []);
+  }, [agentState.agent]);
   
   // Filter payments when filter status, search term, or date range changes
   useEffect(() => {
